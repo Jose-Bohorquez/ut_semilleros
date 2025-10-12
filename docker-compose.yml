@@ -1,0 +1,42 @@
+#version: "3.9"                       # Especifica la versión de Docker Compose que se está utilizando.
+
+services:                             # Inicia la sección que define los distintos servicios del contenedor Docker.
+  app:                                # Define el servicio de la aplicación principal.
+    build:                            # Especifica cómo construir la imagen del servicio.
+      context: .                      # Indica la carpeta donde se encuentran los archivos para construir la imagen.
+      dockerfile: ./Dockerfile        # Define el nombre del archivo Dockerfile que se usará para construir la imagen.
+    container_name: ut_semilleros_api # Asigna un nombre específico para el contenedor.
+    ports:                            # Mapea los puertos del contenedor a los puertos de la máquina host.
+      - "8080:80"                     # Mapea el puerto 8080 de la máquina host al puerto 80 del contenedor.
+    volumes:                          # Define los volúmenes que se montarán en el contenedor.
+      - ./api:/var/www/html           # Monta la carpeta ./api del host en /var/www/html dentro del contenedor.
+    environment:                      # Define variables de entorno para el contenedor.
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public # Establece la raíz del documento para Apache.
+    depends_on:                                   # Indica otros servicios de los que depende este servicio.
+      - db                                        # Este servicio depende del servicio 'db'.
+
+  db:                                             # Define el servicio de la base de datos.
+    image: mysql:9.0                              # Especifica la imagen de MySQL que se utilizará.
+    container_name: ut_semilleros_db              # Asigna un nombre específico para el contenedor de la base de datos.
+    restart: always                               # Configura el contenedor para reiniciarse automáticamente si falla.
+    environment:                                  # Define las variables de entorno necesarias para la configuración de MySQL.
+      MYSQL_ROOT_PASSWORD: root                   # Establece la contraseña para el usuario root.
+      MYSQL_DATABASE: ut_semilleros               # Crea una base de datos con el nombre 'ut_semilleros'.
+      MYSQL_USER: jose                            # Crea un nuevo usuario llamado 'jose'.
+      MYSQL_PASSWORD: jose123                     # Establece una contraseña para el usuario 'jose'.
+    ports:                                        # Mapea los puertos del contenedor a los puertos de la máquina host.
+      - "3306:3306"                               # Mapea el puerto 3306 del host al puerto 3306 del contenedor.
+    volumes:                                      # Define los volúmenes que se montarán en el contenedor.
+      - ./db/data:/var/lib/mysql                  # Monta la carpeta ./db/data del host en /var/lib/mysql dentro del contenedor.
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql # Copia el archivo init.sql al directorio de inicialización de MySQL.
+
+  phpmyadmin:                                               # Define el servicio para phpMyAdmin, una interfaz web para gestionar MySQL.
+    image: phpmyadmin:5.2.2                                 # Especifica la imagen de phpMyAdmin que se utilizará.
+    container_name: ut_semilleros_phpmyadmin                # Asigna un nombre específico para el contenedor de phpMyAdmin.
+    restart: always                                         # Configura el contenedor para reiniciarse automáticamente si falla.
+    ports:                                                  # Mapea los puertos del contenedor a los puertos de la máquina host.
+      - "8081:80"                                           # Mapea el puerto 8081 del host al puerto 80 del contenedor.
+    environment:                                            # Define variables de entorno específicas para phpMyAdmin.
+      PMA_HOST: db                                          # Indica el host de la base de datos a la que phpMyAdmin se conectará.
+      PMA_USER: root                                        # Establece el usuario para conectarse a la base de datos.
+      PMA_PASSWORD: root                                    # Establece la contraseña para ese usuario.

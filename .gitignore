@@ -1,0 +1,60 @@
+# ========================================================
+# 🌐 Laravel 12 - Proyecto con Docker
+# ========================================================
+
+# ⚙️ Archivos de entorno
+.env
+.env.*
+!.env.example        # se conserva la plantilla de ejemplo
+
+# 🧩 Dependencias PHP y Node
+/vendor/
+node_modules/
+package-lock.json
+
+# ⚙️ Compilados de frontend
+/public/build/
+/public/hot/
+
+# 🗄️ Archivos generados o temporales
+/storage/*.key
+/storage/app/public/
+storage/logs/
+bootstrap/cache/*.php
+.phpunit.result.cache
+.phpactor.json
+
+# 🧱 Configuración de IDEs y entornos de desarrollo
+/.idea/
+/.vscode/
+/.fleet/
+/.zed/
+*.code-workspace
+
+# 🧰 Herramientas de Laravel Nova, Sail, etc.
+.nova/
+.sail/
+Homestead.json
+Homestead.yaml
+
+# 🐋 Docker y base de datos
+/db/data/                  # base de datos persistente local
+/docker-compose.override.yml
+*.log
+
+# 🖼️ Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# ========================================================
+# ✅ Archivos que SÍ se deben versionar (por convención)
+# ========================================================
+!.gitignore
+!composer.json
+!composer.lock
+!package.json
+!vite.config.js
+!artisan
+!Dockerfile
+!docker-compose.yml
+!apache/laravel.conf
