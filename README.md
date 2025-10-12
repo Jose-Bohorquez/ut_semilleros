@@ -188,7 +188,7 @@ Actualmente enfocado en construir soluciones digitales seguras, escalables y cen
 📧 **Correo:** [josejbohorquezd@gmail.com](mailto:josejbohorquezd@gmail.com)  
 🐙 **GitHub:** [@Jose-Bohorquez](https://github.com/Jose-Bohorquez)  
 💼 **LinkedIn:** [linkedin.com/in/josebohorquez](https://www.linkedin.com/in/jose-bohorquez-full-stack-software-developer/)  
-🌐 **Portafolio (en desarrollo):** [josebohorquez.dev](https://jose-bohorquez.github.io/)
+🌐 **Portafolio (en desarrollo):** [josebohorquez](https://jose-bohorquez.github.io/)
 
 ---
 
