@@ -1,0 +1,94 @@
+// -------------------------------------------------------------
+// 📘 Importaciones principales necesarias para configurar Vite
+// -------------------------------------------------------------
+
+// Importamos la función principal 'defineConfig' de Vite.
+// Esta función nos permite escribir una configuración con autocompletado
+// y validación de tipos (más ordenada y clara que exportar un simple objeto).
+import { defineConfig } from 'vite'
+
+// Importamos el plugin oficial de Vue 3 para Vite.
+// Este plugin le enseña a Vite cómo manejar archivos .vue (componentes Vue).
+import vue from '@vitejs/plugin-vue'
+
+// Importamos el módulo 'path' de Node.js.
+// Este módulo sirve para manejar y unir rutas de carpetas de forma segura
+// (por ejemplo, unir "frontend/" con "../api/public").
+import path from 'path'
+
+
+// -------------------------------------------------------------
+// 🧩 Exportamos la configuración de Vite
+// -------------------------------------------------------------
+// Usamos la función defineConfig() para declarar nuestra configuración
+// con todas las opciones necesarias (plugins, servidor, compilación, etc.)
+export default defineConfig({
+
+  // -----------------------------------------------------------
+  // 🔌 Plugins que Vite debe usar
+  // -----------------------------------------------------------
+  // Aquí estamos cargando el plugin de Vue para que Vite entienda
+  // cómo leer, compilar y procesar archivos .vue.
+  // Si no agregamos esto, Vite no sabría qué hacer con los componentes de Vue.
+  plugins: [vue()],
+
+  // -----------------------------------------------------------
+  // ⚙️ Configuración del servidor de desarrollo (npm run dev)
+  // -----------------------------------------------------------
+  server: {
+    // Puerto donde se ejecutará el servidor de desarrollo local de Vite.
+    // Por defecto suele ser 5173, pero puedes cambiarlo si lo necesitas.
+    // Ejemplo: si otro programa ya usa ese puerto, podrías poner 5174.
+    port: 5173,
+
+    // ---------------------------------------------------------
+    // 🌐 Proxy de desarrollo para evitar errores de CORS
+    // ---------------------------------------------------------
+    // Cuando desarrollas en local, tu front corre en http://localhost:5173
+    // pero tu API (Laravel) corre en http://localhost:8000
+    // Esto provoca un error de seguridad del navegador llamado "CORS"
+    // (Cross-Origin Resource Sharing), ya que son dos orígenes diferentes.
+    //
+    // El "proxy" actúa como un puente: Vite intercepta las peticiones
+    // que empiezan por "/api" y las reenvía automáticamente al backend Laravel.
+    //
+    // Así, desde el punto de vista del navegador, parece que todo viene
+    // del mismo servidor (http://localhost:5173), aunque internamente
+    // el tráfico va a Laravel en el puerto 8000.
+    proxy: {
+      // Definimos una regla para todas las peticiones que empiecen por /api
+      '/api': {
+        // Dirección del backend Laravel que queremos alcanzar en desarrollo.
+        // Cambia este valor si tu Laravel usa otro puerto o dominio.
+        target: 'http://localhost:8080',
+
+        // changeOrigin: true fuerza a que el proxy cambie el encabezado "Host"
+        // de la solicitud al del servidor destino (Laravel),
+        // lo cual evita problemas cuando Laravel valida el dominio de origen.
+        changeOrigin: true,
+      },
+    },
+  },
+
+  // -----------------------------------------------------------
+  // 🏗️ Configuración de compilación (npm run build)
+  // -----------------------------------------------------------
+  build: {
+    // 📂 outDir: define la carpeta donde Vite colocará los archivos compilados
+    // (HTML, CSS, JS minificados y optimizados para producción).
+    //
+    // Por defecto, Vite los guarda en "frontend/dist",
+    // pero aquí le decimos que los ponga directamente dentro del proyecto Laravel,
+    // en su carpeta "public" (que es la que Apache o Nginx sirven al usuario final).
+    //
+    // path.resolve(__dirname, '../api/public') significa:
+    // “desde donde está este archivo (frontend/), sube un nivel (‘../’)
+    // y entra a api/public”.
+    outDir: path.resolve(__dirname, '../api/public'),
+
+    // 🧹 emptyOutDir: true le dice a Vite que limpie la carpeta de destino
+    // antes de generar los nuevos archivos. Así evitamos tener basura vieja.
+    // Si fuera false, los archivos antiguos podrían mezclarse con los nuevos.
+    emptyOutDir: true,
+  },
+})

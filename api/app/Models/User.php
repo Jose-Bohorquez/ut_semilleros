@@ -96,4 +96,25 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+        /**
+     * Relación con el modelo Role (cada usuario pertenece a un rol).
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Verifica si el usuario tiene un rol específico.
+     *
+     * Ejemplo:
+     *   if ($user->es('admin')) { ... }
+     */
+    public function es(string $rol): bool
+    {
+        return $this->role && $this->role->nombre === $rol;
+    }
+
+    
 }

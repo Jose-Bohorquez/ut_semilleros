@@ -1,20 +1,24 @@
 # ========================================================
-# 🌐 Laravel 12 - Proyecto con Docker
+# 🌐 Proyecto UT-Semilleros (Laravel + Vue + Docker)
 # ========================================================
 
-# ⚙️ Archivos de entorno
+# ⚙️ Archivos de entorno (no se deben subir nunca)
 .env
 .env.*
-!.env.example        # se conserva la plantilla de ejemplo
+!.env.example          # se conserva solo la plantilla
 
 # 🧩 Dependencias PHP y Node
 /vendor/
 node_modules/
+frontend/node_modules/
 package-lock.json
+frontend/package-lock.json
 
-# ⚙️ Compilados de frontend
+# ⚙️ Archivos compilados del frontend
 /public/build/
 /public/hot/
+frontend/dist/
+/api/public/build/
 
 # 🗄️ Archivos generados o temporales
 /storage/*.key
@@ -28,18 +32,19 @@ bootstrap/cache/*.php
 /.idea/
 /.vscode/
 /.fleet/
-/.zed/
-*.code-workspace
+/zed/
+/*.code-workspace
 
-# 🧰 Herramientas de Laravel Nova, Sail, etc.
+# 🧰 Herramientas opcionales de Laravel Nova, Sail, Homestead
 .nova/
 .sail/
 Homestead.json
 Homestead.yaml
 
-# 🐋 Docker y base de datos
-/db/data/                  # base de datos persistente local
-/docker-compose.override.yml
+# 🐋 Docker y bases de datos
+/db/data/
+db_data/
+docker-compose.override.yml
 *.log
 
 # 🖼️ Archivos de sistema
@@ -47,13 +52,15 @@ Homestead.yaml
 Thumbs.db
 
 # ========================================================
-# ✅ Archivos que SÍ se deben versionar (por convención)
+# ✅ Archivos que SÍ se deben versionar
 # ========================================================
 !.gitignore
 !composer.json
 !composer.lock
 !package.json
+!frontend/package.json
 !vite.config.js
+!frontend/vite.config.js
 !artisan
 !Dockerfile
 !docker-compose.yml

@@ -1,0 +1,78 @@
+<!doctype html>
+<!-- 
+💡 Esta línea indica el tipo de documento (doctype) al navegador.
+"<!doctype html>" le dice al navegador que este archivo sigue el estándar HTML5.
+Si no estuviera, algunos navegadores podrían interpretar el HTML en "modo antiguo"
+(lo que causaría errores o estilos inconsistentes).
+-->
+
+<html lang="en">
+<!-- 
+🌎 <html> es la raíz del documento HTML.
+El atributo lang="en" indica que el idioma principal del contenido es inglés.
+Puedes cambiarlo a "es" (español) si quieres mejorar la accesibilidad y SEO.
+-->
+
+  <head>
+  <!-- 
+  🧠 La sección <head> contiene metadatos y configuraciones
+  que no se muestran directamente en la página, pero que definen
+  cómo el navegador debe interpretarla.
+  -->
+
+    <meta charset="UTF-8" />
+    <!-- 
+    🔤 Esta metaetiqueta define la codificación de caracteres (UTF-8),
+    que soporta letras, tildes y caracteres especiales.
+    Sin esto, podrías ver símbolos raros en los textos (como “Ã©” en vez de “é”).
+    -->
+
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- 
+    🖼️ Define el ícono (favicon) que aparece en la pestaña del navegador.
+    En este caso usa el logo de Vite (vite.svg) que viene por defecto.
+    Puedes reemplazarlo por tu propio ícono (por ejemplo, /assets/logo.svg).
+    -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 
+    📱 Esto asegura que la página se adapte correctamente a pantallas móviles.
+    "width=device-width" usa el ancho real del dispositivo.
+    "initial-scale=1.0" establece el zoom inicial (1 = 100%).
+    Es fundamental para diseños responsivos.
+    -->
+
+    <title>frontend</title>
+    <!-- 
+    🏷️ Define el título de la pestaña en el navegador.
+    Puedes cambiarlo por algo más descriptivo, por ejemplo:
+    <title>UT Semilleros – Panel</title>
+    -->
+  </head>
+
+  <body>
+  <!-- 
+  💻 Todo lo que el usuario ve en pantalla vive dentro del <body>.
+  Aquí es donde Vue se "monta" dinámicamente.
+  -->
+
+    <div id="app"></div>
+    <!-- 
+    🎯 Este <div> es el "punto de montaje" de Vue.
+    - Su id (#app) debe coincidir con el que usamos en main.js → app.mount('#app')
+    - Vue tomará el control de este div y reemplazará su contenido
+      por los componentes dinámicos de tu app (App.vue → Login.vue, Dashboard.vue, etc.)
+    - Sin este div, Vue no tendría dónde renderizar la aplicación.
+    -->
+
+    <script type="module" src="/src/main.js"></script>
+    <!-- 
+    ⚙️ Este script es el que arranca la aplicación.
+    - Carga el archivo main.js (donde creas y montas la app Vue).
+    - El atributo type="module" le indica al navegador que use módulos ES6,
+      lo que permite importar/exportar archivos de forma nativa.
+    - Vite se encarga de procesar este archivo, analizar las dependencias
+      y generar los archivos finales en el build (HTML, CSS, JS optimizados).
+    -->
+  </body>
+</html>

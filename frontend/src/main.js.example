@@ -1,0 +1,54 @@
+// -------------------------------------------------------------
+// 📘 Importaciones principales para iniciar la aplicación Vue
+// -------------------------------------------------------------
+
+// 1️⃣ Importamos la función 'createApp' desde la librería principal de Vue.
+//    - Es el punto de entrada para crear una nueva aplicación Vue 3.
+//    - En Vue 2 se usaba "new Vue(...)", pero en Vue 3 se reemplazó por "createApp()".
+//    - Esto devuelve una instancia de aplicación sobre la cual podemos agregar
+//      plugins, componentes, y finalmente "montarla" en el HTML.
+import { createApp } from 'vue'
+
+// 2️⃣ Importamos el componente raíz de nuestra aplicación, "App.vue".
+//    - Este componente actúa como el contenedor principal de toda la app.
+//    - Dentro de App.vue normalmente ponemos el <router-view />, que sirve
+//      para mostrar las diferentes páginas (Login, Dashboard, etc.) según la ruta.
+import App from './App.vue'
+
+// 3️⃣ Importamos el archivo de configuración del enrutador (router).
+//    - El router se encargará de manejar las rutas y páginas de la app.
+//    - Por ejemplo: "/" → Login.vue, "/dashboard" → Dashboard.vue
+//    - Es el corazón de la navegación en una SPA (Single Page Application).
+import router from './router'
+
+// 4️⃣ Importamos los estilos globales.
+//    - 'style.css' es un archivo generado automáticamente por Vite.
+//    - Aquí puedes dejar estilos generales (fondos, tipografía, etc.),
+//      o incluso importar librerías CSS como Bootstrap o Tailwind más adelante.
+import './style.css'
+
+
+// -------------------------------------------------------------
+// 🚀 Creación e inicialización de la aplicación Vue
+// -------------------------------------------------------------
+
+// 5️⃣ Creamos la instancia principal de Vue.
+//    - Esto arranca la aplicación y carga la lógica definida en App.vue.
+//    - A partir de este punto, podemos agregarle "plugins" (como el router),
+//      componentes globales, directivas personalizadas, etc.
+const app = createApp(App)
+
+
+// 6️⃣ Le decimos a la aplicación que use el router.
+//    - Esto es lo que permite navegar entre páginas sin recargar el sitio.
+//    - Por ejemplo, al hacer router.push('/dashboard'), Vue cambia el contenido
+//      de la página sin volver a cargar el HTML completo.
+//    - Básicamente, aquí “inyectamos” el sistema de rutas a toda la app.
+app.use(router)
+
+
+// 7️⃣ Montamos la aplicación sobre un elemento del HTML.
+//    - '#app' se refiere a un elemento <div id="app"></div> en index.html.
+//    - Todo el contenido dinámico que renderiza Vue se mostrará dentro de ese div.
+//    - Cuando Vue “monta” la app, reemplaza ese div por el contenido generado.
+app.mount('#app')

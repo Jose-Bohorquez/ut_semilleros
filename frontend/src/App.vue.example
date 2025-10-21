@@ -1,0 +1,78 @@
+<!-- -----------------------------------------------------------
+📘 SECCIÓN 1: <script setup>
+Aquí definimos la lógica de la aplicación principal.
+El "setup" es una forma moderna y más limpia de usar la API de composición de Vue.
+Todo lo que declares aquí (variables, funciones, imports) estará disponible en el template.
+----------------------------------------------------------- -->
+<script setup>
+
+// 💡 Importación de componentes que queremos usar dentro de esta vista raíz.
+// En este caso, el archivo por defecto traía un "HelloWorld.vue" de prueba,
+// que muestra un mensaje en pantalla, pero nosotros lo eliminaremos más adelante
+// para reemplazarlo por nuestro <router-view />, que es el espacio donde se
+// mostrarán dinámicamente las páginas (Login, Dashboard, etc.).
+import HelloWorld from './components/HelloWorld.vue'
+
+</script>
+
+
+<!-- -----------------------------------------------------------
+📘 SECCIÓN 2: <template>
+Aquí definimos la parte visual o el HTML del componente.
+En App.vue, esta sección representa el “contenedor principal” de toda la aplicación.
+----------------------------------------------------------- -->
+<template>
+
+  <!-- Este <div> contenía el logo de Vite y Vue, que solo sirve de ejemplo visual.
+       Puedes borrarlo, pero lo dejaremos comentado para que sepas qué era. -->
+
+  <!--
+  <div>
+    <a href="https://vite.dev" target="_blank">
+      <img src="/vite.svg" class="logo" alt="Vite logo" />
+    </a>
+    <a href="https://vuejs.org/" target="_blank">
+      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
+    </a>
+  </div>
+
+  <HelloWorld msg="Vite + Vue" />
+  -->
+
+  <!-- 💎 Aquí va la parte importante:
+       Reemplazamos todo lo anterior por <router-view />, que actúa como un
+       “marco dinámico” donde se cargarán las diferentes vistas del proyecto.
+       Cuando el usuario va a /, se muestra Login.vue;
+       cuando va a /dashboard, se muestra Dashboard.vue.
+  -->
+  <router-view />
+</template>
+
+
+<!-- -----------------------------------------------------------
+📘 SECCIÓN 3: <style>
+Aquí definimos los estilos CSS específicos de este componente.
+"scoped" significa que solo se aplicarán dentro de App.vue (no afectarán a otros componentes).
+----------------------------------------------------------- -->
+<style scoped>
+/* Estos estilos venían del ejemplo original de Vite/Vue.
+   Puedes conservarlos si te gusta el efecto hover, o eliminarlos.
+   Los dejo comentados con explicación. */
+
+/*
+.logo {
+  height: 6em;               // Altura del logo
+  padding: 1.5em;            // Espaciado interno
+  will-change: filter;       // Optimización del hover
+  transition: filter 300ms;  // Suaviza el cambio de filtro al pasar el ratón
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa); // Sombra azul para el logo Vite
+}
+
+.logo.vue:hover {
+  filter: drop-shadow(0 0 2em #42b883aa); // Sombra verde para el logo Vue
+}
+*/
+</style>

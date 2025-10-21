@@ -1,0 +1,85 @@
+// ------------------------------------------------------------
+// 📘 1️⃣ Importamos las funciones necesarias del paquete vue-router
+// ------------------------------------------------------------
+
+// createRouter → se usa para crear una instancia del enrutador.
+// createWebHistory → permite que las rutas usen el modo "historial" del navegador,
+// es decir, URLs limpias sin el # (hash) en medio.
+// Ejemplo: /dashboard en lugar de /#/dashboard
+import { createRouter, createWebHistory } from 'vue-router'
+
+
+
+// ------------------------------------------------------------
+// 📘 2️⃣ Importamos los componentes (vistas) que queremos mostrar
+// ------------------------------------------------------------
+
+// Estas son las "páginas" principales de tu app. Cada una es un componente Vue.
+// Cuando el usuario navegue a una ruta específica (ej: '/'), Vue mostrará el
+// componente correspondiente dentro del <router-view /> de App.vue.
+import Login from '../views/Login.vue'
+import Dashboard from '../views/Dashboard.vue'
+
+
+
+// ------------------------------------------------------------
+// 🧱 3️⃣ Definimos un middleware básico de autenticación
+// ------------------------------------------------------------
+
+// Este middleware se ejecuta antes de entrar a ciertas rutas (por ejemplo, /dashboard).
+// Su trabajo es revisar si el usuario tiene un token JWT guardado en el navegador.
+// Si no hay token, lo redirige automáticamente a la página de login.
+const requireAuth = (to, from, next) => {
+  // Obtenemos el token del almacenamiento local del navegador.
+  // Este token se guarda al hacer login en Login.vue con localStorage.setItem('token', ...).
+  const token = localStorage.getItem('token')
+
+  // Si no hay token → el usuario no está autenticado → lo enviamos a la página de login.
+  if (!token) return next({ name: 'Login' })
+
+  // Si hay token → el usuario puede continuar hacia la ruta solicitada.
+  next()
+}
+
+
+
+// ------------------------------------------------------------
+// 🗺️ 4️⃣ Definimos todas las rutas de la aplicación
+// ------------------------------------------------------------
+
+// Cada objeto dentro del arreglo "routes" representa una página (ruta) del sitio.
+const routes = [
+  {
+    // Ruta raíz del sitio → http://localhost:5173/ (o tu dominio principal)
+    path: '/',
+    name: 'Login',       // Nombre interno de la ruta (puedes usarlo en router.push)
+    component: Login     // Componente que se renderiza en esta ruta
+  },
+  {
+    // Ruta protegida → solo accesible si hay token JWT
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    // beforeEnter se ejecuta ANTES de entrar a la ruta.
+    // Aquí usamos el middleware "requireAuth" definido arriba.
+    // Si no hay token → redirige al login automáticamente.
+    beforeEnter: requireAuth
+  },
+]
+
+
+
+// ------------------------------------------------------------
+// 🧭 5️⃣ Creamos y exportamos la instancia del router
+// ------------------------------------------------------------
+
+// createRouter() construye el enrutador de Vue con la configuración que le pasamos.
+export default createRouter({
+  // createWebHistory() usa la API de historial del navegador (pushState)
+  // para manejar las rutas sin recargar la página.
+  // Ejemplo: puedes usar el botón "atrás" del navegador y Vue manejará la navegación.
+  history: createWebHistory(),
+
+  // El arreglo de rutas definido arriba (con Login y Dashboard)
+  routes,
+})
