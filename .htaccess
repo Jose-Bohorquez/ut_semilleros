@@ -1,0 +1,28 @@
+#RewriteEngine On
+
+# Si el archivo o carpeta no existe
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+
+# redirigir todo a index.html (SPA router)
+#RewriteRule ^ index.html [L]
+
+
+
+Options -MultiViews
+RewriteEngine On
+
+# ── REGLA 1: Primero — rutas /api/* van al backend Laravel ──────
+# Debe ir ANTES que la regla SPA, si no el SPA se come las peticiones API
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ /api/public/index.php [L,QSA]
+
+# ── REGLA 2: Archivos y carpetas reales → servir directo ─────────
+# (imágenes, css, js, manifest.json, service-worker.js, etc.)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ── REGLA 3: Todo lo demás → SPA (tu router JS) ──────────────────
+# Esta es tu regla original, al final
+RewriteRule ^ index.html [L]

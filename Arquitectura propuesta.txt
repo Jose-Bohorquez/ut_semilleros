@@ -1,0 +1,33 @@
+frontend/
+│
+├── index.html
+├── app.js
+├── service-worker.js
+├── manifest.json
+│
+├── core/
+│   ├── router.js
+│   ├── guards.js
+│   ├── state.js
+│
+├── modules/
+│   ├── auth/
+│   │   ├── login.view.js
+│   │   ├── auth.service.js
+│   │   └── auth.controller.js
+│   │
+│   ├── dashboard/
+│   │   ├── dashboard.view.js
+│   │   └── dashboard.controller.js
+│   │
+│   └── semilleros/
+│       ├── semilleros.view.js
+│       └── semilleros.service.js
+│
+├── services/
+│   ├── api.service.js
+│   └── storage.service.js
+│
+└── components/
+    ├── navbar.js
+    └── loader.js

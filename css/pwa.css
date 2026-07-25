@@ -1,0 +1,674 @@
+/* =========================================================
+   pwa.css — Capa de UI nativa móvil para el SPA
+   Hereda tokens de theme.css. Solo activo en mobile (≤768px).
+   ========================================================= */
+
+
+/* =========================================================
+   TOP APP BAR — reemplaza navbar oscura en mobile
+   ========================================================= */
+
+/*
+   safe-area-inset-top: necesario porque usamos
+   apple-mobile-web-app-status-bar-style="black-translucent".
+   En modo standalone iOS el contenido empieza BAJO la barra de
+   estado translúcida, por lo que el navbar debe compensarlo.
+   En Android y browser normal env() devuelve 0, sin efecto.
+*/
+@media (display-mode: standalone) {
+  .navbar {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+  }
+}
+
+@media (display-mode: standalone) {
+  .pwa-detail-bar {
+    padding-top: env(safe-area-inset-top, 0px);
+    height: calc(56px + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Convierte el navbar existente al estilo PWA */
+  .navbar {
+    background: var(--color-gradient) !important;
+    padding: 0 var(--space-3) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18) !important;
+  }
+
+  /* Logo en el centro */
+  .navbar .logo strong {
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+
+  /* Ocultar texto del usuario — solo el ícono de estado */
+  .navbar .username {
+    display: none !important;
+  }
+
+  /* Logout: solo ícono */
+  #logoutBtn .pwa-hide-label {
+    display: none;
+  }
+
+  /* Hamburger visible — da acceso al sidebar completo */
+  .hamburger-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: unset;
+  }
+}
+
+
+/* =========================================================
+   BOTTOM NAV BAR — nav principal en mobile
+   ========================================================= */
+
+.pwa-bottom-nav {
+  display: none;              /* oculto en desktop */
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  z-index: 150;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pwa-bottom-nav .nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  font-family: var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  min-height: 44px;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.pwa-bottom-nav .nav-item i {
+  font-size: 1.25rem;
+  transition: transform 0.2s ease;
+}
+
+.pwa-bottom-nav .nav-item.active {
+  color: var(--color-primary);
+}
+
+.pwa-bottom-nav .nav-item.active i {
+  transform: translateY(-2px);
+}
+
+/* Indicador activo (punto/línea) */
+.pwa-bottom-nav .nav-item.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  border-radius: 0 0 var(--radius-full) var(--radius-full);
+  background: var(--color-gradient);
+}
+
+@media (max-width: 768px) {
+
+  .pwa-bottom-nav {
+    display: flex;
+  }
+
+  /* El content necesita espacio para el bottom nav */
+  .content {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + var(--space-4)) !important;
+  }
+
+  /* El modal bottom-sheet respeta el bottom nav */
+  #crudModal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  #crudModal .crudModalBox,
+  #crudModal form {
+    max-width: 100%;
+    width: 100%;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    max-height: 85vh;
+    padding: var(--space-6);
+    margin-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+
+/* =========================================================
+   PWA CONTENT WRAPPER
+   ========================================================= */
+
+.pwa-page {
+  padding: var(--space-4);
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + var(--space-4));
+  min-height: 100dvh;
+}
+
+
+/* =========================================================
+   PWA CARD — tarjeta nativa para listas
+   ========================================================= */
+
+.pwa-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.pwa-card:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+.pwa-card .card-avatar {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--color-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Variantes de avatar */
+.pwa-card .card-avatar.avatar-green  { background: linear-gradient(135deg, #10b981, #34d399); }
+.pwa-card .card-avatar.avatar-blue   { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+.pwa-card .card-avatar.avatar-yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.pwa-card .card-avatar.avatar-purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+
+.pwa-card .card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-card .card-title {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text);
+}
+
+.pwa-card .card-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwa-card .card-meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  margin-top: 2px;
+}
+
+.pwa-card .card-arrow {
+  color: var(--color-text-faint);
+  flex-shrink: 0;
+  font-size: 0.875rem;
+}
+
+/* Card sin hover en mobile — usa :active */
+@media (hover: hover) {
+  .pwa-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+
+/* =========================================================
+   PWA SECTION HEADER — cabecera de grupos/secciones
+   ========================================================= */
+
+.pwa-section-header {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  background: var(--color-bg);
+  position: sticky;
+  top: calc(56px + env(safe-area-inset-top, 0px));
+  z-index: 10;
+}
+
+
+/* =========================================================
+   PWA FORMS — inputs nativos (16px para no hacer zoom en iOS)
+   ========================================================= */
+
+.pwa-form-group {
+  margin-bottom: var(--space-5);
+}
+
+.pwa-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.pwa-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: 1rem;        /* 16px — evita zoom en iOS */
+  font-family: var(--font-body);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+  color: var(--color-text);
+  min-height: 48px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.pwa-input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.pwa-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+}
+
+.pwa-input.is-valid   { border-color: var(--color-success); }
+.pwa-input.is-invalid { border-color: var(--color-error); }
+
+.pwa-field-error {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  margin-top: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Select específico */
+.pwa-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-4) center;
+  padding-right: calc(var(--space-4) * 2.5);
+}
+
+
+/* =========================================================
+   PWA BUTTONS — botones con touch targets de 48px
+   ========================================================= */
+
+/* Botón primario full-width (formularios) */
+.pwa-btn-primary {
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-gradient);
+  color: #fff;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: opacity 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pwa-btn-primary:active {
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+.pwa-btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Botón secundario */
+.pwa-btn-secondary {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: background 0.2s, transform 0.15s;
+}
+
+.pwa-btn-secondary:active {
+  background: var(--color-primary-light);
+  transform: scale(0.98);
+}
+
+
+/* =========================================================
+   FAB — Floating Action Button
+   ========================================================= */
+
+.pwa-fab {
+  position: fixed;
+  bottom: calc(60px + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  right: var(--space-4);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--color-gradient);
+  color: #fff;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(239,68,68,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pwa-fab:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 8px rgba(239,68,68,0.3);
+}
+
+/* Ocultar FAB en desktop */
+@media (min-width: 769px) {
+  .pwa-fab { display: none; }
+}
+
+
+/* =========================================================
+   BADGES — para estado en tarjetas
+   ========================================================= */
+
+.badge-pwa {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.badge-pwa-success { background: #d1fae5; color: #065f46; }
+.badge-pwa-warning { background: #fef3c7; color: #92400e; }
+.badge-pwa-error   { background: #fee2e2; color: #991b1b; }
+.badge-pwa-info    { background: #dbeafe; color: #1e40af; }
+.badge-pwa-neutral { background: var(--color-surface-2); color: var(--color-text-muted); }
+
+
+/* =========================================================
+   BACK NAVIGATION BAR — para vistas de detalle
+   ========================================================= */
+
+.pwa-detail-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  z-index: 100;
+  background: var(--color-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  gap: var(--space-3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.pwa-detail-bar .bar-title {
+  flex: 1;
+  font-size: 1.0625rem;
+  font-weight: var(--weight-bold);
+  font-family: var(--font-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwa-detail-bar .bar-action {
+  background: none;
+  border: none;
+  color: #fff;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1rem;
+  min-height: unset;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pwa-detail-bar .bar-action:active {
+  background: rgba(255,255,255,0.2);
+}
+
+
+/* =========================================================
+   MOBILE TABLE → CARD TRANSFORM
+   Reemplaza tablas con layout de tarjetas en mobile
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* Las tablas del CRUD engine se convierten en cards */
+  table.mobile-card-table thead {
+    display: none;
+  }
+
+  table.mobile-card-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    margin-bottom: var(--space-3);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease;
+  }
+
+  table.mobile-card-table tbody tr:active {
+    transform: scale(0.99);
+  }
+
+  /* Cada celda se convierte en un par label: valor */
+  table.mobile-card-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border-light);
+    font-size: var(--text-sm);
+    gap: var(--space-2);
+  }
+
+  table.mobile-card-table td:first-child {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-base);
+    border-bottom-width: 1.5px;
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-1);
+  }
+
+  table.mobile-card-table td:last-child {
+    border-bottom: none;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    padding-top: var(--space-3);
+  }
+
+  table.mobile-card-table td::before {
+    content: attr(data-label);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  /* La celda de ID y la de acciones no necesitan label visible */
+  table.mobile-card-table td[data-label="ID"]::before,
+  table.mobile-card-table td[data-label="Acciones"]::before {
+    display: none;
+  }
+
+  table.mobile-card-table td[data-label="ID"] {
+    display: none;  /* Ocultar ID en mobile */
+  }
+
+  /* Botones de acción en mobile — más grandes */
+  table.mobile-card-table td.actions-col .actions-cell {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  table.mobile-card-table td.actions-col .btn {
+    flex: 1;
+    min-width: 80px;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  /* DataTables — ocultar controles innecesarios en mobile */
+  .dataTables_wrapper .dataTables_length {
+    display: none;
+  }
+
+  .dataTables_wrapper .dataTables_paginate {
+    text-align: center;
+    padding-top: var(--space-3);
+  }
+}
+
+
+/* =========================================================
+   SCROLL NATIVO — mobile
+   ─────────────────────────────────────────────────────────
+   PRINCIPIO: solo .layout puede tener overflow-x:hidden.
+   Aplicarlo a body, .main o .content en móvil crea un BFC
+   que convierte esos elementos en scroll-containers y BLOQUEA
+   el scroll táctil vertical en iOS Safari / Android Chrome.
+   ========================================================= */
+
+/* .layout es seguro: no es body, no es flex, no tiene height fijo */
+.layout {
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+
+  /* Scroll táctil suave en el área de contenido (iOS) */
+  .content {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Safe area para iPhones con notch / Dynamic Island */
+  .content {
+    padding-left:  max(var(--space-4), env(safe-area-inset-left));
+    padding-right: max(var(--space-4), env(safe-area-inset-right));
+  }
+
+  /* DataTables wrapper: scroll horizontal propio, no del documento */
+  .dataTables_wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+
+/* =========================================================
+   DARK MODE — bottom nav y cards respetan el tema
+   ========================================================= */
+
+[data-theme="dark"] .pwa-bottom-nav {
+  background: var(--color-surface);
+  border-top-color: var(--color-border);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
+}
+
+[data-theme="dark"] .pwa-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .pwa-section-header {
+  background: var(--color-bg);
+}
+
+[data-theme="dark"] .badge-pwa-success { background: #022c22; color: #6ee7b7; }
+[data-theme="dark"] .badge-pwa-warning { background: #292011; color: #fde68a; }
+[data-theme="dark"] .badge-pwa-error   { background: #2c0a0a; color: #fca5a5; }
+[data-theme="dark"] .badge-pwa-info    { background: #0c1a3b; color: #93c5fd; }
+
+
+/* =========================================================
+   ANTI-TAP-HIGHLIGHT — eliminar flash azul en Android
+   ========================================================= */
+
+.pwa-bottom-nav .nav-item,
+.pwa-card,
+.pwa-btn-primary,
+.pwa-btn-secondary,
+.pwa-fab {
+  -webkit-tap-highlight-color: transparent;
+}

@@ -1,0 +1,16 @@
+semilleros-pwa/
+│
+├── docker-compose.yml
+│
+├── frontend/
+│   ├── index.html
+│   ├── app.js
+│   ├── manifest.json
+│   ├── service-worker.js
+│   └── Dockerfile
+│
+├── backend/
+│   ├── (Laravel project)
+│   └── Dockerfile
+│
+└── database/

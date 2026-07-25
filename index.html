@@ -1,0 +1,113 @@
+<!-- archivo: frontend/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sistema de Gestión de Semilleros de Investigación — Universidad del Tolima, IDEAD. Administra semilleros, proyectos, propuestas y solicitudes desde cualquier dispositivo.">
+<meta name="robots" content="noindex, nofollow">
+<title>Sistema de Semilleros IDEAD — Universidad del Tolima</title>
+
+<base href="/">
+
+<!-- Anti-FOUC: aplica el tema guardado antes de renderizar -->
+<script>
+  (function () {
+    const t = localStorage.getItem('theme');
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="manifest" href="/manifest.json">
+
+<!-- ── iOS / Safari PWA ──────────────────────────────────────
+     Safari ignora manifest.json para la mayoría de ajustes PWA.
+     Estas meta tags y link tags son el mecanismo nativo de iOS.
+  ──────────────────────────────────────────────────────────── -->
+
+<!-- 1. Activa el modo standalone al agregar al inicio (home screen) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<!-- 2. Color de la barra de estado:
+        "default"         → barra gris claro (iOS <15)
+        "black"           → barra negra opaca
+        "black-translucent" → contenido se extiende bajo la barra (usar con padding-top seguro)
+     Se elige "black-translucent" para que el gradiente de la app ocupe toda la pantalla.
+     El layout debe sumar env(safe-area-inset-top) donde sea necesario. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- 3. Nombre que aparece bajo el ícono en el inicio de iOS -->
+<meta name="apple-mobile-web-app-title" content="Semilleros">
+
+<!-- 4. Íconos para iOS home screen (Safari ignora los "icons" del manifest)
+        iOS escoge el más cercano al tamaño requerido según el dispositivo.
+        180×180 es el tamaño requerido para iPhone Retina (@3×). -->
+<link rel="apple-touch-icon" href="/apple-touch-icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180.png">
+
+<!-- 5. theme-color — afecta la chrome del navegador en Safari 15+ -->
+<meta name="theme-color" content="#111827">
+
+<!-- Design tokens (source of truth) -->
+<link rel="stylesheet" href="/css/theme.css">
+
+<!-- Component styles -->
+<link rel="stylesheet" href="/style.css">
+
+<!-- PWA mobile-native layer -->
+<link rel="stylesheet" href="/css/pwa.css">
+
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<!-- Botones DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<script type="module" src="/app.js"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- Buttons -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+
+<!-- Export -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<!-- Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+</body>
+</html>

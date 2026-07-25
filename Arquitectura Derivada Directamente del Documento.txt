@@ -1,0 +1,20 @@
+modules/
+│
+├── usuarios/        ← CU01
+│
+├── catalogos/       ← CU02–CU07
+│   ├── facultades/
+│   ├── programas/
+│   ├── cat/
+│   ├── areas/
+│   ├── grupos/
+│   └── coordinadores/
+│
+├── semilleros/      ← CU08, CU09, CU13
+│
+├── procesos/        ← CU10, CU11, CU12
+│   ├── solicitudes/
+│   ├── propuestas/
+│   └── integrantes/
+│
+└── auditoria/       ← CU14
