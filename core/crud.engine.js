@@ -14,6 +14,10 @@ export function createCrudModule(config) {
     const title   = config.title;
     const fields  = config.fields;
 
+    /* Los campos de contraseña son solo de formulario — nunca deben verse en una
+       tabla de listado, ni siquiera vacíos (ver auditoría de diseño 2026-07-25). */
+    const tableFields = fields.filter(f => f.type !== "password");
+
     let currentEditId = null;
     let recordsCache  = [];
     let eventsBound   = false;
@@ -90,7 +94,7 @@ export function createCrudModule(config) {
         const noEdit      = isReadonly || config.noEditFor?.includes(userRole)   || false;
         /* ────────────────────────────────────────────────────────────────── */
 
-        const headers = fields.map(f => `<th>${f.label}</th>`).join("");
+        const headers = tableFields.map(f => `<th>${f.label}</th>`).join("");
 
         /* Empty state */
         if (records.length === 0) {
@@ -131,7 +135,7 @@ export function createCrudModule(config) {
         /* Rows */
         const rows = records.map(record => {
 
-            const cols = fields.map(f => {
+            const cols = tableFields.map(f => {
 
                 if (f.type === "relation") {
                     const rel = record[f.relation.slice(0, -1)];
