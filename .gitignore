@@ -5,7 +5,8 @@
 # ⚙️ Archivos de entorno
 .env
 .env.*
-!.env.example        # se conserva la plantilla de ejemplo
+# se conserva la plantilla de ejemplo
+!.env.example
 
 # 🧩 Dependencias PHP y Node
 /vendor/
@@ -38,7 +39,8 @@ Homestead.json
 Homestead.yaml
 
 # 🐋 Docker y base de datos
-/db/data/                  # base de datos persistente local
+# base de datos persistente local (git NO admite comentarios al final de la línea)
+/db/data/
 /docker-compose.override.yml
 *.log
 
@@ -58,3 +60,16 @@ Thumbs.db
 !Dockerfile
 !docker-compose.yml
 !apache/laravel.conf
+
+# ========================================================
+# 📦 Propios de esta carpeta (2026-09-27)
+# ========================================================
+# Proyectos hermanos: SGAA tiene su propio repo (asistencia-app); el otro es historia muerta
+/SGAA/
+/todo_ut-edu.space_old/
+# Backups redundantes del código
+*.zip
+# graphify: se versiona el grafo, no la caché ni rutas locales
+graphify-out/cache/
+graphify-out/cost.json
+graphify-out/.graphify_python
