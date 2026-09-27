@@ -1,0 +1,8 @@
+# Proyectos hermanos independientes — tienen su propio grafo / son historia muerta
+SGAA/
+todo_ut-edu.space_old/
+# Backups redundantes y datos locales de MySQL
+*.zip
+db/
+api/vendor/
+node_modules/
