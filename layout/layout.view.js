@@ -74,6 +74,7 @@ export function LayoutView(content = "") {
     if (role === "ADMINISTRATIVO" || role === "ADMIN_SISTEMA") {
         menu += `
         <a href="/admin/seedbeds"   data-link><i class="fas fa-seedling"></i>        Semilleros</a>
+        <a href="/objectives"       data-link><i class="fas fa-bullseye"></i>        Objetivos</a>
         <a href="/projects"         data-link><i class="fas fa-project-diagram"></i> Proyectos</a>
         <a href="/products"         data-link><i class="fas fa-flask"></i>           Productos</a>
         <a href="/results"          data-link><i class="fas fa-chart-bar"></i>       Resultados</a>

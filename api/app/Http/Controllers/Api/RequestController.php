@@ -37,6 +37,21 @@ class RequestController extends Controller
 
         ]);
 
+        /* Regla de negocio (Jose, 2026-07-28): un estudiante no puede tener
+           más de una postulación activa a la vez. Si ya tiene una PENDIENTE
+           (esperando revisión) o APROBADA (ya es integrante de un semillero),
+           no puede postularse a otro. RECHAZADA no cuenta — sí puede volver
+           a intentarlo en otro semillero. */
+        $yaTieneActiva = RequestModel::where('user_id', $validated['user_id'])
+            ->whereIn('status', ['PENDIENTE', 'APROBADA'])
+            ->exists();
+
+        if ($yaTieneActiva) {
+            return response()->json([
+                'message' => 'Ya tienes una postulación pendiente o aprobada. No puedes postularte a otro semillero mientras esa siga activa.',
+            ], 422);
+        }
+
         $requestModel = RequestModel::create($validated);
 
         return response()->json([

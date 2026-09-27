@@ -17,6 +17,7 @@ class SeedbedController extends Controller
             ->select(
                 'id',
                 'name',
+                'description',
                 'program_id',
                 'status'
             )->get();
@@ -34,6 +35,7 @@ class SeedbedController extends Controller
         $validated = $request->validate([
 
             "name" => "required|string|max:255",
+            "description" => "nullable|string",
             "program_id" => "required|exists:programs,id",
             "status" => "required|in:ACTIVO,INACTIVO"
 
@@ -41,6 +43,7 @@ class SeedbedController extends Controller
 
         $seedbed = Seedbed::create([
             "name" => $validated["name"],
+            "description" => $validated["description"] ?? null,
             "program_id" => $validated["program_id"],
             "status" => $validated["status"]
         ]);
@@ -63,6 +66,7 @@ class SeedbedController extends Controller
         $validated = $request->validate([
 
             "name" => "required|string|max:255",
+            "description" => "nullable|string",
             "program_id" => "required|exists:programs,id",
             "status" => "required|in:ACTIVO,INACTIVO"
 

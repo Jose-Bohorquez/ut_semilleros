@@ -52,6 +52,19 @@ class ProposalController extends Controller
 
         $proposal = Proposal::findOrFail($id);
 
+        /* El estudiante solo puede editar SU PROPIA propuesta, y solo
+           mientras siga PENDIENTE — igual regla que ya aplicaba el frontend,
+           pero antes no existía backend porque esta ruta estaba cerrada
+           por completo para ESTUDIANTE (Jose, 2026-07-28). */
+        if (auth()->user()->role === 'ESTUDIANTE') {
+            if ($proposal->user_id !== auth()->id()) {
+                return response()->json(['message' => 'No puedes editar una propuesta que no es tuya'], 403);
+            }
+            if ($proposal->status !== 'PENDIENTE') {
+                return response()->json(['message' => 'Solo puedes editar propuestas en estado Pendiente'], 403);
+            }
+        }
+
         $validated = $request->validate([
 
             "user_id"=>"required|exists:users,id",
@@ -63,6 +76,13 @@ class ProposalController extends Controller
             "status"=>"required|in:PENDIENTE,APROBADA,RECHAZADA"
 
         ]);
+
+        /* El estudiante no puede cambiar el estado desde este endpoint —
+           siempre se conserva el estado actual, aunque el frontend ya
+           siempre manda PENDIENTE. */
+        if (auth()->user()->role === 'ESTUDIANTE') {
+            $validated['status'] = $proposal->status;
+        }
 
         $proposal->update($validated);
 

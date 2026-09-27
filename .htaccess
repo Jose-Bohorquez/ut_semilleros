@@ -26,3 +26,18 @@ RewriteRule ^ - [L]
 # ── REGLA 3: Todo lo demás → SPA (tu router JS) ──────────────────
 # Esta es tu regla original, al final
 RewriteRule ^ index.html [L]
+# ── Cache-Control para módulos JS y CSS ──────────────────────────
+# Los .js son ES modules importados dinámicamente por múltiples rutas
+# cruzadas (core/router.js, layout/*, módulos/*); el service worker ya
+# implementa network-first para ellos, pero un Cache-Control largo en
+# origen/CDN anula esa estrategia y sirve versiones viejas tras cada
+# despliegue. Cache corto + revalidación evita tener que versionar cada
+# import a mano (bug real encontrado 2026-07-28).
+<IfModule mod_headers.c>
+    <FilesMatch "\.js$">
+        Header set Cache-Control "public, max-age=300, must-revalidate"
+    </FilesMatch>
+    <FilesMatch "\.css$">
+        Header set Cache-Control "public, max-age=300, must-revalidate"
+    </FilesMatch>
+</IfModule>

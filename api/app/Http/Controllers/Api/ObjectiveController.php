@@ -15,7 +15,7 @@ class ObjectiveController extends Controller
 
         $objectives = Objective::with([
             'seedbed:id,name'
-        ])->get();
+        ])->orderBy('seedbed_id')->orderBy('order')->get();
 
         return response()->json([
             "objectives"=>$objectives
@@ -31,9 +31,15 @@ class ObjectiveController extends Controller
 
             "seedbed_id"=>"required|exists:seedbeds,id",
 
-            "content"=>"required|string"
+            "content"=>"required|string",
+
+            "order"=>"nullable|integer|min:0"
 
         ]);
+
+        if (!isset($validated['order'])) {
+            $validated['order'] = (int) Objective::where('seedbed_id', $validated['seedbed_id'])->max('order') + 1;
+        }
 
         $objective = Objective::create($validated);
 
@@ -54,7 +60,9 @@ class ObjectiveController extends Controller
 
             "seedbed_id"=>"required|exists:seedbeds,id",
 
-            "content"=>"required|string"
+            "content"=>"required|string",
+
+            "order"=>"nullable|integer|min:0"
 
         ]);
 
@@ -65,6 +73,22 @@ class ObjectiveController extends Controller
             "objective"=>$objective
         ]);
 
+    }
+
+
+    /**
+     * Eliminar objetivo — antes no existía este endpoint en absoluto
+     * (Jose, 2026-07-28: necesario para poder quitar objetivos desde el
+     * mismo formulario de semilleros, no solo agregarlos).
+     */
+    public function destroy($id)
+    {
+        $objective = Objective::findOrFail($id);
+        $objective->delete();
+
+        return response()->json([
+            "message"=>"Objetivo eliminado"
+        ]);
     }
 
 

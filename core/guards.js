@@ -33,7 +33,21 @@ export function requireRole(allowedRoles = []) {
 
     if (!allowedRoles.includes(user.role)) {
 
-        alert("No tienes permisos para acceder a esta sección.");
+        /* alert() nativo bloqueaba el hilo del navegador esperando que
+           alguien le diera clic en "Aceptar" — en la práctica se sentía
+           como que la pantalla se congelaba (Jose, 2026-07-28). Un toast
+           no bloqueante + redirección inmediata resuelve lo mismo. */
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: "warning",
+                title: "Sin permisos",
+                text: "No tienes permisos para acceder a esta sección.",
+                timer: 2500,
+                showConfirmButton: false,
+                toast: true,
+                position: "top-end",
+            });
+        }
 
         window.location.href = "/dashboard";
         return false;

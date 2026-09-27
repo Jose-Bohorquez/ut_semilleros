@@ -89,6 +89,21 @@ function hideKPI(id) {
 
 /* ─── CHARTS (Chart.js) ─────────────────────────────── */
 
+/* Cuando no hay datos aún, el canvas se reemplaza por un estado vacío en vez
+   de quedar en blanco sin ninguna explicación (bug real detectado en revisión
+   de diseño, 2026-07-28: las 3 tarjetas con datos en 0 no mostraban nada). */
+function emptyChart(canvasId, message) {
+    const canvas = document.getElementById(canvasId);
+    const wrapper = canvas?.closest(".chart-wrapper");
+    if (!wrapper) return;
+    wrapper.innerHTML = `
+        <div class="empty-state" style="margin-top:0;padding:var(--space-8) var(--space-4);">
+            <div class="empty-state-icon"><i class="fas fa-chart-simple"></i></div>
+            <p>${message}</p>
+        </div>
+    `;
+}
+
 async function loadCharts() {
     if (typeof Chart === "undefined") return;
 
@@ -150,6 +165,8 @@ async function loadCharts() {
                 },
             },
         });
+    } else {
+        emptyChart("chartSeedbedStatus", "Aún no hay semilleros registrados.");
     }
 
     /* 2. Bar — Propuestas por estado */
@@ -186,6 +203,8 @@ async function loadCharts() {
                 },
             },
         });
+    } else {
+        emptyChart("chartProposalStatus", "Aún no hay propuestas registradas.");
     }
 
     /* 3. Horizontal bar — Semilleros por facultad */
@@ -220,6 +239,8 @@ async function loadCharts() {
                 },
             },
         });
+    } else {
+        emptyChart("chartSeedbedFaculty", "Aún no hay semilleros asociados a facultades.");
     }
 
     /* 4. Doughnut — Usuarios por rol */

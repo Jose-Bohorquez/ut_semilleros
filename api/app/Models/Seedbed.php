@@ -10,6 +10,7 @@ class Seedbed extends Model
 
     protected $fillable = [
         'name',
+        'description',
         'program_id',
         'status'
     ];

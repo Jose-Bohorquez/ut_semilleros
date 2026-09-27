@@ -1,7 +1,7 @@
 /* #archivo: /frontend/layout/layout.controller.js */
 
 import { logout }          from "../modules/auth/auth.service.js";
-import { navigateTo }      from "../core/router.js";
+import { navigateTo }      from "../core/router.js?v=2";
 import { startBadgePolling } from "../modules/notifications/notifications.badge.js";
 
 /* Mapa ruta → título para el top bar en mobile */

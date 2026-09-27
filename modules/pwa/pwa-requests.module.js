@@ -58,6 +58,10 @@ async function loadAndRender() {
 }
 
 function renderList(requests) {
+    /* Regla de negocio (Jose, 2026-07-28): mientras el estudiante tenga una
+       postulación PENDIENTE o APROBADA, no puede crear otra. */
+    const tieneActiva = requests.some(r => r.status === "PENDIENTE" || r.status === "APROBADA");
+
     const cards = requests.length === 0
         ? `<div class="empty-state">
                <div class="empty-state-icon"><i class="fas fa-paper-plane"></i></div>
@@ -98,6 +102,17 @@ function renderList(requests) {
         La aprobación o rechazo es realizada por el Administrador o Líder de Semillero.
     </div>`;
 
+    /* Mientras haya una postulación PENDIENTE o APROBADA, no se puede crear otra. */
+    const bloqueoActiva = tieneActiva ? `
+    <div style="display:flex;align-items:center;gap:6px;
+                 background:var(--color-warning-light);border:1px solid var(--color-warning-border);
+                 border-radius:var(--radius-btn);padding:var(--space-3) var(--space-4);
+                 margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--color-warning-text)">
+        <i class="fas fa-lock"></i>
+        Ya tienes una postulación ${requests.find(r => r.status === "APROBADA") ? "aprobada" : "pendiente"}.
+        No puedes enviar otra mientras esa siga activa.
+    </div>` : "";
+
     const content = `
     <div style="padding:var(--space-4)" id="requestsPage">
         <h2 style="margin:0 0 var(--space-4);font-size:var(--text-2xl);font-weight:700">
@@ -105,13 +120,15 @@ function renderList(requests) {
             Mis Solicitudes
         </h2>
         ${requests.length > 0 ? info : ""}
+        ${bloqueoActiva}
         <div id="requestsList">${cards}</div>
     </div>
 
-    <!-- FAB: nueva solicitud -->
+    <!-- FAB: nueva solicitud (oculto si ya tiene una postulación activa) -->
+    ${!tieneActiva ? `
     <button class="pwa-fab" id="newRequestBtn" aria-label="Nueva solicitud" title="Nueva solicitud">
         <i class="fas fa-plus"></i>
-    </button>
+    </button>` : ""}
 
     <!-- Modal: nueva solicitud -->
     <div id="newRequestModal" style="display:none;position:fixed;inset:0;

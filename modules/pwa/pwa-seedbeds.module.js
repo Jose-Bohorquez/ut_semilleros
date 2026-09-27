@@ -183,6 +183,18 @@ function openDetail(seedbed) {
                 <span class="badge-pwa badge-pwa-success">Activo</span>
             </div>
         </div>
+
+        <h4 style="font-size:var(--text-base);font-weight:600;margin:0 0 var(--space-3);color:var(--color-text)">
+            <i class="fas fa-align-left" style="color:var(--color-primary);margin-right:6px"></i>
+            Descripción
+        </h4>
+        <p style="font-size:var(--text-sm);color:var(--color-text-2);line-height:1.5;margin:0 0 var(--space-5);
+                  ${seedbed.description ? "" : "font-style:italic;color:var(--color-text-muted)"}">
+            ${seedbed.description
+                ? seedbed.description.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+                : "Este semillero aún no tiene una descripción registrada."}
+        </p>
+
         <h4 style="font-size:var(--text-base);font-weight:600;margin:0 0 var(--space-3);color:var(--color-text)">
             <i class="fas fa-bullseye" style="color:var(--color-primary);margin-right:6px"></i>
             Objetivos

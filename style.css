@@ -617,6 +617,7 @@ tbody tr:hover { background: var(--color-surface-2); }
 }
 
 .required-star { color: var(--color-error); margin-left: 2px; }
+.optional-hint { color: var(--color-text-muted); font-weight: var(--weight-regular, 400); font-size: var(--text-xs); }
 .form-legend { font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: var(--space-4); }
 
 #crudModal input,
@@ -905,6 +906,21 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .login-header-links { display: flex; align-items: center; gap: var(--space-6); }
 .login-header-links a { font-size: var(--text-sm); color: var(--color-text-muted); text-decoration: none; transition: color 0.2s ease; }
 .login-header-links a:hover { color: var(--color-primary); }
+
+@media (max-width: 768px) {
+  .login-header-inner {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+  .login-header-brand h1 { font-size: var(--text-base); }
+  .login-header-links { gap: var(--space-4); }
+}
+
+@media (max-width: 480px) {
+  .login-header-links { display: none; }
+}
 
 .login-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: var(--space-12) var(--space-4); }
 .login-grid { max-width: 72rem; width: 100%; display: grid; gap: var(--space-12); align-items: center; }

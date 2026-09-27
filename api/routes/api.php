@@ -197,7 +197,10 @@ Route::middleware('auth:sanctum')->group(function () {
     |----------------------------------------------------------------------
     | SEMILLEROS (RF13 / CU13)
     |   GET list+show → todos los roles (A, L, ADM, E)
-    |   POST/PUT/TOGGLE → L
+    |   POST/PUT/TOGGLE → L, ADM_SISTEMA, ADMINISTRATIVO (Jose, 2026-07-28: el
+    |     admin debe poder crear/editar semilleros desde el panel, no solo el
+    |     líder; ADMINISTRATIVO ya veía el botón en el frontend pero el backend
+    |     se lo rechazaba con 403 — mismo bug que ya se encontró en propuestas)
     |----------------------------------------------------------------------
     */
 
@@ -207,7 +210,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
          ->get('/seedbeds/{id}', [SeedbedController::class, 'show']);
 
-    Route::middleware('role:LIDER_SEMILLERO')->group(function () {
+    Route::middleware('role:LIDER_SEMILLERO,ADMIN_SISTEMA,ADMINISTRATIVO')->group(function () {
         Route::post('/seedbeds',                         [SeedbedController::class, 'store']);
         Route::put('/seedbeds/{id}',                     [SeedbedController::class, 'update']);
         Route::put('/seedbeds/{id}/toggle-status',       [SeedbedController::class, 'toggleStatus']);
@@ -230,17 +233,19 @@ Route::middleware('auth:sanctum')->group(function () {
     |----------------------------------------------------------------------
     | OBJETIVOS (RF08 / CU08)
     |   GET list → todos los roles
-    |   POST/PUT/TOGGLE → L, ADM
+    |   POST/PUT/TOGGLE → L, ADM, ADMIN_SISTEMA (Jose, 2026-07-28: el admin
+    |     también debe poder gestionar objetivos, igual que semilleros)
     |----------------------------------------------------------------------
     */
 
     Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
          ->get('/objectives', [ObjectiveController::class, 'index']);
 
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO,ADMIN_SISTEMA')->group(function () {
         Route::post('/objectives',                   [ObjectiveController::class, 'store']);
         Route::put('/objectives/{id}',               [ObjectiveController::class, 'update']);
         Route::put('/objectives/{id}/toggle-status', [ObjectiveController::class, 'toggleStatus']);
+        Route::delete('/objectives/{id}',             [ObjectiveController::class, 'destroy']);
     });
 
     /*
@@ -306,11 +311,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
          ->post('/proposals', [ProposalController::class, 'store']);
 
-    /* PUT (update + status) — solo L, ADM */
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
-        Route::put('/proposals/{id}',               [ProposalController::class, 'update']);
-        Route::put('/proposals/{id}/update-status', [ProposalController::class, 'updateStatus']);
-    });
+    /* PUT /proposals/{id} — L, ADM (cualquier propuesta) + ESTUDIANTE (solo la
+       suya, y solo si sigue PENDIENTE — validado dentro del controlador).
+       update-status (aprobar/rechazar) sigue siendo exclusivo de L, ADM. */
+    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
+         ->put('/proposals/{id}', [ProposalController::class, 'update']);
+
+    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO')
+         ->put('/proposals/{id}/update-status', [ProposalController::class, 'updateStatus']);
 
     /* GET propias — solo E */
     Route::middleware('role:ESTUDIANTE')

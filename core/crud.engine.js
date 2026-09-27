@@ -15,8 +15,9 @@ export function createCrudModule(config) {
     const fields  = config.fields;
 
     /* Los campos de contraseña son solo de formulario — nunca deben verse en una
-       tabla de listado, ni siquiera vacíos (ver auditoría de diseño 2026-07-25). */
-    const tableFields = fields.filter(f => f.type !== "password");
+       tabla de listado, ni siquiera vacíos (ver auditoría de diseño 2026-07-25).
+       Los textarea (texto largo tipo descripción) tampoco caben en una columna. */
+    const tableFields = fields.filter(f => f.type !== "password" && f.type !== "textarea");
 
     let currentEditId = null;
     let recordsCache  = [];
@@ -102,10 +103,13 @@ export function createCrudModule(config) {
             <div class="table-toolbar">
                 <h2>${title}</h2>
                 ${!noCreate ? `
-                <button class="btn btn-primary" id="createBtn-${entity}">
-                    <i class="fas fa-plus"></i>
-                    Crear ${title.split(" ").pop()}
-                </button>` : ""}
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn btn-primary" id="createBtn-${entity}">
+                        <i class="fas fa-plus"></i>
+                        Crear ${title.split(" ").pop()}
+                    </button>
+                    ${config.toolbarExtraHtml ? config.toolbarExtraHtml() : ""}
+                </div>` : ""}
             </div>
             <div class="empty-state">
                 <div class="empty-state-icon">
@@ -125,6 +129,8 @@ export function createCrudModule(config) {
 
             document.getElementById(`createBtn-${entity}-empty`)
                 ?.addEventListener("click", () => renderForm());
+
+            config.afterTableMount?.();
 
             return;
         }
@@ -202,10 +208,13 @@ export function createCrudModule(config) {
                 </span>
             </div>
             ${!noCreate ? `
-            <button class="btn btn-primary" id="createBtn-${entity}">
-                <i class="fas fa-plus"></i>
-                Crear ${title.split(" ").pop()}
-            </button>` : ""}
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-primary" id="createBtn-${entity}">
+                    <i class="fas fa-plus"></i>
+                    Crear ${title.split(" ").pop()}
+                </button>
+                ${config.toolbarExtraHtml ? config.toolbarExtraHtml() : ""}
+            </div>` : ""}
         </div>
 
         <table id="datatable-${entity}" class="display mobile-card-table" style="width:100%">
@@ -222,6 +231,10 @@ export function createCrudModule(config) {
 
         document.getElementById("app").innerHTML = LayoutView(content);
         initLayoutController();
+
+        /* Hook para que un módulo active su propio JS del toolbar extra
+           (ej. botón "Importar") una vez la tabla ya está en el DOM. */
+        config.afterTableMount?.();
 
         setTimeout(() => {
             const tableId = `#datatable-${entity}`;
@@ -295,7 +308,7 @@ export function createCrudModule(config) {
 
     function validateForm(form) {
         const errors = [];
-        form.querySelectorAll("input[required], select[required]").forEach(input => {
+        form.querySelectorAll("input[required], select[required], textarea[required]").forEach(input => {
             const msgEl = form.querySelector(`#err-${input.name}`);
             if (!validateField(input, msgEl)) {
                 errors.push(input);
@@ -330,8 +343,36 @@ export function createCrudModule(config) {
 
             if (f.name === "id") continue;
 
-            const isRequired = true; /* all non-id fields are required by default */
-            const labelHtml  = `${f.label}<span class="required-star" aria-hidden="true">*</span>`;
+            /* Todos los campos son obligatorios por defecto — un módulo puede
+               marcar required:false explícitamente (ej. una descripción). */
+            const isRequired = f.required !== false;
+            const labelHtml  = isRequired
+                ? `${f.label}<span class="required-star" aria-hidden="true">*</span>`
+                : `${f.label} <span class="optional-hint">(opcional)</span>`;
+
+            /* TEXTAREA */
+            if (f.type === "textarea") {
+                const inputValue = record ? (record[f.name] ?? "") : "";
+                /* Escapar: el contenido va dentro de <textarea>...</textarea> —
+                   sin esto, una descripción con "</textarea>" rompería el markup. */
+                const safeValue = String(inputValue)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+                inputs.push(`
+                <div class="form-group">
+                    <label for="field-${f.name}">${labelHtml}</label>
+                    <textarea
+                        id="field-${f.name}"
+                        name="${f.name}"
+                        rows="4"
+                        ${isRequired ? "required" : ""}
+                    >${safeValue}</textarea>
+                    <span class="field-error-msg" id="err-${f.name}"></span>
+                </div>`);
+                if (isRequired) requiredFields.push(f.name);
+                continue;
+            }
 
             /* SELECT */
             if (f.type === "select") {
@@ -490,11 +531,12 @@ export function createCrudModule(config) {
                     name="${f.name}"
                     value="${inputType !== "password" ? inputValue : ""}"
                     ${extraAttrs}
-                    required>
+                    ${isRequired ? "required" : ""}>
+                ${f.hint ? `<span class="optional-hint" style="display:block;margin-top:4px">${f.hint}</span>` : ""}
                 <span class="field-error-msg" id="err-${f.name}"></span>
             </div>`);
 
-            requiredFields.push(f.name);
+            if (isRequired) requiredFields.push(f.name);
         }
 
         const modal = `
@@ -517,6 +559,8 @@ export function createCrudModule(config) {
 
                     ${inputs.join("")}
 
+                    ${config.extraFormHtml ? config.extraFormHtml(record) : ""}
+
                     <div class="modal-actions">
                         <button type="button" class="btn btn-ghost" id="closeModalBtn">
                             <i class="fas fa-times"></i> Cancelar
@@ -534,7 +578,7 @@ export function createCrudModule(config) {
         /* Blur validation after modal is in DOM */
         const form = document.getElementById(`crudForm-${entity}`);
         if (form) {
-            form.querySelectorAll("input[required], select[required]").forEach(input => {
+            form.querySelectorAll("input[required], select[required], textarea[required]").forEach(input => {
                 input.addEventListener("blur", () => {
                     const msgEl = form.querySelector(`#err-${input.name}`);
                     validateField(input, msgEl);
@@ -544,6 +588,10 @@ export function createCrudModule(config) {
             /* Auto-focus first field */
             form.querySelector("input, select")?.focus();
         }
+
+        /* Hook para que un módulo agregue su propia lógica (ej. lista de
+           objetivos anidada) una vez el formulario ya está en el DOM. */
+        await config.afterFormMount?.(record);
     }
 
 
@@ -552,13 +600,15 @@ export function createCrudModule(config) {
     ===================================================== */
 
     async function create(data) {
-        await apiFetch(`/${entity}`, { method: "POST", body: JSON.stringify(data) });
+        const response = await apiFetch(`/${entity}`, { method: "POST", body: JSON.stringify(data) });
         await init();
+        return response;
     }
 
     async function update(id, data) {
-        await apiFetch(`/${entity}/${id}`, { method: "PUT", body: JSON.stringify(data) });
+        const response = await apiFetch(`/${entity}/${id}`, { method: "PUT", body: JSON.stringify(data) });
         await init();
+        return response;
     }
 
 
@@ -684,12 +734,28 @@ export function createCrudModule(config) {
 
             const data = Object.fromEntries(new FormData(form).entries());
 
-            try {
-                if (currentEditId) {
-                    await update(currentEditId, data);
-                } else {
-                    await create(data);
+            /* Un campo opcional (required:false) vacío se omite en vez de
+               enviarse como "" — evita que reglas tipo "nullable|min:6"
+               rechacen una contraseña vacía (nullable solo perdona null,
+               no un string vacío). */
+            for (const f of fields) {
+                if (f.required === false && data[f.name] === "") {
+                    delete data[f.name];
                 }
+            }
+
+            try {
+                let response;
+                if (currentEditId) {
+                    response = await update(currentEditId, data);
+                } else {
+                    response = await create(data);
+                }
+
+                /* Hook para que un módulo haga algo con el registro recién
+                   guardado (ej. crear los objetivos anidados de un semillero
+                   nuevo, usando el id que acaba de asignar el backend). */
+                await config.onSaved?.(response, !!currentEditId, currentEditId);
 
                 document.getElementById("crudModal")?.remove();
 

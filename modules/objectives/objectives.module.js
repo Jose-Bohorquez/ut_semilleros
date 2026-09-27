@@ -47,8 +47,8 @@ fields: [
 
 ],
 
-noCreateFor: ['ADMIN_SISTEMA'],
+noCreateFor: ['ESTUDIANTE'],
 
-noEditFor: ['ADMIN_SISTEMA']
+noEditFor: ['ESTUDIANTE']
 
 });

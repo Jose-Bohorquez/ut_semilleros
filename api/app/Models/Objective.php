@@ -11,6 +11,7 @@ class Objective extends Model
     protected $fillable = [
         'seedbed_id',
         'content',
+        'order',
         'status'
     ];
 

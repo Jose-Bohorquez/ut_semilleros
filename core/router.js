@@ -119,7 +119,7 @@ export const routes = {
 
         if (!requireAuth()) return;
 
-        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO"])) return;
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO","LIDER_SEMILLERO"])) return;
 
         const module = await import("../modules/seedbeds/seedbeds.module.js");
 
@@ -147,6 +147,8 @@ export const routes = {
 
         if (!requireAuth()) return;
 
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO"])) return;
+
         const module = await import("../modules/products/products.module.js");
 
         await module.productsModule.init();
@@ -158,6 +160,11 @@ export const routes = {
 
         if (!requireAuth()) return;
 
+        /* Jose, 2026-07-28: el link solo aparece en el menú de ADMIN_SISTEMA —
+           si un rol no tiene la opción a la vista, tampoco debe poder entrar
+           por URL directa y encontrarse una pantalla rota/vacía. */
+        if (!requireRole(["ADMIN_SISTEMA"])) return;
+
         const module = await import("../modules/coordinators/coordinators.module.js");
 
         await module.coordinatorsModule.init();
@@ -167,6 +174,8 @@ export const routes = {
     "/cats": async () => {
 
         if (!requireAuth()) return;
+
+        if (!requireRole(["ADMIN_SISTEMA"])) return;
 
         const module = await import("../modules/cats/cats.module.js");
 
@@ -178,6 +187,8 @@ export const routes = {
     "/areas": async () => {
 
         if (!requireAuth()) return;
+
+        if (!requireRole(["ADMIN_SISTEMA"])) return;
 
         const module = await import("../modules/areas/areas.module.js");
 
@@ -192,6 +203,8 @@ export const routes = {
 
         if (!requireAuth()) return;
 
+        if (!requireRole(["ADMIN_SISTEMA"])) return;
+
         const module = await import("../modules/groups/groups.module.js");
 
         await module.groupsModule.init();
@@ -202,6 +215,8 @@ export const routes = {
 
         if (!requireAuth()) return;
 
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO","LIDER_SEMILLERO"])) return;
+
         const module = await import("../modules/objectives/objectives.module.js");
 
         await module.objectivesModule.init();
@@ -211,6 +226,8 @@ export const routes = {
     "/results": async () => {
 
         if (!requireAuth()) return;
+
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO","LIDER_SEMILLERO"])) return;
 
         const module = await import("../modules/results/results.module.js");
 
@@ -293,6 +310,8 @@ export const routes = {
     "/audits": async () => {
 
         if (!requireAuth()) return;
+
+        if (!requireRole(["ADMIN_SISTEMA"])) return;
 
         const module = await import("../modules/audits/audits.module.js");
 
