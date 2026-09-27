@@ -84,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:ADMIN_SISTEMA')->group(function () {
         Route::get('/users/{id}',                    [UserController::class, 'show']);
         Route::post('/users',                        [UserController::class, 'store']);
+        Route::post('/users/import',                 [UserController::class, 'import']);
         Route::put('/users/{id}',                    [UserController::class, 'update']);
         Route::put('/users/{id}/toggle-status',      [UserController::class, 'toggleStatus']);
     });

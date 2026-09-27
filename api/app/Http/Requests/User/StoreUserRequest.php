@@ -31,9 +31,14 @@ class StoreUserRequest extends FormRequest
 
             ],
 
+            /* Si el admin no manda contraseña, se genera una aleatoria interna
+               y se le envía al usuario un correo de activación para que
+               defina la suya (Jose, 2026-08-31). Si sí la manda (flujo viejo
+               desde el formulario individual), se usa esa y no se envía
+               correo — se mantiene igual que antes. */
             'password' => [
 
-                'required',
+                'nullable',
                 'min:6'
 
             ],

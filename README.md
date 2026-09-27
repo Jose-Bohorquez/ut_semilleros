@@ -150,13 +150,41 @@ Próximas mejoras previstas:
 
 ---
 
-## 🧩 Próximos Pasos
+## 📚 Documentación
 
-1. Crear el archivo `.env` con configuración Docker + Producción.  
-2. Implementar autenticación con Laravel Sanctum.  
-3. Desarrollar modelos y migraciones de semilleros, proyectos y usuarios.  
-4. Construir endpoints RESTful iniciales.  
-5. Desarrollar frontend PWA para consumo de API y notificaciones.  
+- [`docs/roles-usuarios.md`](docs/roles-usuarios.md) — matriz de roles y permisos, validada contra el backend real.
+- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — bugs encontrados y corregidos en cada ronda de auditoría (última: 2026-08-31).
+
+## 🔑 Credenciales y configuración sensible
+
+Este repositorio es **público** — ninguna contraseña, token o secreto real se documenta
+aquí ni en ningún otro `.md` del proyecto. Lo que sí queda documentado es **dónde vive**
+cada credencial:
+
+| Credencial | Dónde vive |
+|---|---|
+| `.env` de producción (BD, `APP_KEY`, SMTP, VAPID) | Solo en el servidor (`api/.env`, `chmod 600`), nunca en el repo (`.gitignore` ya excluye `.env`/`.env.*`). |
+| Contraseña del buzón `activacion@ut-edu.online` (SMTP de correos de activación/recuperación) | hPanel de Hostinger → Correos. Usada en `MAIL_USERNAME`/`MAIL_PASSWORD` del `.env` de producción. |
+| Contraseñas de usuarios reales del sistema | Nunca se generan ni se comparten en texto plano salvo una única vez al crear la primera cuenta admin; todo usuario nuevo se crea **sin contraseña** y activa la suya propia vía el correo de activación (`/reset-password?...&activation=1`). |
+| Credenciales de BD de producción | hPanel de Hostinger → Bases de datos. |
+
+## 🚀 Estado actual
+
+El sistema ya está desplegado en producción (`https://ut-edu.online/`), con autenticación,
+gestión de semilleros (con objetivos reordenables), proyectos, productos, resultados,
+solicitudes de ingreso, propuestas de investigación, notificaciones push, dashboard por
+rol, e **importación masiva de usuarios con activación de cuenta por correo real** (SMTP
+configurado, ya no `MAIL_MAILER=log`). Ver `docs/CHANGELOG.md` para el detalle de qué se
+validó y corrigió en cada ronda.
+
+### Próximas mejoras identificadas (no bloqueantes)
+
+- Confirmar recepción visible/audible de una notificación push en un dispositivo físico
+  real (el envío del lado del servidor ya se verificó exitoso contra FCM).
+- Versionamiento de propuestas (historial de cambios), mencionado como posible mejora
+  futura por el equipo.
+- Cargar los usuarios reales pendientes (CAT Kennedy) vía el importador, una vez se
+  confirmen o corrijan los nombres sugeridos.
 
 ---
 

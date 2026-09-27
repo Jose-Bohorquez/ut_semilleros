@@ -52,14 +52,25 @@ export const routes = {
 
     },
 
+    /* Públicas — recuperación/activación de cuenta (Jose, 2026-08-31) */
+    "/forgot-password": async () => {
+        const m = await import("../modules/auth/forgot-password.module.js");
+        m.forgotPasswordModule.init();
+    },
+
+    "/reset-password": async () => {
+        const m = await import("../modules/auth/reset-password.module.js");
+        m.resetPasswordModule.init();
+    },
+
 
 
     "/dashboard": async () => {
 
         if (!requireAuth()) return;
 
-        const view = await import("../modules/dashboard/dashboard.view.js");
-        const controller = await import("../modules/dashboard/dashboard.controller.js");
+        const view = await import("../modules/dashboard/dashboard.view.js?v=2");
+        const controller = await import("../modules/dashboard/dashboard.controller.js?v=2");
 
         const content = view.DashboardView();
 

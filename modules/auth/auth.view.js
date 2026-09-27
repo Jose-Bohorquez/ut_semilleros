@@ -210,7 +210,7 @@ export function LoginView() {
 
             <!-- Links -->
             <div class="login-links">
-              <a href="#" class="login-link-primary">
+              <a href="/forgot-password" class="login-link-primary">
                 <i class="fas fa-key"></i>
                 ¿Olvidaste tu contraseña?
               </a>
