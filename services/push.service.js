@@ -10,8 +10,10 @@
 import { apiFetch } from "./api.service.js";
 import { getToken } from "./storage.service.js";
 
-/* Clave VAPID pública — debe coincidir con VAPID_PUBLIC_KEY en .env del backend */
-const VAPID_PUBLIC_KEY = "BI5F1eyUCzDwl0sFvbCaVQ-VUkHlq-RO2V1kOSz9qHq1qgX1gkzyzJL5Hf7HMru9eDJ8B7M-CuXnoY1tTRZLyys";
+/* Clave VAPID pública — debe coincidir con VAPID_PUBLIC_KEY en .env del backend
+   (regenerada 2026-07-28: la anterior no tenía su PRIVATE_KEY correspondiente
+   configurada en el servidor, así que ningún push podía enviarse nunca). */
+const VAPID_PUBLIC_KEY = "BBHXivmRXUDJfObqhfOHKHz70mnSE6grOQVcF6XKcaL8227JWzzpCtnOuGLmLS17YV4r21OdpuBWUnQunQfIz4k";
 
 /* ── Convierte VAPID key de base64url a Uint8Array ─────── */
 function urlBase64ToUint8Array(base64String) {
@@ -62,18 +64,13 @@ export async function subscribeToPush() {
             });
         }
 
-        /* Guardar la suscripción en el backend */
-        await apiFetch("/push/subscribe", {
+        /* Guardar la suscripción en el backend — la ruta real es POST /push-subscriptions
+           (PushSubscriptionController::store) y espera exactamente la forma de
+           subscription.toJSON(): {endpoint, keys:{p256dh, auth}}. /push/subscribe
+           nunca existió como ruta (404 silencioso). */
+        await apiFetch("/push-subscriptions", {
             method: "POST",
-            body:   JSON.stringify({
-                endpoint:   subscription.endpoint,
-                p256dh_key: btoa(String.fromCharCode(
-                    ...new Uint8Array(subscription.getKey("p256dh"))
-                )),
-                auth_token: btoa(String.fromCharCode(
-                    ...new Uint8Array(subscription.getKey("auth"))
-                )),
-            }),
+            body:   JSON.stringify(subscription.toJSON()),
         });
 
         console.info("[Push] Suscripción registrada correctamente.");
@@ -95,8 +92,8 @@ export async function unsubscribeFromPush() {
 
         if (subscription) {
             await subscription.unsubscribe();
-            await apiFetch("/push/unsubscribe", {
-                method: "POST",
+            await apiFetch("/push-subscriptions", {
+                method: "DELETE",
                 body:   JSON.stringify({ endpoint: subscription.endpoint }),
             });
             console.info("[Push] Suscripción cancelada.");

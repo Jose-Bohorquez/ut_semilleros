@@ -296,6 +296,12 @@ class NotificacionController extends Controller
             if ($report->isSubscriptionExpired()) {
                 PushSubscription::where('endpoint', $report->getRequest()->getUri()->__toString())->delete();
             }
+            if (!$report->isSuccess()) {
+                \Illuminate\Support\Facades\Log::warning('[Push] Falló el envío a una suscripción', [
+                    'endpoint' => (string) $report->getRequest()->getUri(),
+                    'reason'   => $report->getReason(),
+                ]);
+            }
         }
     }
 }

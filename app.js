@@ -1,5 +1,5 @@
 /* #archivo: /frontend/app.js */
-import { renderRoute } from './core/router.js';
+import { renderRoute } from './core/router.js?v=2';
 
 document.addEventListener("DOMContentLoaded", () => {
     renderRoute();
@@ -16,8 +16,11 @@ if ('serviceWorker' in navigator) {
             console.log('Service Worker registrado');
             // Solicitar permiso y suscribir al push (solo si el usuario está autenticado).
             // Se expone en window para que layout.controller.js lo llame después del login.
-            const { requestPushPermissionAndSubscribe } = await import('./modules/notifications/push.service.js');
-            window.__subscribePush = requestPushPermissionAndSubscribe;
+            // (2026-07-28: unificado con services/push.service.js — el módulo viejo
+            // modules/notifications/push.service.js tenía una VAPID key placeholder
+            // sin completar y apuntaba a una ruta /push/subscribe que nunca existió.)
+            const { subscribeToPush } = await import('./services/push.service.js');
+            window.__subscribePush = subscribeToPush;
         })
         .catch(err => console.error('Error SW:', err));
 }
