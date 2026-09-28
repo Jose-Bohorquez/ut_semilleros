@@ -68,6 +68,13 @@ export const routes = {
         m.forgotPasswordModule.init();
     },
 
+    /* RF16 / CU02 A1 — aviso de privacidad (requiere sesión, no requireAuth:
+       requireAuth redirige aquí mismo) */
+    "/consent": async () => {
+        const m = await import("../modules/auth/consent.module.js");
+        await m.consentModule.init();
+    },
+
     "/reset-password": async () => {
         const m = await import("../modules/auth/reset-password.module.js");
         m.resetPasswordModule.init();

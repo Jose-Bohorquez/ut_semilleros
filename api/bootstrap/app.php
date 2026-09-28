@@ -29,6 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
             /* Usuario INACTIVO no puede usar su token (C-04, 2026-09-27) */
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
 
+            /* RF16: el estudiante debe aceptar el tratamiento de datos */
+            'consent' => \App\Http\Middleware\EnsureDataConsent::class,
+
             /*
             |--------------------------------------------------------------------------
             | Reemplazo Authenticate API

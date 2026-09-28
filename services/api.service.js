@@ -4,7 +4,8 @@
    Servicio central para comunicación con la API Laravel
    ========================================================= */
 
-import { getToken, rememberIntendedRoute } from "./storage.service.js";
+import { getToken, getUser, rememberIntendedRoute, clearOfflineCache } from "./storage.service.js";
+import { showOfflineBanner } from "../core/offline-banner.js";
 
 /* =========================================================
    URL BASE DE LA API
@@ -36,6 +37,40 @@ function clearAuthSession() {
     } catch (e) {
         console.warn("No se pudo limpiar localStorage:", e);
     }
+    clearOfflineCache();
+}
+
+/* =========================================================
+   RNF02 — consulta sin conexión
+   El listado y el detalle de semilleros (con sus objetivos) se guardan al
+   consultarlos; sin red se devuelve la última copia y se avisa. Se guarda por
+   usuario y se borra al cerrar sesión: en un equipo compartido nadie ve lo
+   que consultó otro. Se hace aquí y no en el service worker porque la
+   respuesta depende del token (rol), y así la copia queda atada al usuario.
+   ========================================================= */
+
+const OFFLINE_ENDPOINTS = [/^\/seedbeds(\/\d+)?$/, /^\/objectives$/];
+
+function offlineKey(endpoint) {
+    const uid = getUser()?.id;
+    return uid ? `offline:v1:${uid}:${endpoint}` : null;
+}
+
+function isOfflineCacheable(endpoint, method) {
+    return (method || "GET").toUpperCase() === "GET"
+        && OFFLINE_ENDPOINTS.some(re => re.test(endpoint.split("?")[0]));
+}
+
+function saveOffline(endpoint, data) {
+    const key = offlineKey(endpoint);
+    if (!key) return;
+    try { localStorage.setItem(key, JSON.stringify({ at: new Date().toISOString(), data })); } catch {}
+}
+
+function readOffline(endpoint) {
+    const key = offlineKey(endpoint);
+    if (!key) return null;
+    try { return JSON.parse(localStorage.getItem(key) || "null"); } catch { return null; }
 }
 
 /* =========================================================
@@ -69,6 +104,11 @@ export async function apiFetch(endpoint, options = {}) {
             headers
         });
     } catch (networkError) {
+        const offline = token && isOfflineCacheable(endpoint, fetchOptions.method) && readOffline(endpoint);
+        if (offline) {
+            showOfflineBanner(offline.at);
+            return offline.data;
+        }
         console.error("[apiFetch] Error de red:", networkError);
         const err = new Error("No se pudo conectar con el servidor");
         err.status = 0;
@@ -102,6 +142,14 @@ export async function apiFetch(endpoint, options = {}) {
             return;
         }
 
+        /* RF16: estudiante sin autorización de datos → pantalla del aviso */
+        if (response.status === 403 && data?.code === "CONSENT_REQUIRED" && token) {
+            if (window.location.pathname !== "/consent") {
+                window.location.href = "/consent";
+                return;
+            }
+        }
+
         const serverMessage =
             (typeof data === "object" && data?.message) ||
             (typeof data === "string" && data) ||
@@ -118,6 +166,8 @@ export async function apiFetch(endpoint, options = {}) {
         err.payload = data;
         throw err;
     }
+
+    if (token && isOfflineCacheable(endpoint, fetchOptions.method)) saveOffline(endpoint, data);
 
     return data;
 }

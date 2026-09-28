@@ -22,6 +22,7 @@ class Faculty extends Model
      * Campos que pueden ser asignados masivamente
      */
     protected $fillable = [
+        'code',
         'name',
         'status'
     ];

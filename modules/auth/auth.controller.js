@@ -1,9 +1,138 @@
 /* #archivo: /frontend/modules/auth/auth.controller.js */
 
 import { apiFetch }        from "../../services/api.service.js";
-import { setToken, setUser, setTokenExpiry, consumeIntendedRoute } from "../../services/storage.service.js";
+import { setToken, setUser, setTokenExpiry, consumeIntendedRoute, needsDataConsent } from "../../services/storage.service.js";
 import { navigateTo }      from "../../core/router.js";
 import { initPushOnLogin } from "../../services/push.service.js";
+
+/* Común a CU01 (contraseña) y CU02 (Google): guarda la sesión y decide a
+   dónde ir. Un estudiante sin autorización de datos pasa primero por el
+   aviso (CU02 A1 / RF16). */
+function startSession(response) {
+    setToken(response.token);
+    setUser(response.user);
+    setTokenExpiry(response.expires_at);
+
+    /* Prepara la suscripción push para cuando el layout monte */
+    initPushOnLogin();
+
+    if (needsDataConsent(response.user)) {
+        navigateTo("/consent");
+        return;
+    }
+
+    Swal.fire({
+        icon:             "success",
+        title:            "Bienvenido",
+        timer:            1500,
+        showConfirmButton: false,
+    });
+
+    /* CU01 A3: volver a la ruta que se intentaba abrir */
+    navigateTo(consumeIntendedRoute() || "/dashboard");
+}
+
+/* =========================================================
+   CU02 — Iniciar sesión con la cuenta de Google institucional
+   Google Identity Services entrega un ID token (credential) que el servidor
+   verifica. Si el servidor no tiene Client ID configurado, la sección no se
+   muestra y el login sigue solo con contraseña.
+   ========================================================= */
+
+const GIS_SRC = "https://accounts.google.com/gsi/client";
+const E4_MSG  = "Necesita conexión a internet para iniciar sesión";
+const E5_MSG  = "No fue posible autenticarse con Google, intente nuevamente";
+
+function loadGis() {
+    if (window.google?.accounts?.id) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+        const tag = document.createElement("script");
+        tag.src = GIS_SRC;
+        tag.async = true;
+        tag.onload = resolve;
+        tag.onerror = reject;
+        document.head.appendChild(tag);
+    });
+}
+
+async function initGoogleLogin() {
+    const section = document.getElementById("google-login");
+    const btnBox  = document.getElementById("google-btn");
+    const alertEl = document.getElementById("google-alert");
+    const alertTx = document.getElementById("google-alert-text");
+    if (!section || !btnBox) return;
+
+    const show = msg => { alertTx.textContent = msg; alertEl.hidden = false; };
+    const hide = ()  => { alertEl.hidden = true; };
+
+    /* E4: sin conexión no se puede ni consultar la configuración */
+    if (!navigator.onLine) {
+        section.hidden = false;
+        show(E4_MSG);
+        window.addEventListener("online", () => initGoogleLogin(), { once: true });
+        return;
+    }
+
+    let cfg;
+    try {
+        cfg = await apiFetch("/auth/config", { auth: false });
+    } catch {
+        return;   /* sin configuración: queda solo el formulario */
+    }
+    if (!cfg?.google_client_id) return;
+
+    try {
+        await loadGis();
+    } catch {
+        section.hidden = false;
+        show(navigator.onLine ? E5_MSG : E4_MSG);
+        return;
+    }
+
+    /* La vista pudo cambiar mientras cargaba el script */
+    if (!document.body.contains(btnBox)) return;
+
+    hide();
+    section.hidden = false;
+
+    google.accounts.id.initialize({
+        client_id: cfg.google_client_id,
+        /* Sin «hd»: restringiría el selector a @ut.edu.co y un ADMIN_SISTEMA con
+           otra cuenta no podría entrar. RN04 se aplica en el servidor (E1). */
+        callback: async ({ credential }) => {
+            /* E2: si cancela en Google no llega callback → no se muestra nada */
+            if (!credential) return;
+            hide();
+            if (!navigator.onLine) { show(E4_MSG); return; }
+            btnBox.setAttribute("aria-busy", "true");
+            try {
+                const response = await apiFetch("/auth/google", {
+                    method: "POST",
+                    body:   JSON.stringify({ credential }),
+                    auth:   false,
+                });
+                startSession(response);
+            } catch (error) {
+                /* E1 (dominio), E3 (inactivo), E5 (Google) — mensaje del servidor */
+                show(error.status === 0 ? E4_MSG
+                    : error.status === 429 ? "Demasiados intentos. Espere un minuto e intente de nuevo."
+                    : (error.message || E5_MSG));
+            } finally {
+                btnBox.removeAttribute("aria-busy");
+            }
+        },
+        cancel_on_tap_outside: true,
+        context: "signin",
+        ux_mode: "popup",
+        itp_support: true,
+    });
+
+    const width = Math.min(360, Math.max(240, Math.floor(btnBox.getBoundingClientRect().width || 320)));
+    google.accounts.id.renderButton(btnBox, {
+        type: "standard", theme: "outline", size: "large", shape: "pill",
+        text: "signin_with", logo_alignment: "left", locale: "es", width,
+    });
+}
 
 /* CU01 — Iniciar sesión en el panel web.
    Pasos, alternos (A*) y excepciones (E*) según
@@ -19,6 +148,12 @@ export function initLoginController() {
     const alertBox   = document.getElementById("login-alert");
     const alertText  = document.getElementById("login-alert-text");
     const origText   = submitBtn?.innerHTML;
+
+    initGoogleLogin();
+
+    /* CU02 A1.4: mensaje tras «No acepto» en el aviso de privacidad */
+    let flash = null;
+    try { flash = sessionStorage.getItem("ut_login_flash"); sessionStorage.removeItem("ut_login_flash"); } catch {}
 
     /* ================================
        PASSWORD TOGGLE
@@ -90,6 +225,8 @@ export function initLoginController() {
         submitBtn.innerHTML = origText;
     }
 
+    if (flash) showAlert(flash);
+
     emailInput?.addEventListener("blur",  validateEmail);
     passInput?.addEventListener("blur",   validatePassword);
     emailInput?.addEventListener("input", () => { clearError(emailInput); hideAlert(); });
@@ -131,22 +268,7 @@ export function initLoginController() {
                 auth:   false,
             });
 
-            setToken(response.token);
-            setUser(response.user);
-            setTokenExpiry(response.expires_at);
-
-            /* Prepara la suscripción push para cuando el layout monte */
-            initPushOnLogin();
-
-            Swal.fire({
-                icon:             "success",
-                title:            "Bienvenido",
-                timer:            1500,
-                showConfirmButton: false,
-            });
-
-            /* A3: volver a la ruta que se intentaba abrir */
-            navigateTo(consumeIntendedRoute() || "/dashboard");
+            startSession(response);
 
         } catch (error) {
 

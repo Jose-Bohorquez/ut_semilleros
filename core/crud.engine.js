@@ -400,9 +400,19 @@ export function createCrudModule(config) {
                 try {
                     const relData = await apiFetch(`/${f.relation}`);
                     const items   = relData?.[f.relation] || [];
-                    const options = items.map(item => {
+                    /* RF02 / RF03: un registro inactivo (o cuya facultad / programa
+                       padre esté inactivo) no se ofrece en los formularios. Se
+                       conserva solo si es el valor actual del registro que se edita,
+                       para no cambiarlo sin que el usuario lo note. */
+                    const isOff = item => item.status === "INACTIVO"
+                        || item.faculty?.status === "INACTIVO"
+                        || item.program?.status === "INACTIVO";
+                    const selectable = items.filter(item =>
+                        !isOff(item) || (record && record[f.name] == item.id));
+                    const options = selectable.map(item => {
                         const selected = record && record[f.name] == item.id ? "selected" : "";
-                        return `<option value="${escapeHtml(item.id)}" ${selected}>${escapeHtml(item[f.display] ?? item.id)}</option>`;
+                        const label = (item[f.display] ?? item.id) + (isOff(item) ? " (inactivo)" : "");
+                        return `<option value="${escapeHtml(item.id)}" ${selected}>${escapeHtml(label)}</option>`;
                     }).join("");
 
                     inputs.push(`
@@ -519,9 +529,12 @@ export function createCrudModule(config) {
             /* INPUT */
             const inputType  = f.type || "text";
             const inputValue = record ? (record[f.name] ?? "") : "";
-            const extraAttrs = inputType === "password"
+            const extraAttrs = (inputType === "password"
                 ? 'autocomplete="new-password" placeholder="Mínimo 8 caracteres"'
-                : `autocomplete="off"`;
+                : `autocomplete="off"`)
+                + (f.maxlength   ? ` maxlength="${Number(f.maxlength)}"` : "")
+                + (f.placeholder ? ` placeholder="${escapeHtml(f.placeholder)}"` : "")
+                + (f.uppercase   ? ` style="text-transform:uppercase" autocapitalize="characters"` : "");
 
             inputs.push(`
             <div class="form-group">

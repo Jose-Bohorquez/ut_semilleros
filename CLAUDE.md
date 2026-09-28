@@ -40,8 +40,15 @@ propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 
 (include) · CU30 consultar auditoría.
 
 **Avance de la validación 1 a 1** (acta por CU en `docs/validacion/CUxx.md`, versionada): CU01
-web ✅ desplegado y validado en producción · PWA ✅ desplegada y validada en producción (2026-09-28; E5 queda para CU02) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
-parcial (tokens de 8 h / 30 d).
+web ✅ desplegado y validado en producción · PWA ✅ desplegada y validada en producción (2026-09-28) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
+parcial (tokens de 8 h / 30 d). CU02 + RF02 + RF16 + RNF02 ✅ en local (2026-09-28, acta
+`docs/validacion/CU02.md`); Google real pendiente del Client ID (`GOOGLE_CLIENT_ID` en `.env`).
+
+**Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
+(`GOOGLE_ALLOWED_DOMAINS`, por defecto `ut.edu.co`, y claim `hd` igual). Única excepción: un
+ADMIN_SISTEMA ya registrado puede usar cualquier cuenta de Google. **El login con contraseña sigue
+abierto para todos los roles** (CU01 E5 no se aplica): el estudiante puede entrar directo con Google o
+crear una contraseña desde «¿Olvidó su contraseña?» con su correo institucional.
 
 **SIA (RF17 propuesto, 2026-09-28):** asistente con IA (Groq `gpt-oss-20b`) y botón de WhatsApp
 solo para bugs (+57 3178773186), en todas las pantallas; panel `/admin/sia`. Diseño, límites y
@@ -51,8 +58,8 @@ La key (`GROQ_API_KEY`) vive solo en `.env` o en el override local; nunca en git
 
 Diferencias conocidas a cerrar (2026-09-28): RN10
 (contraseña fuerte) no se aplica; RN06 (líder solo en sus semilleros) no se aplica; RN02/RN03
-(referencia de autorización escrita) sin campo; RN08 (códigos únicos) solo en CAT, áreas y grupos;
-RF15/CU28 reportes y RF16/RN09 consentimiento de datos no existen; CU02 no usa Google. El avance de
+(referencia de autorización escrita) sin campo; RN08 (códigos únicos) en CAT, áreas, grupos y
+facultades (faltan programa y semillero); RF15/CU28 reportes no existen. El avance de
 la validación 1 a 1 queda en `docs/qa/` (no versionado mientras haya vulnerabilidades abiertas).
 
 ## Antes de trabajar aquí

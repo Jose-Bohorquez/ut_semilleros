@@ -50,7 +50,7 @@ export function removeUser() {
    ========================================================= */
 
 const INTENDED_KEY  = "ut_after_login";
-const PUBLIC_ROUTES = ["/", "/login", "/forgot-password", "/reset-password"];
+const PUBLIC_ROUTES = ["/", "/login", "/forgot-password", "/reset-password", "/consent"];
 
 export function rememberIntendedRoute() {
     const { pathname, search } = window.location;
@@ -93,6 +93,25 @@ export function hasValidSession() {
        la API, que responde 401 si el token ya no sirve. */
     if (!exp) return true;
     if (Date.parse(exp) > Date.now()) return true;
-    removeToken(); removeUser(); setTokenExpiry(null);
+    removeToken(); removeUser(); setTokenExpiry(null); clearOfflineCache();
     return false;
+}
+
+
+/* =========================================================
+   RNF02 — copias sin conexión (ver api.service.js). Se borran todas al
+   cerrar sesión o cuando la sesión vence.
+   ========================================================= */
+
+export function clearOfflineCache() {
+    try {
+        Object.keys(localStorage)
+            .filter(k => k.startsWith("offline:"))
+            .forEach(k => localStorage.removeItem(k));
+    } catch {}
+}
+
+/* RF16 / RN09: el estudiante debe haber aceptado el tratamiento de datos */
+export function needsDataConsent(user = getUser()) {
+    return !!user && user.role === "ESTUDIANTE" && !user.data_consent_at;
 }

@@ -6,9 +6,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProgramController extends Controller
 {
+    private const FACULTY_MESSAGES = [
+        'faculty_id.exists' => 'La facultad seleccionada no existe o está inactiva.',
+    ];
 
     /**
      * Listar programas
@@ -33,11 +37,12 @@ class ProgramController extends Controller
     public function store(Request $request)
     {
 
+/* RF02: una facultad inactiva no se puede elegir para un programa */
 $validated = $request->validate([
     "name" => "required|string|max:255",
-    "faculty_id" => "required|exists:faculties,id",
+    "faculty_id" => ["required", Rule::exists('faculties', 'id')->where('status', 'ACTIVO')],
     "status" => "required|in:ACTIVO,INACTIVO"
-]);
+], self::FACULTY_MESSAGES);
 
 $program = Program::create([
     "name"=>$validated["name"],
@@ -61,13 +66,19 @@ $program = Program::create([
 
         $program = Program::findOrFail($id);
 
+        /* RF02: al editar se puede conservar la facultad actual aunque se haya
+           inactivado después; cambiar a otra exige que esté activa. */
+        $facultyRule = (int) $request->input("faculty_id") === (int) $program->faculty_id
+            ? "exists:faculties,id"
+            : Rule::exists('faculties', 'id')->where('status', 'ACTIVO');
+
         $validated = $request->validate([
 
             "name"=>"required|string|max:255",
-            "faculty_id"=>"required|exists:faculties,id",
-            "status"=>"required"
+            "faculty_id"=>["required", $facultyRule],
+            "status"=>"required|in:ACTIVO,INACTIVO"
 
-        ]);
+        ], self::FACULTY_MESSAGES);
 
         $program->update($validated);
 

@@ -32,6 +32,10 @@ class UserFactory extends Factory
 
             'status' => 'ACTIVO',
 
+            /* RF16: por defecto, un usuario que ya aceptó el tratamiento de
+               datos. Los tests de consentimiento lo ponen en null. */
+            'data_consent_at' => now(),
+
         ];
     }
 }

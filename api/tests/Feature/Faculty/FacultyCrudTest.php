@@ -32,6 +32,7 @@ class FacultyCrudTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $response = $this->postJson('/api/faculties', [
+            'code'   => 'FI',
             'name'   => 'Facultad de Ingeniería',
             'status' => 'ACTIVO',
         ]);
@@ -46,11 +47,12 @@ class FacultyCrudTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function test_faculty_create_requires_status(): void
+    /* RF02 «Procesamiento»: sin estado explícito se registra activa */
+    public function test_faculty_create_without_status_registers_active(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
-        $response = $this->postJson('/api/faculties', ['name' => 'Sin estado']);
-        $response->assertStatus(422);
+        $response = $this->postJson('/api/faculties', ['code' => 'SE', 'name' => 'Sin estado']);
+        $response->assertStatus(201)->assertJsonPath('faculty.status', 'ACTIVO');
     }
 
     public function test_authenticated_user_can_update_faculty(): void
@@ -58,6 +60,7 @@ class FacultyCrudTest extends TestCase
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $faculty = Faculty::create(['name' => 'Original', 'status' => 'ACTIVO']);
         $response = $this->putJson("/api/faculties/{$faculty->id}", [
+            'code'   => 'ACT',
             'name'   => 'Actualizada',
             'status' => 'ACTIVO',
         ]);

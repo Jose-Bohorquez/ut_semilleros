@@ -35,6 +35,12 @@ Route::post('/login',            [AuthController::class, 'login']);
 Route::post('/forgot-password',  [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password',   [AuthController::class, 'resetPassword']);
 
+/* CU02 — Google institucional. tokeninfo es una llamada externa: se limita
+   por IP para que el endpoint no sirva de amplificador. */
+Route::get('/auth/config',       [AuthController::class, 'authConfig']);
+Route::middleware('throttle:10,1')
+     ->post('/auth/google',      [AuthController::class, 'google']);
+
 /* SIA — asistente con IA (RF17 propuesto). Público: también se usa en el login.
    Límites por IP/usuario/conversación y tope global en SiaController; el throttle
    por minuto frena ráfagas antes de tocar la BD. */
@@ -64,7 +70,7 @@ Route::middleware('throttle:15,1')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'active'])->group(function () {
+Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
@@ -77,6 +83,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/profile/photo',    [AuthController::class, 'updatePhoto']);
     Route::delete('/profile/photo',  [AuthController::class, 'deletePhoto']);
     Route::post('/logout',           [AuthController::class, 'logout']);
+    Route::post('/consent',          [AuthController::class, 'consent']);   /* RF16 */
 
     /*
     |----------------------------------------------------------------------

@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\Audit;
 use App\Models\User;
+use App\Services\Auth\GoogleAuthException;
+use App\Services\Auth\GoogleIdTokenVerifier;
 
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -102,7 +105,22 @@ class AuthController extends Controller
            auditoría (el AuditObserver solo cubre altas y cambios de modelos).
            Token y auditoría van juntos: si no se puede auditar no se emite el
            token (RN07 es obligatoria) y no quedan tokens huérfanos. */
-        $token = DB::transaction(function () use ($user, $expiresAt) {
+        return $this->issueSession($user, $expiresAt);
+    }
+
+    /**
+     * Emite el token y audita el LOGIN en una sola transacción (CU01 paso 6,
+     * CU02 paso 8): si no se puede auditar no se emite el token (RN07) y no
+     * quedan tokens huérfanos. $extra se escribe con forceFill dentro de la
+     * misma transacción (CU02: alta del estudiante o vínculo de google_id).
+     */
+    private function issueSession(User $user, \DateTimeInterface $expiresAt, array $extra = [])
+    {
+        $token = DB::transaction(function () use ($user, $expiresAt, $extra) {
+
+            if (!$user->exists || $extra) {
+                $user->forceFill($extra)->save();
+            }
 
             $plain = $user->createToken(
                 'auth_token',
@@ -130,6 +148,128 @@ class AuthController extends Controller
 
             'expires_at' => $expiresAt->toIso8601String()
 
+        ]);
+    }
+
+    /**
+     * Configuración pública del login (CU02): la PWA solo muestra el botón
+     * de Google si hay Client ID configurado en el servidor.
+     */
+    public function authConfig()
+    {
+        return response()->json([
+            'google_client_id'      => config('services.google.client_id') ?: null,
+            'institutional_domains' => GoogleIdTokenVerifier::institutionalDomains(),
+        ]);
+    }
+
+    /**
+     * CU02 — Iniciar sesión con la cuenta de Google institucional.
+     *
+     * RN04: con Google entran solo correos del dominio institucional (y de su
+     * Google Workspace). Única excepción (decisión de Jose, 2026-09-28): un
+     * ADMIN_SISTEMA ya registrado puede usar otra cuenta de Google. Nadie se
+     * crea con un correo externo (E1).
+     */
+    public function google(Request $request, GoogleIdTokenVerifier $verifier)
+    {
+        $validated = $request->validate([
+            'credential' => 'required|string|max:4096',
+        ]);
+
+        $e5 = 'No fue posible autenticarse con Google, intente nuevamente';
+
+        try {
+            $claims = $verifier->verify($validated['credential']);
+        } catch (GoogleAuthException $e) {
+            /* E5 — el detalle ya quedó en el log técnico */
+            return response()->json(['message' => $e5], $e->reason === 'invalid_token' ? 401 : 503);
+        }
+
+        $email         = Str::lower($claims['email']);
+        $sub           = (string) $claims['sub'];
+        $institutional = GoogleIdTokenVerifier::isInstitutional($claims);
+
+        /* Primero por la cuenta de Google ya vinculada; si no, por correo (paso 7) */
+        $user = User::where('google_id', $sub)->first()
+             ?? User::where('email', $email)->first();
+
+        /* E1: fuera del dominio institucional solo pasa un ADMIN_SISTEMA existente */
+        if (!$institutional && (!$user || $user->role !== 'ADMIN_SISTEMA')) {
+            return response()->json(['message' => 'Debe ingresar con su cuenta institucional'], 403);
+        }
+
+        /* Un correo ya vinculado a otra cuenta de Google no se re-vincula en
+           silencio (evita que una cuenta nueva con el mismo correo lo tome). */
+        if ($user && $user->google_id && $user->google_id !== $sub) {
+            Log::warning('[CU02] google_id distinto para un usuario vinculado', ['user_id' => $user->id]);
+            return response()->json(['message' => $e5], 403);
+        }
+
+        /* E3 */
+        if ($user && $user->status !== 'ACTIVO') {
+            return response()->json(['message' => 'Su acceso está inactivo'], 403);
+        }
+
+        $extra = [];
+
+        if (!$user) {
+            /* Paso 7: alta como estudiante con nombre y correo de Google. Queda
+               una contraseña aleatoria que nadie conoce; si el estudiante quiere
+               entrar también con contraseña, la crea con «¿Olvidó su
+               contraseña?» usando su correo institucional (CU04). */
+            $user = new User([
+                'name'     => Str::limit(trim($claims['name'] ?? '') ?: Str::before($email, '@'), 250, ''),
+                'email'    => $email,
+                'password' => Str::random(48),
+                'role'     => 'ESTUDIANTE',
+                'status'   => 'ACTIVO',
+            ]);
+            $extra['email_verified_at'] = now();
+        }
+
+        if (!$user->google_id) {
+            $extra['google_id'] = $sub;
+        }
+
+        /* Paso 8 + RNF03: 8 horas */
+        return $this->issueSession($user, now()->addHours(8), $extra);
+    }
+
+    /**
+     * RF16 / CU02 A1 — autorización de tratamiento de datos personales.
+     * «Acepto» guarda la fecha; «No acepto» cierra la sesión.
+     */
+    public function consent(Request $request)
+    {
+        $validated = $request->validate(['accept' => 'required|boolean']);
+        $user = $request->user();
+
+        if (!$validated['accept']) {
+            $user->currentAccessToken()?->delete();
+
+            return response()->json([
+                'message' => 'No puede usar la aplicación sin la autorización de tratamiento de datos personales.',
+                'logged_out' => true,
+            ]);
+        }
+
+        DB::transaction(function () use ($user) {
+            if (!$user->data_consent_at) {
+                $user->forceFill(['data_consent_at' => now()])->save();
+
+                Audit::create([
+                    'user_id'    => $user->id,
+                    'action'     => 'CONSENT',
+                    'table_name' => 'users',
+                    'record_id'  => $user->id,
+                ]);
+            }
+        });
+
+        return response()->json([
+            'message' => 'Autorización registrada',
+            'user'    => new UserResource($user->fresh()),
         ]);
     }
 

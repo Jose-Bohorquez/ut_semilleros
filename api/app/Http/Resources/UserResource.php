@@ -26,6 +26,9 @@ class UserResource extends JsonResource
 
             'profile_photo' => $this->profile_photo,
 
+            /* RF16: la PWA pide la autorización de datos si viene null */
+            'data_consent_at' => $this->data_consent_at,
+
             'created_at' => $this->created_at,
 
             'updated_at' => $this->updated_at,

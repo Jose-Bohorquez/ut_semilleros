@@ -51,4 +51,12 @@ return [
         'model'    => env('SIA_MODEL', 'openai/gpt-oss-20b'),
     ],
 
+    /* CU02 — ingreso con Google (flujo de ID token: solo Client ID, sin secret).
+       GOOGLE_ALLOWED_DOMAINS: dominios institucionales, separados por coma.
+       Fuera de esos dominios solo entra un ADMIN_SISTEMA ya registrado. */
+    'google' => [
+        'client_id'       => env('GOOGLE_CLIENT_ID'),
+        'allowed_domains' => env('GOOGLE_ALLOWED_DOMAINS', 'ut.edu.co'),
+    ],
+
 ];

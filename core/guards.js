@@ -1,6 +1,6 @@
 /** # archivo: /frontend/core/guards.js **/
 
-import { getToken, getUser, rememberIntendedRoute } from "../services/storage.service.js";
+import { getToken, getUser, rememberIntendedRoute, needsDataConsent } from "../services/storage.service.js";
 
 /**
  * Verifica que el usuario esté autenticado
@@ -13,6 +13,12 @@ export function requireAuth() {
 
         rememberIntendedRoute();   /* CU01 A3: volver aquí tras el login */
         window.location.href = "/";
+        return false;
+    }
+
+    /* RF16 / CU02 A1: sin autorización de datos no se usa la aplicación */
+    if (needsDataConsent()) {
+        window.location.href = "/consent";
         return false;
     }
 

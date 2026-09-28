@@ -81,6 +81,20 @@ export function LoginView() {
 
             </div>
 
+            <!-- CU02: ingreso con Google institucional. Oculto hasta confirmar que
+                 el servidor tiene Client ID (GET /api/auth/config). -->
+            <section id="google-login" class="login-google" aria-labelledby="google-login-title" hidden>
+              <p id="google-login-title" class="login-google-title">
+                Estudiantes: ingrese con su cuenta <strong>@ut.edu.co</strong>
+              </p>
+              <div id="google-btn" class="login-google-btn"></div>
+              <div id="google-alert" class="login-alert" role="alert" hidden>
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                <span id="google-alert-text"></span>
+              </div>
+              <div class="login-or" aria-hidden="true"><span>o con correo y contraseña</span></div>
+            </section>
+
             <!-- Formulario -->
             <form id="loginForm" novalidate>
 

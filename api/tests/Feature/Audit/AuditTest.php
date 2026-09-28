@@ -33,7 +33,7 @@ class AuditTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
         Sanctum::actingAs($user);
-        $this->postJson('/api/faculties', ['name' => 'Facultad Auditada', 'status' => 'ACTIVO']);
+        $this->postJson('/api/faculties', ['code' => 'FAU', 'name' => 'Facultad Auditada', 'status' => 'ACTIVO']);
         $this->assertDatabaseHas('audits', [
             'table_name' => 'faculties',
             'action'     => 'CREATE',
@@ -45,7 +45,7 @@ class AuditTest extends TestCase
         $user    = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
         Sanctum::actingAs($user);
         $faculty = Faculty::create(['name' => 'Original', 'status' => 'ACTIVO']);
-        $this->putJson("/api/faculties/{$faculty->id}", ['name' => 'Modificada', 'status' => 'ACTIVO']);
+        $this->putJson("/api/faculties/{$faculty->id}", ['code' => 'MOD', 'name' => 'Modificada', 'status' => 'ACTIVO']);
         $this->assertDatabaseHas('audits', [
             'table_name' => 'faculties',
             'action'     => 'UPDATE',

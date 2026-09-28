@@ -48,6 +48,9 @@ class User extends Authenticatable
 
         'profile_photo',
 
+        /* google_id y data_consent_at NO van aquí: solo se escriben con
+           forceFill en AuthController (CU02 / RF16), nunca desde un formulario. */
+
         'created_by',
 
         'updated_by',
@@ -63,6 +66,8 @@ class User extends Authenticatable
 
         'password',
 
+        'google_id',
+
         'remember_token',
     ];
 
@@ -77,6 +82,8 @@ class User extends Authenticatable
         return [
 
             'email_verified_at' => 'datetime',
+
+            'data_consent_at' => 'datetime',
 
             'password' => 'hashed',
         ];

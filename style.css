@@ -1024,6 +1024,30 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* Alerta del formulario (CU01 E2/E3/E4 y error de red), anunciada por lectores de pantalla */
 .login-alert { display: flex; gap: var(--space-2); align-items: flex-start; margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius-btn); background: var(--color-error-light); border: 1px solid var(--color-error-border); color: var(--color-error-text); font-size: var(--text-sm); line-height: 1.45; }
 .login-alert[hidden] { display: none; }
+/* CU02 — botón de Google institucional (el botón lo pinta Google Identity Services) */
+.login-google { margin: 0 0 var(--space-4); }
+.login-google[hidden] { display: none; }
+.login-google-title { margin: 0 0 var(--space-3); font-size: var(--text-sm); color: var(--color-text-2); text-align: center; }
+.login-google-btn { display: flex; justify-content: center; min-height: 44px; margin-bottom: var(--space-3); }
+.login-or { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-4) 0 0; font-size: var(--text-xs); color: var(--color-text-4); }
+.login-or::before, .login-or::after { content: ""; flex: 1; height: 1px; background: var(--color-border); }
+/* RF16 — aviso de privacidad */
+/* El padding inferior deja libres los botones flotantes de SIA y WhatsApp (abajo a la izquierda) */
+.consent-wrap { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: calc(var(--space-6) + env(safe-area-inset-top, 0px)) var(--space-4) calc(140px + env(safe-area-inset-bottom, 0px)); background: var(--color-bg); }
+.consent-card { width: 100%; max-width: 560px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card, 16px); padding: var(--space-6); box-shadow: var(--shadow-md); }
+.consent-card h1 { margin: 0 0 var(--space-2); font-size: var(--text-xl); color: var(--color-text); }
+.consent-card .consent-lead { margin: 0 0 var(--space-4); color: var(--color-text-2); font-size: var(--text-sm); }
+.consent-body { max-height: 45dvh; overflow-y: auto; padding: var(--space-4); border: 1px solid var(--color-border-light); border-radius: var(--radius-btn); background: var(--color-bg); font-size: var(--text-sm); line-height: 1.55; color: var(--color-text-2); }
+.consent-body h2 { margin: var(--space-3) 0 var(--space-1); font-size: var(--text-sm); color: var(--color-text); }
+.consent-body h2:first-child { margin-top: 0; }
+.consent-body ul { margin: 0; padding-left: 1.2em; list-style: disc; }
+.consent-body li + li { margin-top: var(--space-1); }
+.consent-body a { color: var(--color-primary); }
+.consent-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+.consent-actions .btn { flex: 1 1 180px; min-height: 48px; justify-content: center; }
+/* RNF02 — aviso de datos sin conexión */
+.offline-banner { position: fixed; left: 0; right: 0; margin: 0 auto; width: fit-content; top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 9998; max-width: calc(100vw - 32px); display: flex; gap: var(--space-2); align-items: center; padding: var(--space-3) var(--space-4); border-radius: 999px; background: var(--color-text); color: var(--color-surface); font-size: var(--text-sm); box-shadow: var(--shadow-md); }
+.offline-banner[hidden] { display: none; }
 
 .login-logo { height: 96px; width: auto; display: block; }
 

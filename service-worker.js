@@ -3,7 +3,7 @@
    Service Worker de la PWA del Sistema de Semilleros
    ========================================================= */
 
-const CACHE_NAME = "semilleros-v17";
+const CACHE_NAME = "semilleros-v18";
 
 /* Archivos del shell (raramente cambian → cache first) */
 const SHELL_URLS = [
@@ -29,7 +29,21 @@ function isJsModule(url) {
     return url.pathname.endsWith(".js") && !url.pathname.endsWith("/service-worker.js");
 }
 
-/* API calls → never cache */
+/* RNF02: librerías de CDN (estilos, iconos, SweetAlert, jQuery…). Sin ellas la
+   app abre sin conexión pero sin estilos. Se sirven de la caché y se actualizan
+   en segundo plano. Son respuestas «opaque» (sin CORS): se aceptan solo de
+   estos hosts. Google Identity (accounts.google.com) NO se cachea. */
+const CDN_HOSTS = [
+    "cdn.jsdelivr.net", "cdn.tailwindcss.com", "code.jquery.com", "cdn.datatables.net",
+    "cdnjs.cloudflare.com", "fonts.googleapis.com", "fonts.gstatic.com"
+];
+
+function isCdnAsset(url) {
+    return CDN_HOSTS.includes(url.hostname);
+}
+
+/* API calls → never cache (la copia sin conexión de semilleros la guarda
+   api.service.js por usuario, ver RNF02) */
 function isApiCall(url) {
     return url.pathname.startsWith("/api");
 }
@@ -95,6 +109,43 @@ self.addEventListener("fetch", event => {
 
     /* API → nunca cachear */
     if (isApiCall(url)) return;
+
+    /* RNF02: abrir cualquier ruta de la SPA sin conexión (/seedbeds, /dashboard…).
+       Red primero para recibir siempre el index.html actual; sin red, el shell. */
+    if (request.mode === "navigate" && url.origin === self.location.origin) {
+        event.respondWith(
+            fetch(request, { cache: "no-cache" })
+                .then(response => {
+                    if (response.ok) {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then(c => c.put("/index.html", clone));
+                    }
+                    return response;
+                })
+                .catch(async () =>
+                    (await caches.match("/index.html")) || (await caches.match("/")) || Response.error()
+                )
+        );
+        return;
+    }
+
+    /* CDN → caché primero y actualización en segundo plano */
+    if (isCdnAsset(url)) {
+        event.respondWith(
+            caches.open(CACHE_NAME).then(async cache => {
+                const cached = await cache.match(request);
+                const network = fetch(request).then(response => {
+                    if (response.ok || response.type === "opaque") cache.put(request, response.clone());
+                    return response;
+                }).catch(() => cached);
+                return cached || network;
+            })
+        );
+        return;
+    }
+
+    /* Otros orígenes (Google Identity, etc.) → sin intervenir */
+    if (url.origin !== self.location.origin) return;
 
     /* JS modules → network first (siempre versión fresca).
        cache:"no-cache" obliga a revalidar con el servidor (304 si no cambió):
