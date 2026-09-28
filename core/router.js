@@ -23,7 +23,7 @@ export const routes = {
 import { requireAuth, requireRole } from "./guards.js";
 import { LayoutView }              from "../layout/layout.view.js";
 import { initLayoutController }    from "../layout/layout.controller.js";
-import { getUser }                 from "../services/storage.service.js";
+import { getUser, hasValidSession } from "../services/storage.service.js";
 
 
 /* =========================================================
@@ -41,6 +41,13 @@ let navigating = false;
 export const routes = {
 
     "/": async () => {
+
+        /* PWA instalada (start_url "/") o usuario que vuelve al inicio: con
+           sesión vigente va directo al panel en lugar de pedir login otra vez. */
+        if (hasValidSession()) {
+            navigateTo("/dashboard");
+            return;
+        }
 
         const view = await import("../modules/auth/auth.view.js");
         const controller = await import("../modules/auth/auth.controller.js");

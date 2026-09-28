@@ -43,6 +43,11 @@
   /* Gradiente rojo→naranja (botón primario, igual que login.php) */
   --color-gradient:      linear-gradient(135deg, #ef4444, #f97316);
   --color-gradient-hover:linear-gradient(135deg, #dc2626, #ea580c);
+  /* Botones con texto blanco: la misma familia rojo→naranja pero AA
+     (blanco 4,83 / 5,18:1; hover 6,47 / 7,31). --color-gradient se deja para
+     el header PWA y los acentos decorativos (Jose, 2026-09-28). */
+  --color-gradient-cta:       linear-gradient(135deg, #dc2626, #c2410c);
+  --color-gradient-cta-hover: linear-gradient(135deg, #b91c1c, #9a3412);
 
   /* Gradiente decorativo barra (login.php: from-blue-400 to-green-400) */
   --gradient-accent: linear-gradient(to right, #60a5fa, #34d399);
@@ -170,6 +175,11 @@
 
   --color-gradient:      linear-gradient(135deg, #f87171, #fb923c);
   --color-gradient-hover:linear-gradient(135deg, #ef4444, #f97316);
+  /* Botones con texto blanco: la misma familia rojo→naranja pero AA
+     (blanco 4,83 / 5,18:1; hover 6,47 / 7,31). --color-gradient se deja para
+     el header PWA y los acentos decorativos (Jose, 2026-09-28). */
+  --color-gradient-cta:       linear-gradient(135deg, #dc2626, #c2410c);
+  --color-gradient-cta-hover: linear-gradient(135deg, #b91c1c, #9a3412);
 
   --color-success:        #34d399;
   --color-success-light:  #022c22;

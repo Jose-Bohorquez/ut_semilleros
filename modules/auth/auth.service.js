@@ -1,6 +1,6 @@
 /* #archivo: /frontend/modules/auth/auth.service.js */
 
-import { setToken, setUser, removeToken, removeUser } from "../../services/storage.service.js";
+import { setToken, setUser, removeToken, removeUser, setTokenExpiry } from "../../services/storage.service.js";
 import { login as apiLogin, logout as apiLogout } from "../../services/api.service.js";
 
 /**
@@ -56,5 +56,6 @@ export async function logout() {
     // eliminar sesión local
     removeToken();
     removeUser();
+    setTokenExpiry(null);
 
 }

@@ -40,7 +40,7 @@ propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 
 (include) · CU30 consultar auditoría.
 
 **Avance de la validación 1 a 1** (acta por CU en `docs/validacion/CUxx.md`, versionada): CU01
-web ✅ desplegado y validado en producción (2026-09-28; E5 queda para CU02) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
+web ✅ desplegado y validado en producción · PWA ✅ en local (2026-09-28; E5 queda para CU02) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
 parcial (tokens de 8 h / 30 d).
 
 Diferencias conocidas a cerrar (2026-09-28): RN10
@@ -88,7 +88,7 @@ sección "🔑 Credenciales y configuración sensible" del `README.md`.
   siempre `api/.env`, `api/storage` y `SGAA`.
 - Caché: el CDN de Hostinger cacheaba `.js`/`.css` por 7 días. El `.htaccess` lo baja a 5 minutos.
   Si cambias un asset cacheado por el service worker, sube `CACHE_NAME` en `service-worker.js`
-  (hoy `semilleros-v15`).
+  (hoy `semilleros-v16`).
 - Migraciones: todas aplicadas en producción (`php artisan migrate:status`). **Nunca `--seed` en
   producción**: los seeders crean usuarios demo con contraseña conocida.
 - Producción tiene 4 usuarios, uno por rol, y muy pocos datos. Cualquier prueba en vivo usa datos

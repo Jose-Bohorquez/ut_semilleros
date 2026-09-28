@@ -21,6 +21,13 @@
   }
 }
 
+/* Login en la PWA instalada: la cabecera y el pie también quedan bajo la barra
+   de estado translúcida y el indicador de inicio (CU01 en PWA, 2026-09-28). */
+@media (display-mode: standalone) {
+  .login-header { padding-top: env(safe-area-inset-top, 0px); }
+  .login-footer { padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px)); }
+}
+
 @media (display-mode: standalone) {
   .pwa-detail-bar {
     padding-top: env(safe-area-inset-top, 0px);

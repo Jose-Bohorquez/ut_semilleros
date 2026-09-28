@@ -1,7 +1,7 @@
 /* #archivo: /frontend/modules/auth/auth.controller.js */
 
 import { apiFetch }        from "../../services/api.service.js";
-import { setToken, setUser, consumeIntendedRoute } from "../../services/storage.service.js";
+import { setToken, setUser, setTokenExpiry, consumeIntendedRoute } from "../../services/storage.service.js";
 import { navigateTo }      from "../../core/router.js";
 import { initPushOnLogin } from "../../services/push.service.js";
 
@@ -61,7 +61,7 @@ export function initLoginController() {
     function validateEmail() {
         const val = emailInput.value.trim();
         if (!val) { showError(emailInput, "El correo es obligatorio"); return false; }
-        if (!isValidEmail(val)) { showError(emailInput, "Ingresa un correo válido"); return false; }
+        if (!isValidEmail(val)) { showError(emailInput, "Ingrese un correo válido"); return false; }
         clearError(emailInput);
         return true;
     }
@@ -115,7 +115,7 @@ export function initLoginController() {
         if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.setAttribute("aria-busy", "true");
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Ingresando...';
         }
 
         const data = {
@@ -133,6 +133,7 @@ export function initLoginController() {
 
             setToken(response.token);
             setUser(response.user);
+            setTokenExpiry(response.expires_at);
 
             /* Prepara la suscripción push para cuando el layout monte */
             initPushOnLogin();
@@ -171,7 +172,7 @@ export function initLoginController() {
 
             /* E2 (credenciales) y E3 (inactivo): mensaje del servidor */
             showAlert(error.status === 0
-                ? "No se pudo conectar con el servidor. Revisa tu conexión."
+                ? "No se pudo conectar con el servidor. Revise su conexión."
                 : (error.message || "Credenciales incorrectas"));
             resetButton();
             passInput?.focus();

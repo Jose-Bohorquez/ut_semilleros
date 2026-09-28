@@ -69,3 +69,30 @@ export function consumeIntendedRoute() {
     if (PUBLIC_ROUTES.includes(path.split("?")[0])) return null;
     return path;
 }
+
+
+/* =========================================================
+   Vigencia de la sesión (RNF03: el token vence a las 8 h, o 30 d con
+   «Recordarme»). Permite que la PWA instalada, al abrirse en "/", entre
+   directo al panel si la sesión sigue vigente (CU01 en PWA), sin mostrar el
+   login ni gastar un 401 contra la API cuando el token ya venció.
+   ========================================================= */
+
+const EXPIRES_KEY = "token_expires_at";
+
+export function setTokenExpiry(isoDate) {
+    try { isoDate ? localStorage.setItem(EXPIRES_KEY, isoDate) : localStorage.removeItem(EXPIRES_KEY); } catch {}
+}
+
+export function hasValidSession() {
+    const token = getToken();
+    if (!token || !getUser()) return false;
+    let exp = null;
+    try { exp = localStorage.getItem(EXPIRES_KEY); } catch {}
+    /* Sesiones anteriores al vencimiento (sin fecha guardada): se confía en
+       la API, que responde 401 si el token ya no sirve. */
+    if (!exp) return true;
+    if (Date.parse(exp) > Date.now()) return true;
+    removeToken(); removeUser(); setTokenExpiry(null);
+    return false;
+}

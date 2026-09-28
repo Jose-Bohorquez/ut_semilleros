@@ -281,11 +281,11 @@ body {
 
 /* Variantes */
 .btn-primary {
-  background: var(--color-gradient);
+  background: var(--color-gradient-cta);
   color: #fff;
   border: none;
 }
-.btn-primary:hover { background: var(--color-gradient-hover); }
+.btn-primary:hover { background: var(--color-gradient-cta-hover); }
 
 .btn-secondary {
   background: transparent;
@@ -482,7 +482,7 @@ tbody tr:hover { background: var(--color-surface-2); }
 }
 .dt-button:hover { background: var(--color-primary-light) !important; border-color: var(--color-primary) !important; color: var(--color-primary-text) !important; }
 .dataTables_paginate .paginate_button { border-radius: var(--radius-sm) !important; border: 1px solid var(--color-border) !important; padding: 4px 10px !important; font-size: var(--text-sm) !important; cursor: pointer; }
-.dataTables_paginate .paginate_button.current { background: var(--color-gradient) !important; color: #fff !important; border-color: var(--color-primary) !important; }
+.dataTables_paginate .paginate_button.current { background: var(--color-gradient-cta) !important; color: #fff !important; border-color: var(--color-primary) !important; }
 .dataTables_paginate .paginate_button:hover:not(.current) { background: var(--color-primary-light) !important; color: var(--color-primary-text) !important; }
 .dataTables_info { font-size: var(--text-xs); color: var(--color-text-muted); }
 
@@ -981,7 +981,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 .login-submit-btn {
   width: 100%;
-  background: var(--color-gradient);
+  background: var(--color-gradient-cta);
   color: var(--color-text-invert);
   font-size: var(--text-base); font-weight: var(--weight-semibold);
   padding: 12px var(--space-6);
@@ -992,8 +992,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   min-height: 48px;
   font-family: var(--font-body);
 }
-.login-submit-btn:hover { background: var(--color-gradient-hover); transform: translateY(-2px); box-shadow: var(--shadow-btn); }
-.login-submit-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+.login-submit-btn:hover { background: var(--color-gradient-cta-hover); transform: translateY(-2px); box-shadow: var(--shadow-btn); }
+/* Cargando (aria-busy): conserva el color, sin atenuar a opacity .65 (≈2,4:1).
+   Bloqueado 429: superficie neutra con texto de alto contraste para la cuenta regresiva. */
+.login-submit-btn:disabled { cursor: not-allowed; transform: none; box-shadow: none; }
+.login-submit-btn:disabled[aria-busy="true"] { cursor: progress; }
+.login-submit-btn:disabled:not([aria-busy="true"]) { background: var(--color-surface-3); color: var(--color-text); }
 
 /* CU01 A2 «Recordarme»: área táctil ≥44px, checkbox con el color de marca */
 .login-remember { display: flex; align-items: center; gap: var(--space-2); min-height: 44px; margin: 0 0 var(--space-4); font-size: var(--text-sm); color: var(--color-text-2); cursor: pointer; user-select: none; }
@@ -1002,7 +1006,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .login-links { margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--color-border); display: flex; flex-direction: column; gap: var(--space-3); }
 @media (min-width: 640px) { .login-links { flex-direction: row; justify-content: space-between; align-items: center; } }
 
-.login-links a { font-size: var(--text-sm); text-decoration: none; display: flex; align-items: center; gap: var(--space-2); transition: color 0.2s ease; }
+.login-links a { font-size: var(--text-sm); text-decoration: none; display: flex; align-items: center; gap: var(--space-2); min-height: 44px; /* área táctil (medía 20px, CU01 PWA) */ transition: color 0.2s ease; }
 .login-link-primary   { color: var(--color-primary-text); }
 .login-link-primary:hover { text-decoration: underline; }
 .login-link-secondary { color: var(--color-text-muted); }

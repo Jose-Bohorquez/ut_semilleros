@@ -31,9 +31,6 @@ export function LoginView() {
           <a href="https://www.ut.edu.co" target="_blank" rel="noopener">
             <i class="fas fa-globe" style="margin-right:4px"></i>Sitio Web
           </a>
-          <a href="https://www.ut.edu.co" target="_blank" rel="noopener">
-            <i class="fas fa-book" style="margin-right:4px"></i>Manuales
-          </a>
         </nav>
 
       </div>
@@ -61,65 +58,6 @@ export function LoginView() {
             semilleros, proyectos y propuestas de investigación
             de forma fácil y segura.
           </p>
-
-          <!-- Features (idéntico al grid de login.php) -->
-          <div class="login-features">
-
-            <div class="login-feature-item">
-              <div class="login-feature-icon"
-                   style="background:#DCFCE7;color:#16A34A">
-                <i class="fas fa-shield-alt"></i>
-              </div>
-              <span style="color:var(--color-text-2);font-size:var(--text-sm)">Acceso Seguro</span>
-            </div>
-
-            <div class="login-feature-item">
-              <div class="login-feature-icon"
-                   style="background:#DBEAFE;color:#2563EB">
-                <i class="fas fa-clock"></i>
-              </div>
-              <span style="color:var(--color-text-2);font-size:var(--text-sm)">Disponible 24/7</span>
-            </div>
-
-            <div class="login-feature-item">
-              <div class="login-feature-icon"
-                   style="background:#F3E8FF;color:#9333EA">
-                <i class="fas fa-mobile-alt"></i>
-              </div>
-              <span style="color:var(--color-text-2);font-size:var(--text-sm)">Multiplataforma</span>
-            </div>
-
-            <div class="login-feature-item">
-              <div class="login-feature-icon"
-                   style="background:#FEF9C3;color:#CA8A04">
-                <i class="fas fa-headset"></i>
-              </div>
-              <span style="color:var(--color-text-2);font-size:var(--text-sm)">Soporte Técnico</span>
-            </div>
-
-          </div>
-
-          <!-- Social links -->
-          <div class="login-social">
-            <a href="https://www.facebook.com/comunicacionesuniversidaddeltolima"
-               target="_blank" rel="noopener"
-               style="background:#1D4ED8"
-               title="Facebook">
-              <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="https://twitter.com/Uni_Tolima"
-               target="_blank" rel="noopener"
-               style="background:#0EA5E9"
-               title="Twitter / X">
-              <i class="fab fa-twitter"></i>
-            </a>
-            <a href="https://www.instagram.com/uni_tolima"
-               target="_blank" rel="noopener"
-               style="background:#EC4899"
-               title="Instagram">
-              <i class="fab fa-instagram"></i>
-            </a>
-          </div>
 
         </div>
 
@@ -178,7 +116,7 @@ export function LoginView() {
                     id="password"
                     name="password"
                     class="login-input"
-                    placeholder="Ingresa tu contraseña"
+                    placeholder="Ingrese su contraseña"
                     autocomplete="current-password"
                     aria-describedby="err-password"
                     style="padding-right:48px"
@@ -216,7 +154,7 @@ export function LoginView() {
               <!-- Botón de envío — idéntico al de login.php -->
               <button type="submit" class="login-submit-btn">
                 <i class="fas fa-sign-in-alt"></i>
-                Iniciar sesión
+                Ingresar
               </button>
 
             </form>
@@ -225,12 +163,12 @@ export function LoginView() {
             <div class="login-links">
               <a href="/forgot-password" class="login-link-primary">
                 <i class="fas fa-key"></i>
-                ¿Olvidaste tu contraseña?
+                ¿Olvidó su contraseña?
               </a>
-              <a href="https://www.ut.edu.co" target="_blank" rel="noopener"
+              <a href="https://investigaciones.ut.edu.co/semilleros/idead.html" target="_blank" rel="noopener"
                  class="login-link-secondary">
                 <i class="fas fa-question-circle"></i>
-                ¿Necesitas ayuda?
+                ¿Necesita ayuda?
               </a>
             </div>
 
@@ -239,7 +177,7 @@ export function LoginView() {
               <i class="fas fa-exclamation-triangle"></i>
               <p>
                 <strong>Importante:</strong>
-                Asegúrate de usar las credenciales institucionales
+                Asegúrese de usar las credenciales institucionales
                 de la Universidad del Tolima.
               </p>
             </div>
@@ -255,9 +193,10 @@ export function LoginView() {
       <div class="login-footer-inner">
         <span>© 2026 Universidad del Tolima — Sistema de Semilleros IDEAD</span>
         <div class="login-footer-links">
-          <a href="#">Términos de Uso</a>
-          <a href="#">Privacidad</a>
-          <a href="#">Contacto</a>
+          <a href="https://administrativos.ut.edu.co/images/RES._0676_DEL_27-05-19_ADOPTA_MANUAL_DE_POLITICAS.pdf"
+             target="_blank" rel="noopener">Tratamiento de datos personales</a>
+          <a href="http://administrativos.ut.edu.co/atencion-al-ciudadano/directorio.html?cck=contactos&amp;du_id_oficina=871&amp;boxchecked=0&amp;search=contactos&amp;task=search"
+             target="_blank" rel="noopener">Contacto</a>
         </div>
       </div>
     </footer>
