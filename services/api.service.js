@@ -43,16 +43,21 @@ function clearAuthSession() {
    ========================================================= */
 
 export async function apiFetch(endpoint, options = {}) {
-    const token = getToken();
+    /* auth:false → no enviar el token ni tratar un 401 como sesión vencida.
+       Lo usa el login: si quedó un token vencido en localStorage (lo normal
+       desde que los tokens vencen a las 8 h), mandarlo hacía que el 401 de
+       «Credenciales incorrectas» recargara la página (CU01 E2, review 2026-09-28). */
+    const { auth = true, ...fetchOptions } = options;
+    const token = auth ? getToken() : null;
     const url = buildUrl(endpoint);
 
     const headers = {
         "Accept": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
-        ...(options.headers || {})
+        ...(fetchOptions.headers || {})
     };
 
-    if (!(options.body instanceof FormData)) {
+    if (!(fetchOptions.body instanceof FormData)) {
         headers["Content-Type"] = "application/json";
     }
 
@@ -60,7 +65,7 @@ export async function apiFetch(endpoint, options = {}) {
 
     try {
         response = await fetch(url, {
-            ...options,
+            ...fetchOptions,
             headers
         });
     } catch (networkError) {

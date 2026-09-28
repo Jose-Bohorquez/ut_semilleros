@@ -48,8 +48,11 @@ self.addEventListener("install", event => {
             /* Fix #2: manejo de errores individuales — un archivo inaccesible
                no impide la instalación del SW */
             return Promise.allSettled(
+                /* cache:"reload" salta la caché HTTP/CDN: sin esto el SW nuevo podía
+                   quedarse con un theme.css o index.html viejo fijado en cache-first
+                   hasta la siguiente versión (review 2026-09-28). */
                 SHELL_URLS.map(url =>
-                    cache.add(url).catch(e =>
+                    cache.add(new Request(url, { cache: "reload" })).catch(e =>
                         console.warn("[SW] No se pudo cachear:", url, e)
                     )
                 )

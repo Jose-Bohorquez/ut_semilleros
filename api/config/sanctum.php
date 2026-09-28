@@ -47,7 +47,10 @@ return [
     |
     */
 
-    'expiration' => null,
+    /* Tope duro de 30 días (= «Recordarme», CU01 A2) para cualquier token,
+       incluso uno creado sin expires_at. El vencimiento normal (8 h) va por
+       token en AuthController::login. */
+    'expiration' => 43200,
 
     /*
     |--------------------------------------------------------------------------

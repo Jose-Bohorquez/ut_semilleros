@@ -40,4 +40,9 @@ RewriteRule ^ index.html [L]
     <FilesMatch "\.css$">
         Header set Cache-Control "public, max-age=300, must-revalidate"
     </FilesMatch>
+    # El HTML de la SPA y el propio SW siempre se revalidan: sin Cache-Control el
+    # navegador aplicaba caché heurística y un deploy podía tardar días en verse.
+    <FilesMatch "^(index\.html|service-worker\.js)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
 </IfModule>

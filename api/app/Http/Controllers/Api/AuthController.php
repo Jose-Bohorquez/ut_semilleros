@@ -9,6 +9,7 @@ use App\Models\User;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
@@ -25,7 +26,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
 
-            'email' => 'required|email',
+            'email' => 'required|email|max:255',
 
             'password' => 'required',
 
@@ -34,8 +35,10 @@ class AuthController extends Controller
         ]);
 
         /* CU01 E4 / RN14: 5 intentos fallidos en un minuto (mismo correo e
-           IP) bloquean nuevos intentos durante 60 s. Se revisa ANTES de
-           consultar la BD para no dar pistas por tiempo de respuesta. */
+           IP) bloquean nuevos intentos durante 60 s. El intento se cuenta
+           ANTES de verificar la contraseña: si se contara después, N
+           peticiones en paralelo pasarían todas la revisión (review
+           2026-09-28). Un login exitoso limpia el contador. */
         $throttleKey = 'login:' . Str::lower($validated['email']) . '|' . $request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
@@ -51,20 +54,23 @@ class AuthController extends Controller
             ], 429);
         }
 
+        RateLimiter::hit($throttleKey, 60);
+
         $user = User::where(
             'email',
             $validated['email']
         )->first();
 
+        /* Si el correo no existe se compara contra un hash de relleno, para
+           que el tiempo de respuesta no revele qué correos están registrados. */
+        $hash = $user?->password ?? '$2y$12$tFxM1f2m3NgpMDubyM7HO.xCn2Cm0CibJXJBKOZDJ0RueGV07NlkC';
+
         if (
-            !$user ||
             !Hash::check(
                 $validated['password'],
-                $user->password
-            )
+                $hash
+            ) || !$user
         ) {
-
-            RateLimiter::hit($throttleKey, 60);
 
             /* CU01 E2: mensaje genérico, sin indicar qué dato falló. */
             return response()->json([
@@ -92,20 +98,27 @@ class AuthController extends Controller
         $remember  = (bool) ($validated['remember'] ?? false);
         $expiresAt = $remember ? now()->addDays(30) : now()->addHours(8);
 
-        $token = $user->createToken(
-            'auth_token',
-            ['*'],
-            $expiresAt
-        )->plainTextToken;
-
         /* CU01 paso 6 → CU29 / RN07: todo inicio de sesión queda en la
-           auditoría (el AuditObserver solo cubre altas y cambios de modelos). */
-        Audit::create([
-            'user_id'    => $user->id,
-            'action'     => 'LOGIN',
-            'table_name' => 'users',
-            'record_id'  => $user->id,
-        ]);
+           auditoría (el AuditObserver solo cubre altas y cambios de modelos).
+           Token y auditoría van juntos: si no se puede auditar no se emite el
+           token (RN07 es obligatoria) y no quedan tokens huérfanos. */
+        $token = DB::transaction(function () use ($user, $expiresAt) {
+
+            $plain = $user->createToken(
+                'auth_token',
+                ['*'],
+                $expiresAt
+            )->plainTextToken;
+
+            Audit::create([
+                'user_id'    => $user->id,
+                'action'     => 'LOGIN',
+                'table_name' => 'users',
+                'record_id'  => $user->id,
+            ]);
+
+            return $plain;
+        });
 
         return response()->json([
 

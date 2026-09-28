@@ -26,7 +26,7 @@ class EnsureUserIsActive
             $user->currentAccessToken()?->delete();
 
             return response()->json([
-                'message' => 'Tu cuenta está inactiva. Contacta al administrador.'
+                'message' => 'Su usuario está inactivo. Contacte al administrador del sistema.'
             ], 401);
         }
 

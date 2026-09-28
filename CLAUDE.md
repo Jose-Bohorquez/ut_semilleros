@@ -88,7 +88,7 @@ sección "🔑 Credenciales y configuración sensible" del `README.md`.
   siempre `api/.env`, `api/storage` y `SGAA`.
 - Caché: el CDN de Hostinger cacheaba `.js`/`.css` por 7 días. El `.htaccess` lo baja a 5 minutos.
   Si cambias un asset cacheado por el service worker, sube `CACHE_NAME` en `service-worker.js`
-  (hoy `semilleros-v13`).
+  (hoy `semilleros-v15`).
 - Migraciones: todas aplicadas en producción (`php artisan migrate:status`). **Nunca `--seed` en
   producción**: los seeders crean usuarios demo con contraseña conocida.
 - Producción tiene 4 usuarios, uno por rol, y muy pocos datos. Cualquier prueba en vivo usa datos
@@ -123,7 +123,10 @@ sección "🔑 Credenciales y configuración sensible" del `README.md`.
 Existen 21 archivos de test en `api/tests/Feature` (CRUD por recurso, Auth, SeedbedMember), con
 `phpunit.xml` sobre SQLite en memoria. **No hay evidencia de que se hayan corrido recientemente.**
 Local no tiene PHP instalado, así que se corren dentro del contenedor
-(`docker exec -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: ut_semilleros_api php artisan test`).
+(`docker exec ut_semilleros_api php artisan test`). Desde el 2026-09-28, `phpunit.xml` fuerza
+SQLite con `<env>` **y** `<server>` `force="true"`. Laravel lee `$_SERVER` primero, así que con
+`<env>` solo no alcanzaba (verificado con una sonda). Los `-e` ya no son obligatorios, pero no
+hacen daño.
 **Nunca sin los `-e`**: el override de Docker inyecta `DB_CONNECTION=mysql` y `phpunit.xml` no usa
 `force="true"`, así que la suite correría sobre la BD de dev y `RefreshDatabase` la borraría
 (hallazgo C-01, 2026-09-27). Con los `-e`: 121 tests en verde y la BD intacta. El frontend no tiene tests automatizados. Los

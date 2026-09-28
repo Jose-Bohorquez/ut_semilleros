@@ -128,6 +128,7 @@ export function initLoginController() {
             const response = await apiFetch("/login", {
                 method: "POST",
                 body:   JSON.stringify(data),
+                auth:   false,
             });
 
             setToken(response.token);
