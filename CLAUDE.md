@@ -8,10 +8,48 @@ PWA de Sistema de Semilleros de Investigación, Universidad del Tolima. Frontend
 - `SGAA/` — sistema de asistencia académica (tiene su propio `CLAUDE.md`, léelo si trabajas ahí).
 - `todo_ut-edu.space_old/` — scaffold Laravel descartado, nunca desarrollado, historia muerta.
 
+## Especificación oficial (fuente de verdad funcional)
+
+`docs/especificacion/` tiene el documento del proyecto (entregable SENA ADSO, ficha 3311941,
+adaptado de INITIUM 2020):
+- `Especificacion_Requerimientos_Casos_de_Uso_SemillerosUT.md`: **15 reglas de negocio (RN01–RN15),
+  16 RF, 16 RNF, 30 casos de uso extendidos** (flujo básico, alternos A*n*, excepciones E*n*,
+  postcondiciones) y matrices de trazabilidad.
+- `Documentacion_Tecnica_SemillerosUT.md`: trimestres I–V (BPMN, HU, clases, despliegue,
+  seguridad, pruebas y manuales).
+- `uml/`: diagramas de CU por actor, en `.puml` y `.png`.
+
+**Decisión (Jose, 2026-09-28): lo funcional lo manda el documento; el stack es el real.** Los CU,
+RF, RN y RNF son obligatorios, y lo que falte se implementa. El stack se queda como está (MySQL,
+SPA vanilla JS, Hostinger compartido), y es la Documentación Técnica la que se actualiza para
+describir la arquitectura real. El documento dice MongoDB, Bootstrap 5/Blade, Swagger, Pest y
+nginx+supervisor; nada de eso se usa ni corre en el plan compartido. CU02 sí se implementa con
+**Google OAuth** restringido al dominio institucional (RN04).
+
+**Numeración:** los comentarios `(RFxx / CUxx)` de `api/routes/api.php` siguen el diseño de 2020
+(14 CU). En esos comentarios, "CUxx" es en realidad el RF del mismo número. Los CU vigentes son
+CU01–CU30 del documento (ver su tabla §1.4 de equivalencias).
+
+Casos de uso: CU01 login web · CU02 login PWA con Google · CU03 cerrar sesión · CU04 recuperar
+contraseña · CU05 perfil · CU06 usuarios · CU07 facultades · CU08 programas · CU09 CAT · CU10 áreas
+· CU11 grupos (Líder) · CU12 coordinadores · CU13 registrar semillero · CU14 modificar semillero ·
+CU15 estado de semillero · CU16 consultar semilleros (web) · CU17 semilleros por facultad (PWA) ·
+CU18 detalle de semillero (PWA) · CU19 objetivos · CU20 resultados · CU21 integrantes · CU22 enviar
+solicitud · CU23 mis solicitudes · CU24 gestionar solicitudes · CU25 registrar propuesta · CU26 mis
+propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 registrar auditoría
+(include) · CU30 consultar auditoría.
+
+Diferencias conocidas a cerrar (2026-09-28): RN14 (bloqueo tras 5 intentos) no existe; RN10
+(contraseña fuerte) no se aplica; RN06 (líder solo en sus semilleros) no se aplica; RN02/RN03
+(referencia de autorización escrita) sin campo; RN08 (códigos únicos) solo en CAT, áreas y grupos;
+RF15/CU28 reportes y RF16/RN09 consentimiento de datos no existen; CU02 no usa Google. El avance de
+la validación 1 a 1 queda en `docs/qa/` (no versionado mientras haya vulnerabilidades abiertas).
+
 ## Antes de trabajar aquí
 
-1. Lee `docs/roles-usuarios.md` y `docs/CHANGELOG.md` — matriz de roles y el historial completo de
-   bugs encontrados/corregidos en auditorías previas.
+1. Lee la especificación oficial (arriba) del CU/RF que toques, y además `docs/roles-usuarios.md` y
+   `docs/CHANGELOG.md` — matriz de roles e historial de bugs de auditorías previas. Si
+   `roles-usuarios.md` contradice la especificación, manda la especificación.
 2. Revisa `graphify-out/GRAPH_REPORT.md` (God Nodes, comunidades, bugs documentados) o corre
    `graphify query "<pregunta>"` desde esta carpeta antes de explorar el código a ciegas — 1031
    nodos, arquitectura completa frontend+API mapeada (2026-09-03). Vista interactiva:

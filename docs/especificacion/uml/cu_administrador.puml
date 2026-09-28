@@ -1,0 +1,58 @@
+@startuml CU_Administrador
+title Casos de uso - Administrador del sistema
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecaseBackgroundColor #FFFFFF
+skinparam usecaseBorderColor #8a1538
+skinparam actorStyle awesome
+left to right direction
+actor "Administrador del sistema" as A
+actor "Servidor SMTP" as SMTP <<sistema externo>>
+rectangle "Sistema SemillerosUT" {
+  usecase "CU01\nIniciar sesión en el panel web" as CU01
+  usecase "CU03\nCerrar sesión" as CU03
+  usecase "CU04\nRecuperar contraseña" as CU04
+  usecase "CU05\nConsultar y actualizar perfil" as CU05
+  usecase "CU06\nAdministrar usuarios" as CU06
+  usecase "CU07\nAdministrar facultades" as CU07
+  usecase "CU08\nAdministrar programas" as CU08
+  usecase "CU09\nAdministrar Centros de Atención Tutorial (CAT)" as CU09
+  usecase "CU10\nAdministrar áreas de conocimiento" as CU10
+  usecase "CU12\nAdministrar coordinadores" as CU12
+  usecase "CU14\nModificar semillero" as CU14
+  usecase "CU15\nCambiar estado de semillero" as CU15
+  usecase "CU16\nConsultar semilleros (panel web)" as CU16
+  usecase "CU28\nConsultar reportes y estadísticas" as CU28
+  usecase "CU29\nRegistrar auditoría" as CU29
+  usecase "CU30\nConsultar auditoría" as CU30
+}
+A --> CU01
+A --> CU03
+A --> CU04
+A --> CU05
+A --> CU06
+A --> CU07
+A --> CU08
+A --> CU09
+A --> CU10
+A --> CU12
+A --> CU14
+A --> CU15
+A --> CU16
+A --> CU28
+A --> CU30
+CU04 .> CU01 : <<extend>>\n[Olvido de contraseña]
+CU01 .> CU29 : <<include>>
+CU04 .> CU29 : <<include>>
+CU05 .> CU29 : <<include>>
+CU06 .> CU29 : <<include>>
+CU07 .> CU29 : <<include>>
+CU08 .> CU29 : <<include>>
+CU09 .> CU29 : <<include>>
+CU10 .> CU29 : <<include>>
+CU12 .> CU29 : <<include>>
+CU14 .> CU29 : <<include>>
+CU15 .> CU29 : <<include>>
+CU04 --> SMTP
+CU06 --> SMTP
+@enduml

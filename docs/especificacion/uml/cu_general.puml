@@ -1,0 +1,119 @@
+@startuml CU_General
+title Diagrama general de casos de uso - SemillerosUT
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecaseBackgroundColor #FFFFFF
+skinparam usecaseBorderColor #8a1538
+skinparam actorStyle awesome
+left to right direction
+actor "Usuario" as U
+actor "Usuario web" as UW
+actor "Administrador\ndel sistema" as ADM
+actor "Líder de\nsemillero" as LID
+actor "Administrativo" as ADT
+actor "Estudiante" as EST
+actor "Google Identity" as GOO <<sistema externo>>
+actor "Servidor SMTP" as SMTP <<sistema externo>>
+UW -|> U
+EST -|> U
+ADM -|> UW
+LID -|> UW
+ADT -|> UW
+rectangle "Sistema SemillerosUT" {
+  package "Autenticación y perfil" {
+    usecase "CU01\nIniciar sesión en el panel web" as CU01
+    usecase "CU02\nIniciar sesión con cuenta institucional (PWA)" as CU02
+    usecase "CU03\nCerrar sesión" as CU03
+    usecase "CU04\nRecuperar contraseña" as CU04
+    usecase "CU05\nConsultar y actualizar perfil" as CU05
+  }
+  package "Administración y catálogos" {
+    usecase "CU06\nAdministrar usuarios" as CU06
+    usecase "CU07\nAdministrar facultades" as CU07
+    usecase "CU08\nAdministrar programas" as CU08
+    usecase "CU09\nAdministrar Centros de Atención Tutorial (CAT)" as CU09
+    usecase "CU10\nAdministrar áreas de conocimiento" as CU10
+    usecase "CU11\nAdministrar grupos de investigación" as CU11
+    usecase "CU12\nAdministrar coordinadores" as CU12
+  }
+  package "Semilleros" {
+    usecase "CU13\nRegistrar semillero" as CU13
+    usecase "CU14\nModificar semillero" as CU14
+    usecase "CU15\nCambiar estado de semillero" as CU15
+    usecase "CU16\nConsultar semilleros (panel web)" as CU16
+    usecase "CU17\nConsultar semilleros por facultad (PWA)" as CU17
+    usecase "CU18\nConsultar detalle de semillero (PWA)" as CU18
+    usecase "CU19\nGestionar objetivos del semillero" as CU19
+    usecase "CU20\nGestionar resultados del semillero" as CU20
+    usecase "CU21\nGestionar integrantes del semillero" as CU21
+  }
+  package "Vinculación" {
+    usecase "CU22\nEnviar solicitud de vinculación" as CU22
+    usecase "CU23\nConsultar mis solicitudes" as CU23
+    usecase "CU24\nGestionar solicitudes recibidas" as CU24
+  }
+  package "Propuestas" {
+    usecase "CU25\nRegistrar propuesta de semillero" as CU25
+    usecase "CU26\nConsultar mis propuestas" as CU26
+    usecase "CU27\nEvaluar propuestas" as CU27
+  }
+  package "Reportes y auditoría" {
+    usecase "CU28\nConsultar reportes y estadísticas" as CU28
+    usecase "CU29\nRegistrar auditoría" as CU29
+    usecase "CU30\nConsultar auditoría" as CU30
+  }
+}
+U --> CU03
+U --> CU05
+UW --> CU01
+UW --> CU04
+UW --> CU16
+UW --> CU28
+UW --> CU07
+UW --> CU08
+UW --> CU09
+UW --> CU10
+UW --> CU12
+ADM --> CU06
+ADM --> CU15
+ADM --> CU30
+LID --> CU11
+LID --> CU13
+LID --> CU14
+LID --> CU15
+LID --> CU19
+LID --> CU20
+LID --> CU21
+LID --> CU24
+LID --> CU27
+ADT --> CU11
+ADT --> CU19
+ADT --> CU20
+ADT --> CU21
+ADT --> CU24
+ADT --> CU27
+EST --> CU02
+EST --> CU17
+EST --> CU18
+EST --> CU22
+EST --> CU23
+EST --> CU25
+EST --> CU26
+CU02 --> GOO
+CU04 --> SMTP
+CU06 --> SMTP
+CU04 .> CU01 : <<extend>>\n[Olvido de contraseña]
+CU22 .> CU18 : <<extend>>\n[Ser miembro]
+CU25 .> CU17 : <<extend>>\n[Proponer idea]
+CU21 .> CU24 : <<extend>>\n[Aprobación]
+CU06 .> CU29 : <<include>>
+CU13 .> CU29 : <<include>>
+CU22 .> CU29 : <<include>>
+CU24 .> CU29 : <<include>>
+CU25 .> CU29 : <<include>>
+note bottom of CU29
+  También es incluido por CU01, CU02, CU04, CU05,
+  CU07–CU12, CU14, CU15, CU19–CU21 y CU27
+  (se omiten las flechas para legibilidad).
+end note
+@enduml

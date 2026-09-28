@@ -6,3 +6,9 @@ todo_ut-edu.space_old/
 db/
 api/vendor/
 node_modules/
+# Definiciones de agentes: son del proceso de trabajo, no del producto
+.claude/
+# Los diagramas UML ya están como PlantUML (texto) dentro de la especificación
+docs/especificacion/uml/
+# docs/qa describe vulnerabilidades y se regenera por ronda
+docs/qa/

@@ -1,0 +1,39 @@
+@startuml CU_Estudiante
+title Casos de uso - Estudiante
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecaseBackgroundColor #FFFFFF
+skinparam usecaseBorderColor #8a1538
+skinparam actorStyle awesome
+left to right direction
+actor "Estudiante" as A
+actor "Google Identity" as GOO <<sistema externo>>
+rectangle "Sistema SemillerosUT" {
+  usecase "CU02\nIniciar sesión con cuenta institucional (PWA)" as CU02
+  usecase "CU03\nCerrar sesión" as CU03
+  usecase "CU05\nConsultar y actualizar perfil" as CU05
+  usecase "CU17\nConsultar semilleros por facultad (PWA)" as CU17
+  usecase "CU18\nConsultar detalle de semillero (PWA)" as CU18
+  usecase "CU22\nEnviar solicitud de vinculación" as CU22
+  usecase "CU23\nConsultar mis solicitudes" as CU23
+  usecase "CU25\nRegistrar propuesta de semillero" as CU25
+  usecase "CU26\nConsultar mis propuestas" as CU26
+  usecase "CU29\nRegistrar auditoría" as CU29
+}
+A --> CU02
+A --> CU03
+A --> CU05
+A --> CU17
+A --> CU18
+A --> CU22
+A --> CU23
+A --> CU25
+A --> CU26
+CU22 .> CU18 : <<extend>>\n[Ser miembro]
+CU25 .> CU17 : <<extend>>\n[Proponer idea]
+CU02 .> CU29 : <<include>>
+CU05 .> CU29 : <<include>>
+CU22 .> CU29 : <<include>>
+CU25 .> CU29 : <<include>>
+CU02 --> GOO
+@enduml

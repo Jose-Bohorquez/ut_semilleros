@@ -1,0 +1,72 @@
+@startuml CU_Lider
+title Casos de uso - Líder de semillero
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecaseBackgroundColor #FFFFFF
+skinparam usecaseBorderColor #8a1538
+skinparam actorStyle awesome
+left to right direction
+actor "Líder de semillero" as A
+rectangle "Sistema SemillerosUT" {
+  usecase "CU01\nIniciar sesión en el panel web" as CU01
+  usecase "CU03\nCerrar sesión" as CU03
+  usecase "CU04\nRecuperar contraseña" as CU04
+  usecase "CU05\nConsultar y actualizar perfil" as CU05
+  usecase "CU07\nAdministrar facultades" as CU07
+  usecase "CU08\nAdministrar programas" as CU08
+  usecase "CU09\nAdministrar Centros de Atención Tutorial (CAT)" as CU09
+  usecase "CU10\nAdministrar áreas de conocimiento" as CU10
+  usecase "CU11\nAdministrar grupos de investigación" as CU11
+  usecase "CU12\nAdministrar coordinadores" as CU12
+  usecase "CU13\nRegistrar semillero" as CU13
+  usecase "CU14\nModificar semillero" as CU14
+  usecase "CU15\nCambiar estado de semillero" as CU15
+  usecase "CU16\nConsultar semilleros (panel web)" as CU16
+  usecase "CU19\nGestionar objetivos del semillero" as CU19
+  usecase "CU20\nGestionar resultados del semillero" as CU20
+  usecase "CU21\nGestionar integrantes del semillero" as CU21
+  usecase "CU24\nGestionar solicitudes recibidas" as CU24
+  usecase "CU27\nEvaluar propuestas" as CU27
+  usecase "CU28\nConsultar reportes y estadísticas" as CU28
+  usecase "CU29\nRegistrar auditoría" as CU29
+}
+A --> CU01
+A --> CU03
+A --> CU04
+A --> CU05
+A --> CU11
+A --> CU13
+A --> CU14
+A --> CU15
+A --> CU16
+A --> CU19
+A --> CU20
+A --> CU21
+A --> CU24
+A --> CU28
+A --> CU07 : consulta
+A --> CU08 : consulta
+A --> CU09 : consulta
+A --> CU10 : consulta
+A --> CU12 : consulta
+A --> CU27 : consulta
+CU04 .> CU01 : <<extend>>\n[Olvido de contraseña]
+CU21 .> CU24 : <<extend>>\n[Aprobación]
+CU01 .> CU29 : <<include>>
+CU04 .> CU29 : <<include>>
+CU05 .> CU29 : <<include>>
+CU07 .> CU29 : <<include>>
+CU08 .> CU29 : <<include>>
+CU09 .> CU29 : <<include>>
+CU10 .> CU29 : <<include>>
+CU11 .> CU29 : <<include>>
+CU12 .> CU29 : <<include>>
+CU13 .> CU29 : <<include>>
+CU14 .> CU29 : <<include>>
+CU15 .> CU29 : <<include>>
+CU19 .> CU29 : <<include>>
+CU20 .> CU29 : <<include>>
+CU21 .> CU29 : <<include>>
+CU24 .> CU29 : <<include>>
+CU27 .> CU29 : <<include>>
+@enduml
