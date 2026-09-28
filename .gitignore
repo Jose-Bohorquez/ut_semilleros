@@ -77,3 +77,4 @@ graphify-out/.graphify_python
 # Informes de QA: describen vulnerabilidades aún sin corregir en producción; no versionar en el repo
 # público hasta que estén cerradas (2026-09-27)
 docs/qa/
+graphify-out/20*/
