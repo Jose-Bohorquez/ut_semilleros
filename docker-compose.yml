@@ -20,6 +20,19 @@ services:
       - "8000:80"
     volumes:
       - ./api:/var/www/html
+    environment:                       # Solo desarrollo: las variables del contenedor mandan sobre
+      APP_ENV: local                   # api/.env (Laravel usa Dotenv inmutable), así un clon limpio
+      APP_DEBUG: "true"                # funciona sin editar nada y un api/.env con datos reales
+      APP_URL: http://localhost:8000   # nunca se usa en local.
+      FRONTEND_URL: http://localhost:8080
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: ut_semilleros
+      DB_USERNAME: jose
+      DB_PASSWORD: jose123
+      MAIL_MAILER: log                 # ningún correo real sale del entorno local
+      CACHE_STORE: database            # igual que producción; el rate limit de login (RN14) lo usa
     depends_on:
       - db
 

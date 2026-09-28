@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\Audit;
 use App\Models\User;
 
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 use Illuminate\Validation\ValidationException;
 
@@ -24,9 +27,29 @@ class AuthController extends Controller
 
             'email' => 'required|email',
 
-            'password' => 'required'
+            'password' => 'required',
+
+            'remember' => 'sometimes|boolean'
 
         ]);
+
+        /* CU01 E4 / RN14: 5 intentos fallidos en un minuto (mismo correo e
+           IP) bloquean nuevos intentos durante 60 s. Se revisa ANTES de
+           consultar la BD para no dar pistas por tiempo de respuesta. */
+        $throttleKey = 'login:' . Str::lower($validated['email']) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            return response()->json([
+
+                'message' => "Demasiados intentos fallidos. Intenta de nuevo en {$seconds} segundos.",
+
+                'retry_after' => $seconds
+
+            ], 429);
+        }
 
         $user = User::where(
             'email',
@@ -41,6 +64,9 @@ class AuthController extends Controller
             )
         ) {
 
+            RateLimiter::hit($throttleKey, 60);
+
+            /* CU01 E2: mensaje genérico, sin indicar qué dato falló. */
             return response()->json([
 
                 'message' => 'Credenciales incorrectas'
@@ -50,16 +76,36 @@ class AuthController extends Controller
 
         if ($user->status !== 'ACTIVO') {
 
+            /* CU01 E3 */
             return response()->json([
 
-                'message' => 'Usuario inactivo'
+                'message' => 'Su usuario está inactivo. Contacte al administrador del sistema.'
 
             ], 403);
         }
 
+        RateLimiter::clear($throttleKey);
+
+        /* CU01 A2 + RNF03: la sesión vence a las 8 horas, o a los 30 días
+           con «Recordarme». Sanctum 4 invalida el token cuando pasa
+           expires_at (antes los tokens no vencían nunca). */
+        $remember  = (bool) ($validated['remember'] ?? false);
+        $expiresAt = $remember ? now()->addDays(30) : now()->addHours(8);
+
         $token = $user->createToken(
-            'auth_token'
+            'auth_token',
+            ['*'],
+            $expiresAt
         )->plainTextToken;
+
+        /* CU01 paso 6 → CU29 / RN07: todo inicio de sesión queda en la
+           auditoría (el AuditObserver solo cubre altas y cambios de modelos). */
+        Audit::create([
+            'user_id'    => $user->id,
+            'action'     => 'LOGIN',
+            'table_name' => 'users',
+            'record_id'  => $user->id,
+        ]);
 
         return response()->json([
 
@@ -67,7 +113,9 @@ class AuthController extends Controller
 
             'user' => new UserResource($user),
 
-            'token' => $token
+            'token' => $token,
+
+            'expires_at' => $expiresAt->toIso8601String()
 
         ]);
     }

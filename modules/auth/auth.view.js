@@ -132,8 +132,7 @@ export function LoginView() {
 
               <div class="login-logo-wrapper">
                 <img src="assets/images/login/logo.png"
-                     alt="Universidad del Tolima"
-                     style="height:96px;width:auto">
+                     alt="Universidad del Tolima" class="login-logo">
               </div>
 
               <h1>Universidad del Tolima</h1>
@@ -145,7 +144,7 @@ export function LoginView() {
             </div>
 
             <!-- Formulario -->
-            <form id="loginForm">
+            <form id="loginForm" novalidate>
 
               <!-- Email -->
               <div class="login-input-group">
@@ -161,6 +160,7 @@ export function LoginView() {
                   class="login-input"
                   placeholder="correo@ut.edu.co"
                   autocomplete="username"
+                  aria-describedby="err-email"
                   required>
                 <span class="login-field-error" id="err-email"></span>
               </div>
@@ -180,6 +180,7 @@ export function LoginView() {
                     class="login-input"
                     placeholder="Ingresa tu contraseña"
                     autocomplete="current-password"
+                    aria-describedby="err-password"
                     style="padding-right:48px"
                     required>
                   <button
@@ -198,6 +199,18 @@ export function LoginView() {
                   </button>
                 </div>
                 <span class="login-field-error" id="err-password"></span>
+              </div>
+
+              <!-- CU01 A2: Recordarme (sesión de 30 días en este navegador) -->
+              <label class="login-remember" for="remember">
+                <input type="checkbox" id="remember" name="remember">
+                <span>Recordarme en este equipo</span>
+              </label>
+
+              <!-- CU01 E2/E3/E4: errores del servidor, anunciados (role=alert) -->
+              <div id="login-alert" class="login-alert" role="alert" hidden>
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                <span id="login-alert-text"></span>
               </div>
 
               <!-- Botón de envío — idéntico al de login.php -->

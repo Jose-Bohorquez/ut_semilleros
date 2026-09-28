@@ -34,7 +34,7 @@ Desarrollar una plataforma web institucional que permita la **gestión integral 
 
 | Componente | Versión | Descripción |
 |-------------|----------|-------------|
-| PHP | 8.4 | Lenguaje backend principal |
+| PHP | 8.2+ (producción 8.2, Docker 8.4) | Lenguaje backend principal |
 | Laravel | 12.x | Framework MVC y REST API |
 | MySQL | 9.0 | Motor de base de datos relacional |
 | phpMyAdmin | 5.2.2 | Cliente web para administración de BD |
@@ -46,6 +46,8 @@ Desarrollar una plataforma web institucional que permita la **gestión integral 
 
 ## ⚙️ Instalación y Ejecución Local (Entorno Docker)
 
+Requisitos: Docker con Docker Compose v2 y Git. No hace falta PHP, Composer ni Node en el equipo.
+
 ### 1️⃣ Clonar el repositorio
 
 ```
@@ -53,30 +55,40 @@ git clone https://github.com/Jose-Bohorquez/ut_semilleros.git
 cd ut_semilleros
 ```
 
-### 2️⃣ Construir y levantar contenedores
+### 2️⃣ Instalar y levantar (un solo comando)
 
 ```
-docker compose up -d --build
+./scripts/dev-setup.sh
 ```
 
-Servicios que se ejecutan:
+El script crea `api/.env` a partir de `api/.env.example`, levanta los contenedores,
+instala las dependencias PHP, genera la clave de la aplicación, da permisos de escritura
+a `storage/` y migra y siembra la base de datos con datos de ejemplo. Se puede volver a
+ejecutar sin riesgo: no vuelve a sembrar si ya hay usuarios.
 
-- `ut_semilleros_api` → Backend Laravel + Apache  
-- `ut_semilleros_db` → Base de datos MySQL  
-- `ut_semilleros_phpmyadmin` → Interfaz de administración de BD
+Las variables de entorno de desarrollo (BD de Docker, correo a `log` y caché en base de datos)
+están en `docker-compose.yml` y tienen prioridad sobre `api/.env`. Ningún correo real sale del
+entorno local.
 
-### 3️⃣ Acceso a la aplicación
+### 3️⃣ Acceso
 
-- Aplicación web: http://localhost:8080  
-- phpMyAdmin: http://localhost:8081  
-  - Usuario: root  
-  - Contraseña: root
+| Servicio | URL |
+|---|---|
+| Aplicación (panel web y PWA) | http://localhost:8080 |
+| API REST | http://localhost:8000/api |
+| phpMyAdmin | http://localhost:8081 |
 
-### 4️⃣ Verificar contenedores activos
+Los usuarios de ejemplo de cada rol están en `api/database/seeders/UserSeeder.php`. Son
+solo para desarrollo y nunca se siembran en producción.
+
+### 4️⃣ Pruebas
 
 ```
-docker ps
+docker compose exec -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: api php artisan test
 ```
+
+Los `-e` son obligatorios: sin ellos, la suite usaría la BD MySQL de desarrollo, y
+`RefreshDatabase` la borraría.
 
 ---
 

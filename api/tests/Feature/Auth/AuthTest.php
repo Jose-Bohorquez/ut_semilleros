@@ -142,7 +142,7 @@ class AuthTest extends TestCase
             ->assertStatus(403)
             ->assertJson([
 
-                'message' => 'Usuario inactivo'
+                'message' => 'Su usuario está inactivo. Contacte al administrador del sistema.'
 
             ]);
     }

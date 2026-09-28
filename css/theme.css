@@ -17,6 +17,10 @@
   /* Texto */
   --color-text:       #111827;
   --color-text-muted: #6b7280;
+  /* Usados por auth, PWA, usuarios y notificaciones pero nunca definidos:
+     heredaban #111827 y se perdía la jerarquía de grises (review 2026-09-28) */
+  --color-text-2:     #374151;
+  --color-text-4:     #6b7280;
   --color-text-faint: #9ca3af;
   --color-text-invert:#ffffff;
 
@@ -81,7 +85,9 @@
   --shadow-btn:  0 4px   12px rgba(239,68,68,0.30);
 
   /* Focus ring — rojo (focus:ring-red-500 en login.php) */
-  --focus-ring:  0 0 0 3px rgba(239,68,68,0.35);
+  /* Anillo doble: interior del color de la superficie (separa del botón rojo),
+     exterior ≥3:1 (WCAG 2.4.7). El anterior rgba(...,.35) daba 1,60:1. */
+  --focus-ring:  0 0 0 2px var(--color-surface), 0 0 0 4px #b91c1c;
 
   /* Fondo con patrón (bg-pattern en login.php) */
   --bg-pattern:
@@ -144,6 +150,8 @@
 
   --color-text:       #f1f5f9;
   --color-text-muted: #94a3b8;
+  --color-text-2:     #cbd5e1;
+  --color-text-4:     #94a3b8;
   --color-text-faint: #64748b;
 
   --color-border:       #334155;
@@ -190,7 +198,7 @@
   --shadow-xl:   0 20px  40px rgba(0,0,0,0.50);
   --shadow-btn:  0 4px   12px rgba(248,113,113,0.30);
 
-  --focus-ring:  0 0 0 3px rgba(248,113,113,0.40);
+  --focus-ring:  0 0 0 2px var(--color-surface), 0 0 0 4px #fca5a5;
 
   --bg-pattern:
     radial-gradient(circle at 25px 25px, rgba(248,113,113,0.06) 2px, transparent 0),

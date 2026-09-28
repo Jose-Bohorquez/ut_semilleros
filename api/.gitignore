@@ -5,7 +5,8 @@
 # ⚙️ Archivos de entorno
 .env
 .env.*
-!.env.example        # se conserva la plantilla de ejemplo
+# se conserva la plantilla de ejemplo (git no admite comentarios al final de la línea)
+!.env.example
 
 # 🧩 Dependencias PHP y Node
 /vendor/
@@ -38,7 +39,8 @@ Homestead.json
 Homestead.yaml
 
 # 🐋 Docker y base de datos
-/db/data/                  # base de datos persistente local
+# base de datos persistente local
+/db/data/
 /docker-compose.override.yml
 *.log
 

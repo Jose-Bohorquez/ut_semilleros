@@ -1,11 +1,24 @@
 /* #archivo: /frontend/modules/auth/auth.controller.js */
 
 import { apiFetch }        from "../../services/api.service.js";
-import { setToken, setUser } from "../../services/storage.service.js";
+import { setToken, setUser, consumeIntendedRoute } from "../../services/storage.service.js";
 import { navigateTo }      from "../../core/router.js";
 import { initPushOnLogin } from "../../services/push.service.js";
 
+/* CU01 — Iniciar sesión en el panel web.
+   Pasos, alternos (A*) y excepciones (E*) según
+   docs/especificacion/Especificacion_Requerimientos_Casos_de_Uso_SemillerosUT.md §CU01. */
 export function initLoginController() {
+
+    const form      = document.getElementById("loginForm");
+    if (!form) return;
+
+    const emailInput = document.getElementById("email");
+    const passInput  = document.getElementById("password");
+    const submitBtn  = form.querySelector('button[type="submit"]');
+    const alertBox   = document.getElementById("login-alert");
+    const alertText  = document.getElementById("login-alert-text");
+    const origText   = submitBtn?.innerHTML;
 
     /* ================================
        PASSWORD TOGGLE
@@ -14,134 +27,102 @@ export function initLoginController() {
     const toggleBtn = document.getElementById("togglePassword");
     if (toggleBtn) {
         toggleBtn.addEventListener("click", () => {
-            const pwd     = document.getElementById("password");
             const eye     = document.getElementById("eyeIcon");
-            const showing = pwd.type === "text";
-            pwd.type      = showing ? "password" : "text";
+            const showing = passInput.type === "text";
+            passInput.type = showing ? "password" : "text";
             eye.classList.toggle("fa-eye",       showing);
             eye.classList.toggle("fa-eye-slash", !showing);
         });
     }
 
     /* ================================
-       COUNTDOWN
-    ================================ */
-
-    function updateCountdown() {
-        const now      = Date.now();
-        const target   = now + 7 * 24 * 60 * 60 * 1000;
-        const distance = target - now;
-
-        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((distance % (1000 * 60)) / 1000);
-
-        const set = (id, val) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = String(val).padStart(2, "0");
-        };
-        set("days",    d);
-        set("hours",   h);
-        set("minutes", m);
-        set("seconds", s);
-    }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    /* ================================
-       INLINE VALIDATION HELPERS
+       VALIDACIÓN POR CAMPO (E1)
     ================================ */
 
     function isValidEmail(val) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
     }
 
-    function showError(inputId, msg) {
-        const input = document.getElementById(inputId);
-        const err   = document.getElementById(`err-${inputId}`);
-        if (input) input.classList.add("field-invalid");
-        if (err)   err.textContent = msg;
+    function showError(input, msg) {
+        const err = document.getElementById(`err-${input.id}`);
+        input.classList.add("field-invalid");
+        input.classList.remove("field-valid");
+        input.setAttribute("aria-invalid", "true");
+        if (err) err.textContent = msg;
     }
 
-    function clearError(inputId) {
-        const input = document.getElementById(inputId);
-        const err   = document.getElementById(`err-${inputId}`);
-        if (input) {
-            input.classList.remove("field-invalid");
-            input.classList.add("field-valid");
-        }
+    function clearError(input) {
+        const err = document.getElementById(`err-${input.id}`);
+        input.classList.remove("field-invalid");
+        input.removeAttribute("aria-invalid");
         if (err) err.textContent = "";
     }
 
     function validateEmail() {
-        const val = (document.getElementById("email")?.value || "").trim();
-        if (!val) { showError("email", "El correo es obligatorio"); return false; }
-        if (!isValidEmail(val)) { showError("email", "Ingresa un correo válido"); return false; }
-        clearError("email");
+        const val = emailInput.value.trim();
+        if (!val) { showError(emailInput, "El correo es obligatorio"); return false; }
+        if (!isValidEmail(val)) { showError(emailInput, "Ingresa un correo válido"); return false; }
+        clearError(emailInput);
         return true;
     }
 
     function validatePassword() {
-        const val = (document.getElementById("password")?.value || "").trim();
-        if (!val) { showError("password", "La contraseña es obligatoria"); return false; }
-        if (val.length < 4) { showError("password", "Contraseña demasiado corta"); return false; }
-        clearError("password");
+        if (!passInput.value) { showError(passInput, "La contraseña es obligatoria"); return false; }
+        clearError(passInput);
         return true;
     }
 
-    /* Attach error spans to the login form fields */
-    const emailInput = document.getElementById("email");
-    const passInput  = document.getElementById("password");
-
-    if (emailInput && !document.getElementById("err-email")) {
-        const span = document.createElement("span");
-        span.id        = "err-email";
-        span.className = "login-field-error";
-        emailInput.parentElement.appendChild(span);
+    /* Errores del servidor (E2, E3, E4, red): una sola alerta con role=alert */
+    function showAlert(msg) {
+        if (!alertBox) return;
+        alertText.textContent = msg;
+        alertBox.hidden = false;
     }
 
-    if (passInput && !document.getElementById("err-password")) {
-        const span = document.createElement("span");
-        span.id        = "err-password";
-        span.className = "login-field-error";
-        passInput.closest(".relative")?.appendChild(span);
+    function hideAlert() {
+        if (alertBox) alertBox.hidden = true;
+    }
+
+    function resetButton() {
+        if (!submitBtn) return;
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute("aria-busy");
+        submitBtn.innerHTML = origText;
     }
 
     emailInput?.addEventListener("blur",  validateEmail);
     passInput?.addEventListener("blur",   validatePassword);
-    emailInput?.addEventListener("input",  () => clearError("email"));
-    passInput?.addEventListener("input",   () => clearError("password"));
+    emailInput?.addEventListener("input", () => { clearError(emailInput); hideAlert(); });
+    passInput?.addEventListener("input",  () => { clearError(passInput);  hideAlert(); });
 
     /* ================================
        LOGIN SUBMIT
     ================================ */
 
-    const form = document.getElementById("loginForm");
-    if (!form) return;
-
     form.addEventListener("submit", async e => {
 
         e.preventDefault();
+        hideAlert();
 
+        /* E1: no se consulta la API si hay campos vacíos o mal formados */
         const emailOk = validateEmail();
         const passOk  = validatePassword();
-
         if (!emailOk || !passOk) {
-            if (!emailOk) document.getElementById("email")?.focus();
+            (emailOk ? passInput : emailInput)?.focus();
             return;
         }
 
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const origText  = submitBtn?.innerHTML;
-
         if (submitBtn) {
-            submitBtn.disabled   = true;
-            submitBtn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+            submitBtn.disabled = true;
+            submitBtn.setAttribute("aria-busy", "true");
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
         }
 
-        const data = Object.fromEntries(new FormData(form).entries());
+        const data = {
+            email:    emailInput.value.trim(),
+            password: passInput.value,
+            remember: !!document.getElementById("remember")?.checked,   /* A2 */
+        };
 
         try {
             const response = await apiFetch("/login", {
@@ -162,15 +143,36 @@ export function initLoginController() {
                 showConfirmButton: false,
             });
 
-            navigateTo("/dashboard");
+            /* A3: volver a la ruta que se intentaba abrir */
+            navigateTo(consumeIntendedRoute() || "/dashboard");
 
         } catch (error) {
-            showError("email",    "");
-            showError("password", "Credenciales incorrectas. Verifica e intenta de nuevo.");
-            if (submitBtn) {
-                submitBtn.disabled  = false;
-                submitBtn.innerHTML = origText;
+
+            /* E4 / RN14: bloqueo temporal. El aviso es fijo (no se re-anuncia
+               cada segundo); la cuenta regresiva vive solo en el botón. */
+            if (error.status === 429) {
+                let left = Number(error.payload?.retry_after) || 60;
+                showAlert(`Demasiados intentos fallidos. Podrás intentar de nuevo en ${left} segundos.`);
+                const paint = () => {
+                    if (submitBtn) submitBtn.innerHTML = `<i class="fas fa-hourglass-half" aria-hidden="true"></i> Espera ${left} s`;
+                };
+                submitBtn?.removeAttribute("aria-busy");
+                paint();
+                const timer = setInterval(() => {
+                    left -= 1;
+                    if (left > 0) return paint();
+                    clearInterval(timer);
+                    hideAlert();
+                    resetButton();
+                }, 1000);
+                return;
             }
+
+            /* E2 (credenciales) y E3 (inactivo): mensaje del servidor */
+            showAlert(error.status === 0
+                ? "No se pudo conectar con el servidor. Revisa tu conexión."
+                : (error.message || "Credenciales incorrectas"));
+            resetButton();
             passInput?.focus();
         }
     });

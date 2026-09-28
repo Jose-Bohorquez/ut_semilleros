@@ -962,7 +962,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .login-card-header p  { color: var(--color-text-muted); font-size: var(--text-lg); margin: 0 0 var(--space-4); }
 .login-divider { width: 80px; height: 4px; background: var(--gradient-accent); border-radius: var(--radius-full); margin: 0 auto; }
 
-.login-input-group { margin-bottom: var(--space-6); }
+.login-input-group { margin-bottom: var(--space-5); }
 .login-input-group label { display: block; font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text); margin-bottom: var(--space-2); }
 
 .login-input {
@@ -976,7 +976,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   transition: all 0.2s ease;
 }
 .login-input::placeholder { color: var(--color-text-faint); }
-.login-input:focus { border-color: var(--color-primary); box-shadow: var(--focus-ring); transform: translateY(-2px); }
+.login-input:focus { border-color: var(--color-primary); box-shadow: var(--focus-ring); }
 .login-input.field-invalid { border-color: var(--color-error); background: var(--color-error-light); }
 
 .login-submit-btn {
@@ -995,12 +995,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .login-submit-btn:hover { background: var(--color-gradient-hover); transform: translateY(-2px); box-shadow: var(--shadow-btn); }
 .login-submit-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
 
+/* CU01 A2 «Recordarme»: área táctil ≥44px, checkbox con el color de marca */
+.login-remember { display: flex; align-items: center; gap: var(--space-2); min-height: 44px; margin: 0 0 var(--space-4); font-size: var(--text-sm); color: var(--color-text-2); cursor: pointer; user-select: none; }
+.login-remember input { width: 18px; height: 18px; margin: 0; accent-color: var(--color-primary); cursor: pointer; flex-shrink: 0; }
+.login-remember input:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 .login-links { margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--color-border); display: flex; flex-direction: column; gap: var(--space-3); }
 @media (min-width: 640px) { .login-links { flex-direction: row; justify-content: space-between; align-items: center; } }
 
 .login-links a { font-size: var(--text-sm); text-decoration: none; display: flex; align-items: center; gap: var(--space-2); transition: color 0.2s ease; }
-.login-link-primary   { color: var(--color-primary); }
-.login-link-primary:hover { color: var(--color-primary-dark); }
+.login-link-primary   { color: var(--color-primary-text); }
+.login-link-primary:hover { text-decoration: underline; }
 .login-link-secondary { color: var(--color-text-muted); }
 .login-link-secondary:hover { color: var(--color-primary); }
 
@@ -1008,7 +1012,33 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .login-warning i { color: var(--color-warning); flex-shrink: 0; }
 .login-warning p { font-size: var(--text-sm); color: var(--color-warning-text); margin: 0; }
 
-.login-field-error { display: block; font-size: var(--text-xs); color: var(--color-error); margin-top: var(--space-1); min-height: 16px; }
+/* Error por campo en AA (#ef4444 daba 3,76:1). Vacío no ocupa espacio: antes
+   dejaba un hueco de ~57px entre la contraseña y «Recordarme». */
+.login-field-error { display: block; font-size: var(--text-sm); color: var(--color-error-text); margin-top: var(--space-1); }
+.login-field-error:empty { display: none; }
+
+/* Alerta del formulario (CU01 E2/E3/E4 y error de red), anunciada por lectores de pantalla */
+.login-alert { display: flex; gap: var(--space-2); align-items: flex-start; margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius-btn); background: var(--color-error-light); border: 1px solid var(--color-error-border); color: var(--color-error-text); font-size: var(--text-sm); line-height: 1.45; }
+.login-alert[hidden] { display: none; }
+
+.login-logo { height: 96px; width: auto; display: block; }
+
+/* Móvil y tablet: el login es la tarea principal, el formulario va en la
+   primera pantalla (antes #email quedaba en y≈1125 con un viewport de 844). */
+@media (max-width: 1023px) {
+  .login-welcome { display: none; }
+  .login-main { padding: var(--space-6) var(--space-4); }
+  .login-card { padding: var(--space-6); }
+  .login-card-header { margin-bottom: var(--space-6); }
+  .login-logo-wrapper { padding: var(--space-3); margin-bottom: var(--space-4); box-shadow: var(--shadow-sm); }
+  .login-logo { height: 56px; }
+  .login-card-header h1 { font-size: var(--text-2xl); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-welcome, .login-form-side, .login-welcome-icon { animation: none; }
+  .login-submit-btn, .login-input { transition: none; }
+}
 
 .login-footer { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: var(--space-6) var(--space-4); }
 .login-footer-inner { max-width: 80rem; margin: 0 auto; padding: 0 var(--space-6); display: flex; flex-direction: column; align-items: center; gap: var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted); }

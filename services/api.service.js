@@ -4,7 +4,7 @@
    Servicio central para comunicación con la API Laravel
    ========================================================= */
 
-import { getToken } from "./storage.service.js";
+import { getToken, rememberIntendedRoute } from "./storage.service.js";
 
 /* =========================================================
    URL BASE DE LA API
@@ -85,8 +85,13 @@ export async function apiFetch(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-        if (response.status === 401) {
+        /* 401 con sesión = token vencido o revocado → cerrar sesión.
+           401 sin sesión (p.ej. POST /login con clave errada) es un error
+           normal que el formulario debe mostrar: antes recargaba la página
+           y el mensaje «Credenciales incorrectas» nunca se veía (CU01 E2). */
+        if (response.status === 401 && token) {
             console.warn("Token inválido o sesión expirada");
+            rememberIntendedRoute();
             clearAuthSession();
             window.location.href = "/";
             return;

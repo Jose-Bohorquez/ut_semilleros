@@ -52,6 +52,9 @@ export const routes = {
 
     },
 
+    /* CU01 paso 1: la especificación usa /login; se sirve la misma vista */
+    "/login": async () => routes["/"](),
+
     /* Públicas — recuperación/activación de cuenta (Jose, 2026-08-31) */
     "/forgot-password": async () => {
         const m = await import("../modules/auth/forgot-password.module.js");
