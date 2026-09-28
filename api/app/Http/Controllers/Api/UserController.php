@@ -132,7 +132,7 @@ class UserController extends Controller
 
         if ($necesitaActivacion) {
             try {
-                $token = Password::createToken($user);
+                $token = Password::broker('activations')->createToken($user);
                 $user->notify(new AccountActivationNotification($token));
             } catch (\Throwable $e) {
                 $correoEnviado = false;

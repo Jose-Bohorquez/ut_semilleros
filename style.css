@@ -1091,6 +1091,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sia-fab:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .sia-fab-wa { background: #0b7a3e; }            /* verde WhatsApp oscurecido: blanco 5,4:1 */
 .sia-fab-ai { background: var(--color-gradient-cta); }
+/* Conversación guardada (panel minimizado) */
+.sia-fab-ai { position: relative; }
+.sia-fab-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: #16a34a; border: 2px solid var(--color-surface); }
+.sia-fab-dot[hidden] { display: none; }
 .sia-panel { position: fixed; left: max(var(--space-4), env(safe-area-inset-left, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 1101; width: min(380px, calc(100vw - 2 * var(--space-4))); height: min(560px, calc(100vh - 2 * var(--space-6))); display: flex; flex-direction: column; background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-card); box-shadow: 0 16px 40px rgba(0,0,0,.22); overflow: hidden; }
 .sia-panel[hidden] { display: none; }
 .sia-head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); background: var(--color-gradient-cta); color: #fff; }

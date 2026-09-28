@@ -18,7 +18,7 @@ export const resetPasswordModule = {
         const isActivation = params.get("activation") === "1";
 
         render({ token, email, isActivation });
-        bindEvents({ token, email });
+        bindEvents({ token, email, isActivation });
     }
 };
 
@@ -101,7 +101,7 @@ function render({ token, email, isActivation }) {
     </div>`;
 }
 
-function bindEvents({ token, email }) {
+function bindEvents({ token, email, isActivation = false }) {
     document.getElementById("resetPasswordForm")?.addEventListener("submit", async e => {
         e.preventDefault();
 
@@ -136,6 +136,8 @@ function bindEvents({ token, email }) {
                     email,
                     password,
                     password_confirmation: confirm,
+                    /* enlace del correo de registro: token de 7 días (broker «activations») */
+                    activation: isActivation,
                 }),
             });
 

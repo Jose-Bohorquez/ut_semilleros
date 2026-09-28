@@ -97,6 +97,16 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        /* Activación de cuentas nuevas (correo de registro). Mismo mecanismo y
+           tabla que la recuperación, pero el enlace dura 7 días: una invitación
+           de 60 minutos caducaba antes de que la persona abriera el correo. */
+        'activations' => [
+            'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60 * 24 * 7,
+            'throttle' => 0,
+        ],
     ],
 
     /*

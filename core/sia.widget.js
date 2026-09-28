@@ -6,7 +6,9 @@
      · SIA      → mini chat con IA que responde dudas de uso del sistema.
    Se monta una sola vez en <body>, fuera de #app, así sobrevive a los
    cambios de ruta del SPA. La calificación (1–5 caritas + comentario) se
-   pide al finalizar la conversación.
+   pide SOLO al presionar «Finalizar». El botón de minimizar (—), Escape y el
+   botón flotante guardan la conversación para seguir usando la plataforma
+   (Jose, 2026-09-28: antes la «x» obligaba a calificar).
    ========================================================= */
 
 import { apiFetch }   from "../services/api.service.js";
@@ -15,6 +17,8 @@ import { escapeHtml } from "./escape.js";
 const WHATSAPP = "573178773186";
 const TOKEN_KEY = "sia_token";
 const LOG_KEY   = "sia_log";
+const OPEN_KEY  = "sia_open";      /* el panel estaba abierto → se reabre tras recargar */
+const RATE_KEY  = "sia_must_rate"; /* se llegó al límite: al reabrir se muestra la calificación */
 const MAX_CHARS = 500;
 const FACES = [
     { v: 1, e: "😞", t: "Muy mala" },
@@ -52,6 +56,8 @@ export function mountSia() {
         <button type="button" class="sia-fab sia-fab-ai" id="sia-open" aria-haspopup="dialog" aria-expanded="false"
                 aria-controls="sia-panel" title="SIA · Asistente del sistema">
           <i class="fas fa-robot" aria-hidden="true"></i><span>SIA</span>
+          <span class="sia-fab-dot" id="sia-dot" hidden></span>
+          <span class="sr-only" id="sia-dot-sr"></span>
         </button>
         <a class="sia-fab sia-fab-wa" id="sia-wa" href="${whatsappUrl()}" target="_blank" rel="noopener"
            aria-label="Reportar un error por WhatsApp" title="Reportar un error (solo bugs)">
@@ -66,7 +72,8 @@ export function mountSia() {
             <p>Sistema Integrado de Asistencia</p>
           </div>
           <button type="button" class="sia-link-btn" id="sia-finish">Finalizar</button>
-          <button type="button" class="sia-icon-btn" id="sia-close" aria-label="Cerrar SIA"><i class="fas fa-times" aria-hidden="true"></i></button>
+          <button type="button" class="sia-icon-btn" id="sia-close" aria-label="Minimizar SIA (la conversación se guarda)"
+                  title="Minimizar · la conversación se guarda"><i class="fas fa-minus" aria-hidden="true"></i></button>
         </header>
         <div class="sia-body" id="sia-body"></div>
         <form class="sia-form" id="sia-form" autocomplete="off">
@@ -98,7 +105,15 @@ export function mountSia() {
     const bubble = (m) => `<div class="sia-msg sia-msg-${m.r}">${m.r === "a" ? format(m.t) : escapeHtml(m.t)}</div>`;
     const intro = `<div class="sia-msg sia-msg-a">Hola, soy <strong>SIA</strong>. Te ayudo con dudas sobre el uso del Sistema de Semilleros: iniciar sesión, postularte, propuestas, roles y más.<br><span class="sia-hint">No compartas contraseñas ni datos personales. Para reportar un error usa el botón verde de WhatsApp.</span></div>`;
 
+    /* Punto en el botón flotante: hay una conversación guardada */
+    function syncSaved() {
+        const saved = !!store.get(TOKEN_KEY) && panel.hidden;
+        $("sia-dot").hidden = !saved;
+        $("sia-dot-sr").textContent = saved ? " (conversación guardada)" : "";
+    }
+
     function renderChat() {
+        store.del(RATE_KEY);
         form.hidden = false;
         $("sia-finish").hidden = !store.get(TOKEN_KEY);
         body.setAttribute("role", "log");
@@ -114,7 +129,8 @@ export function mountSia() {
     }
 
     /* ── Calificación al finalizar ── */
-    function renderRating(note = "") {
+    function renderRating(note = "", forced = false) {
+        if (forced) store.set(RATE_KEY, note || true);
         form.hidden = true;
         $("sia-finish").hidden = true;
         body.removeAttribute("aria-live");
@@ -130,6 +146,7 @@ export function mountSia() {
             <label class="sia-rate-label" for="sia-feedback">Cuéntanos más (opcional)</label>
             <textarea id="sia-feedback" rows="4" maxlength="2000" placeholder="¿Qué estuvo bien o qué le faltó a la respuesta?"></textarea>
             <div class="sia-rate-actions">
+              ${forced ? "" : `<button type="button" class="sia-link-btn" id="sia-back">Volver al chat</button>`}
               <button type="button" class="sia-link-btn" id="sia-skip">Omitir</button>
               <button type="button" class="btn btn-primary" id="sia-rate-send" disabled>Enviar calificación</button>
             </div>
@@ -141,6 +158,7 @@ export function mountSia() {
             $("sia-rate-send").disabled = false;
         }));
         $("sia-skip").addEventListener("click", () => finish({ skipped: true }));
+        $("sia-back")?.addEventListener("click", () => { renderChat(); input.focus(); });
         $("sia-rate-send").addEventListener("click", () => finish({ rating, feedback: $("sia-feedback").value.trim() || null }));
         body.querySelector(".sia-face")?.focus();
     }
@@ -151,24 +169,30 @@ export function mountSia() {
             try { await apiFetch("/sia/close", { method: "POST", body: JSON.stringify({ token, ...payload }), auth: true }); }
             catch { /* si falla, igual se reinicia la conversación en el cliente */ }
         }
-        store.del(TOKEN_KEY); store.del(LOG_KEY);
+        store.del(TOKEN_KEY); store.del(LOG_KEY); store.del(RATE_KEY);
         body.setAttribute("role", "status");
         body.innerHTML = `<div class="sia-thanks"><span aria-hidden="true">${payload.skipped ? "👋" : "💚"}</span><p>${payload.skipped ? "Conversación finalizada." : "¡Gracias! Tu opinión nos ayuda a mejorar SIA."}</p><button type="button" class="btn btn-primary" id="sia-new">Nueva pregunta</button></div>`;
         $("sia-new").addEventListener("click", () => { renderChat(); input.focus(); });
     }
 
     /* ── Abrir / cerrar ── */
-    function open() {
+    function open({ focus = true } = {}) {
         panel.hidden = false;
+        store.set(OPEN_KEY, true);
         $("sia-open").setAttribute("aria-expanded", "true");
-        renderChat();
-        input.focus();
+        const mustRate = store.get(RATE_KEY);
+        if (mustRate) renderRating(typeof mustRate === "string" ? mustRate : "", true);
+        else renderChat();
+        syncSaved();
+        if (focus && !mustRate) input.focus();
     }
+    /* Minimizar: NO finaliza ni pide calificación; la conversación queda
+       guardada (sessionStorage + abierta en el servidor) y se retoma al abrir. */
     function close() {
-        /* Si hubo conversación sin calificar, se pide la calificación antes de cerrar. */
-        if (store.get(TOKEN_KEY) && body.getAttribute("role") === "log") return renderRating();
         panel.hidden = true;
+        store.del(OPEN_KEY);
         $("sia-open").setAttribute("aria-expanded", "false");
+        syncSaved();
         $("sia-open").focus();
     }
     $("sia-open").addEventListener("click", () => (panel.hidden ? open() : close()));
@@ -199,14 +223,17 @@ export function mountSia() {
             $("sia-typing")?.remove();
             push("a", r.answer);
             $("sia-finish").hidden = false;
-            if (r.remaining === 0) renderRating("Llegaste al máximo de preguntas de esta conversación.");
+            if (r.remaining === 0) renderRating("Llegaste al máximo de preguntas de esta conversación.", true);
         } catch (err) {
             $("sia-typing")?.remove();
             if (err.payload?.token) store.set(TOKEN_KEY, err.payload.token);
-            if (err.payload?.must_close) return renderRating(err.message);
+            if (err.payload?.must_close) return renderRating(err.message, true);
             push("a", err.status === 0 ? "No hay conexión a internet. Revisa tu red e inténtalo de nuevo." : (err.message || "SIA no pudo responder. Intenta de nuevo."));
         } finally {
             busy = false; $("sia-send").disabled = false;
         }
     });
+
+    /* Tras recargar la página se respeta el estado: abierto o minimizado con conversación guardada */
+    if (store.get(OPEN_KEY)) open({ focus: false }); else syncSaved();
 }

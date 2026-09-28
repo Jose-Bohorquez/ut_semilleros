@@ -414,11 +414,19 @@ class AuthController extends Controller
 
             'email' => 'required|email',
 
-            'password' => 'required|min:6|confirmed'
+            'password' => 'required|min:6|confirmed',
+
+            'activation' => 'sometimes|boolean'
 
         ]);
 
-        $status = Password::reset(
+        /* Activación (correo de registro): enlace de 7 días, solo para cuentas
+           que nunca se activaron. Así un enlace de «olvidé mi contraseña» no
+           gana 7 días de vigencia pasando activation=1. */
+        $pending = User::where('email', $request->input('email'))->value('email_verified_at') === null;
+        $broker  = $request->boolean('activation') && $pending ? 'activations' : null;
+
+        $status = Password::broker($broker)->reset(
 
             $request->only(
                 'email',
@@ -431,7 +439,10 @@ class AuthController extends Controller
 
                 $user->forceFill([
 
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
+
+                    /* definir la contraseña desde el correo verifica el correo */
+                    'email_verified_at' => $user->email_verified_at ?? now(),
 
                 ])->save();
             }
