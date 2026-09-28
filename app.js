@@ -1,8 +1,10 @@
 /* #archivo: /frontend/app.js */
 import { renderRoute } from './core/router.js?v=2';
+import { mountSia }    from './core/sia.widget.js';
 
 document.addEventListener("DOMContentLoaded", () => {
     renderRoute();
+    mountSia();   /* SIA + WhatsApp de bugs en todas las pantallas (RF17) */
 });
 
 /**

@@ -3,7 +3,7 @@
    Service Worker de la PWA del Sistema de Semilleros
    ========================================================= */
 
-const CACHE_NAME = "semilleros-v16";
+const CACHE_NAME = "semilleros-v17";
 
 /* Archivos del shell (raramente cambian → cache first) */
 const SHELL_URLS = [

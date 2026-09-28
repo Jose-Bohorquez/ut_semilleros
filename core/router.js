@@ -328,6 +328,14 @@ export const routes = {
 
 
 
+    /* SIA — panel de consumo, feedback y conocimiento (RF17) */
+    "/admin/sia": async () => {
+        if (!requireAuth()) return;
+        if (!requireRole(["ADMIN_SISTEMA"])) return;
+        const module = await import("../modules/sia-admin/sia-admin.module.js");
+        await module.siaAdminModule.init();
+    },
+
     "/audits": async () => {
 
         if (!requireAuth()) return;

@@ -69,6 +69,7 @@ export function LayoutView(content = "") {
         <a href="/groups"           data-link><i class="fas fa-object-group"></i>    Grupos</a>
         <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
         <a href="/audits"           data-link><i class="fas fa-clipboard-list"></i>  Auditoría</a>
+        <a href="/admin/sia"        data-link><i class="fas fa-robot"></i>           SIA · Asistente</a>
         `;
     }
 
