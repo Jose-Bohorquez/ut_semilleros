@@ -1059,13 +1059,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
    Abajo a la izquierda: a la derecha están los «+» de la PWA.
    ========================================================= */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.sia-fabs { position: fixed; left: max(var(--space-4), env(safe-area-inset-left, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 1100; display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start; }
+.sia-fabs { position: fixed; left: max(var(--space-4), env(safe-area-inset-left, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 1100; display: flex; flex-direction: column; gap: var(--space-5); align-items: flex-start; } /* SIA arriba, espacio, WhatsApp de bugs abajo */
 #sia-root.sia--with-nav .sia-fabs { bottom: calc(60px + var(--space-4) + env(safe-area-inset-bottom, 0px)); }
 .sia-fab { min-width: 48px; height: 48px; border-radius: var(--radius-full); border: none; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 0 var(--space-4); color: #fff; font-weight: var(--weight-semibold); font-size: var(--text-sm); text-decoration: none; cursor: pointer; box-shadow: var(--shadow-lg, 0 8px 20px rgba(0,0,0,.18)); transition: transform .15s ease, box-shadow .15s ease; }
 .sia-fab i { font-size: 1.15rem; }
 .sia-fab:hover { transform: translateY(-2px); }
 .sia-fab:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.sia-fab-wa { background: #0b7a3e; padding: 0; width: 48px; }            /* verde WhatsApp oscurecido: blanco 5,4:1 */
+.sia-fab-wa { background: #0b7a3e; }            /* verde WhatsApp oscurecido: blanco 5,4:1 */
 .sia-fab-ai { background: var(--color-gradient-cta); }
 .sia-panel { position: fixed; left: max(var(--space-4), env(safe-area-inset-left, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 1101; width: min(380px, calc(100vw - 2 * var(--space-4))); height: min(560px, calc(100vh - 2 * var(--space-6))); display: flex; flex-direction: column; background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-card); box-shadow: 0 16px 40px rgba(0,0,0,.22); overflow: hidden; }
 .sia-panel[hidden] { display: none; }
@@ -1115,8 +1115,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sia-thanks span { font-size: 2.2rem; }
 @media (max-width: 640px) {
   .sia-panel { left: 0; right: 0; bottom: 0; width: 100%; height: min(85vh, 640px); border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .sia-fab-ai span { display: none; }
-  .sia-fab-ai { width: 48px; padding: 0; }
+  .sia-fab span { display: none; }
+  .sia-fab { width: 48px; padding: 0; }
 }
 /* Escritorio: abajo a la derecha (ahí no hay «+» de la PWA; a la izquierda está el menú lateral) */
 @media (min-width: 1024px) {

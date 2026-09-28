@@ -43,6 +43,12 @@ propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 
 web ✅ desplegado y validado en producción · PWA ✅ desplegada y validada en producción (2026-09-28; E5 queda para CU02) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
 parcial (tokens de 8 h / 30 d).
 
+**SIA (RF17 propuesto, 2026-09-28):** asistente con IA (Groq `gpt-oss-20b`) y botón de WhatsApp
+solo para bugs (+57 3178773186), en todas las pantallas; panel `/admin/sia`. Diseño, límites y
+operación en `docs/sia/README.md`. La memoria técnica que usa SIA está en
+`api/resources/sia/base-conocimiento.md`: **actualízala cuando cambie una función del sistema**.
+La key (`GROQ_API_KEY`) vive solo en `.env` o en el override local; nunca en git.
+
 Diferencias conocidas a cerrar (2026-09-28): RN10
 (contraseña fuerte) no se aplica; RN06 (líder solo en sus semilleros) no se aplica; RN02/RN03
 (referencia de autorización escrita) sin campo; RN08 (códigos únicos) solo en CAT, áreas y grupos;

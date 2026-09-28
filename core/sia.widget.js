@@ -49,14 +49,14 @@ export function mountSia() {
     root.id = "sia-root";
     root.innerHTML = `
       <div class="sia-fabs">
-        <a class="sia-fab sia-fab-wa" id="sia-wa" href="${whatsappUrl()}" target="_blank" rel="noopener"
-           aria-label="Reportar un error por WhatsApp" title="Reportar un error (solo bugs)">
-          <i class="fab fa-whatsapp" aria-hidden="true"></i>
-        </a>
         <button type="button" class="sia-fab sia-fab-ai" id="sia-open" aria-haspopup="dialog" aria-expanded="false"
                 aria-controls="sia-panel" title="SIA · Asistente del sistema">
           <i class="fas fa-robot" aria-hidden="true"></i><span>SIA</span>
         </button>
+        <a class="sia-fab sia-fab-wa" id="sia-wa" href="${whatsappUrl()}" target="_blank" rel="noopener"
+           aria-label="Reportar un error por WhatsApp" title="Reportar un error (solo bugs)">
+          <i class="fab fa-whatsapp" aria-hidden="true"></i><span>Reportar bug</span>
+        </a>
       </div>
       <section class="sia-panel" id="sia-panel" role="dialog" aria-modal="false" aria-labelledby="sia-title" hidden>
         <header class="sia-head">
