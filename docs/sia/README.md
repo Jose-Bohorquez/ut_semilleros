@@ -97,3 +97,20 @@ En el panel, «Respondidas sin API hoy» mide cuánto cupo se está ahorrando.
   - escape del HTML del usuario;
   - calificación con caritas y omitir;
   - panel del administrador: KPIs, filtros, transcripción, revisión, respuesta corregida.
+
+## Despliegue en producción (2026-09-28)
+
+- Respaldo de 8 archivos y del `.env` en `~/backups/ut-edu.online/2026-09-28_pre_sia/`. Lint con
+  PHP 8.2 sin errores en 13 archivos. Migraciones solo aditivas (4 tablas nuevas), revisadas con
+  `--pretend`.
+- `GROQ_API_KEYS` (3 cuentas) cargada en el `.env` de producción **por archivo**, con permisos 600.
+- Frontend: primero los módulos nuevos, después el resto, y a los 6 min el SW v17. Resultado:
+  0 diferencias entre el repo y el servidor.
+- **Validación en vivo 7/7:**
+  - Login con SIA arriba y WhatsApp abajo.
+  - Respuesta local sin API; respuesta real de Groq sin XSS.
+  - Calificación con 4 caritas y comentario.
+  - PWA móvil sin tapar la barra inferior ni el «+».
+  - Rotación: varias cuentas usadas.
+  - Panel con las 3 cuentas.
+- Limpieza: usuarios `qa_temp_sia_*` y conversaciones de prueba eliminados.
