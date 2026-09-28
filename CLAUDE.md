@@ -40,7 +40,7 @@ propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 
 (include) · CU30 consultar auditoría.
 
 **Avance de la validación 1 a 1** (acta por CU en `docs/validacion/CUxx.md`, versionada): CU01
-web ✅ (2026-09-28; E5 queda para CU02) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
+web ✅ desplegado y validado en producción (2026-09-28; E5 queda para CU02) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
 parcial (tokens de 8 h / 30 d).
 
 Diferencias conocidas a cerrar (2026-09-28): RN10
