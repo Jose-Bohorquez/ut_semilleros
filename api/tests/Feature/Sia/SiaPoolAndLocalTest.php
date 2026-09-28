@@ -89,6 +89,8 @@ class SiaPoolAndLocalTest extends TestCase
         $this->assertStringContainsString('linkedin.com/in/jose-bohorquez', $more);
         $this->assertStringContainsString('jose-bohorquez.github.io', $more);
         $this->assertStringContainsString('Genesys Cloud', $more);
+        $this->assertStringContainsString('jjbohorquezd@ut.edu.co', $more);
+        $this->assertStringContainsString('josejbohorquezd@gmail.com', $more);
         Http::assertNothingSent();
     }
 
