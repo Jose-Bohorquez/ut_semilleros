@@ -1,0 +1,9 @@
+# Datos de MySQL local (propiedad del contenedor, ilegibles para el build) y proyectos hermanos
+db/
+SGAA/
+todo_ut-edu.space_old/
+*.zip
+.git/
+graphify-out/
+api/vendor/
+api/.env

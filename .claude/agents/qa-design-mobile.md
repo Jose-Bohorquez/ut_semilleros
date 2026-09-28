@@ -30,6 +30,10 @@ Igual que `qa-design-web` (Chrome del sistema + Puppeteer temporal o chrome-devt
 
 ## Validación PWA (automática, este proyecto la necesita)
 
+Aquí revisas la PWA desde la UX y el aspecto visual. Las pruebas funcionales a fondo (ciclo de
+vida del service worker, caché tras deploy, push, casos de uso del estudiante) son de
+`pwa-tester`: si encuentras algo funcional, derívaselo.
+
 1. **Manifest**: `name`, `short_name`, `start_url`, `scope`, `display` + `display_override`
    (`fullscreen`, `standalone`), `theme_color` y los iconos 192/512 **y** maskable (existen
    `icon-*-maskable.png`: confirma que el manifest los declara con `purpose: "maskable"` y que

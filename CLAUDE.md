@@ -81,7 +81,10 @@ sección "🔑 Credenciales y configuración sensible" del `README.md`.
 Existen 21 archivos de test en `api/tests/Feature` (CRUD por recurso, Auth, SeedbedMember), con
 `phpunit.xml` sobre SQLite en memoria. **No hay evidencia de que se hayan corrido recientemente.**
 Local no tiene PHP instalado, así que se corren dentro del contenedor
-(`docker exec ut_semilleros_api php artisan test`). El frontend no tiene tests automatizados. Los
+(`docker exec -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: ut_semilleros_api php artisan test`).
+**Nunca sin los `-e`**: el override de Docker inyecta `DB_CONNECTION=mysql` y `phpunit.xml` no usa
+`force="true"`, así que la suite correría sobre la BD de dev y `RefreshDatabase` la borraría
+(hallazgo C-01, 2026-09-27). Con los `-e`: 121 tests en verde y la BD intacta. El frontend no tiene tests automatizados. Los
 flujos se validan con Puppeteer.
 
 ## Diseño
@@ -118,6 +121,39 @@ comunidades. God nodes: `User`, `apiFetch()`, `Controller`, `Seedbed`, `createCr
 - `qa-design-web`: QA visual en navegador real (Puppeteer) en desktop.
 - `qa-design-mobile`: QA en viewports móviles, más instalabilidad y offline de la PWA.
 - `use-case-auditor`: cruza las reglas de negocio documentadas contra el código real.
+- `architecture-reviewer`: revisión arquitectónica integral sin pregunta previa. Entrega
+  observaciones priorizadas y concilia los hallazgos del resto del equipo.
+- `ui-designer`: propone mejoras visuales (web, responsive y PWA) con `impeccable` +
+  `ui-ux-pro-max`. No implementa sin confirmación.
+- `frontend-tester`: pruebas funcionales de la UI por caso de uso y rol (Puppeteer).
+- `backend-tester`: API por endpoint y rol, PHPUnit, e integración de lo desplegado en
+  Hostinger.
+- `pwa-tester`: instalabilidad, service worker, caché tras deploy, offline, push y casos de uso del
+  estudiante en la PWA.
+
+### Trabajo en equipo (validación de casos de uso)
+
+La especificación de CU01–CU14 no está en un documento aparte. Está en los comentarios
+`(RFxx / CUxx)` de `api/routes/api.php`, en `docs/roles-usuarios.md` y en `docs/CHANGELOG.md`.
+El flujo es:
+
+1. `use-case-auditor` arma la especificación y el veredicto estático.
+2. `backend-tester`, `frontend-tester` y `pwa-tester` prueban en paralelo, cada uno con su prefijo
+   de datos (`qa_temp_be_`, `qa_temp_fe_` y `qa_temp_pwa_`).
+3. `architecture-reviewer` concilia los resultados, busca la causa raíz y da feedback a cada
+   agente. `ui-designer` evalúa la UX de cada caso de uso.
+4. Cada hallazgo crítico o alto pasa por un verificador adversarial.
+
+El informe queda en `docs/qa/`.
+
+### Entorno de pruebas local (Docker, aislado de producción)
+
+`api/.env` local contiene credenciales de producción: **no se edita**. En su lugar,
+`docker-compose.override.yml` (gitignored) fuerza como variables de entorno del contenedor la BD
+de Docker y `MAIL_MAILER=log`. Esas variables mandan sobre el `.env` porque Laravel usa Dotenv
+inmutable. **Nunca cachees la config** (`config:cache`) en local, porque eso rompería este
+aislamiento. `.dockerignore` excluye `db/` (si no, el build falla por permisos). Para levantarlo:
+`docker compose up -d --build && docker exec ut_semilleros_api php artisan migrate --force`.
 
 Ningún agente ejecuta DDL/DML ni despliega por su cuenta. Todo lo que recomienden se apoya en este
 archivo, en `docs/` y en el grafo, y cualquier cambio se cierra con una validación real y evidencia

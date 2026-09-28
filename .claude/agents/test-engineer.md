@@ -14,7 +14,7 @@ reglas de negocio) y `docs/CHANGELOG.md` (cómo se validó cada flujo la última
 - **Backend**: hay 21 archivos de test PHPUnit en `api/tests/Feature` (CRUD por recurso, Auth,
   SeedbedMember). Usan SQLite `:memory:` (`phpunit.xml`). **No hay evidencia de que se hayan
   corrido recientemente.** Si los corres, reporta el resultado real, fallos incluidos. El host no
-  tiene PHP: se corren en Docker (`docker exec ut_semilleros_api php artisan test`). Recuerda que
+  tiene PHP: se corren en Docker (`docker exec -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: ut_semilleros_api php artisan test`). Recuerda que
   pasar en SQLite **no** prueba compatibilidad con MySQL.
 - **Frontend**: no tiene tests automatizados. Los flujos se validan con Puppeteer o con `curl`
   contra la API. Chrome del sistema: `/usr/bin/google-chrome`. Puppeteer ya no está en
