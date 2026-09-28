@@ -446,7 +446,7 @@ Jerarquía: `Administrador`, `Líder` y `Administrativo` → especializan a `Usu
 | Identificador | RNF01 |
 | Nombre | Plataforma web |
 | Categoría (ISO/IEC 25010) | Mantenibilidad / Portabilidad |
-| Descripción | El backend y el panel web se desarrollan en PHP 8.2 o superior con Laravel 12.x, patrón MVC, plantillas Blade, Bootstrap 5, HTML5, CSS3 y JavaScript, y base de datos MongoDB 7 o superior. El código se gestiona con Git. |
+| Descripción | El backend y el panel web se desarrollan en PHP 8.2 o superior con Laravel 12.x (API REST) y un frontend SPA en HTML5, CSS3 y JavaScript (módulos ES, sin framework), con base de datos MySQL. El código se gestiona con Git. *(Actualizado 2026-09-28: el diseño original decía Blade, Bootstrap 5 y MongoDB 7; se ajusta al stack real, que es el que soporta el hosting compartido de producción.)* |
 | Criterio de aceptación (medible) | Dependencias declaradas en composer.json y package.json; el proyecto se instala siguiendo el manual sin pasos adicionales. |
 | Método de verificación | Revisión de código e instalación en ambiente limpio. |
 | Prioridad | Alta |

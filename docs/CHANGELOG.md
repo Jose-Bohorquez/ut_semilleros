@@ -1,3 +1,26 @@
+# Sesión 2026-09-28 — Validación CU01 (login web), RF01 y RNF01
+
+Primera ronda de la validación 1 a 1 contra `docs/especificacion/` (fuente de verdad funcional).
+Detalle, evidencia y estado en `docs/validacion/CU01.md`.
+
+- **CU01 E2:** con una contraseña errada la página se recargaba (el 401 se trataba como sesión
+  expirada) y el mensaje nunca se veía. Corregido.
+- **CU01 E3:** un usuario inactivo veía «Credenciales incorrectas». Ahora ve el mensaje de la
+  especificación.
+- **CU01 E4 / RN14:** no había límite de intentos. Ahora hay bloqueo tras 5 fallos por minuto
+  (HTTP 429).
+- **CU01 A2 + RNF03:** los tokens no vencían nunca. Ahora vencen a las 8 h, o a los 30 días con
+  «Recordarme».
+- **CU01 A3:** después del login se vuelve a la ruta que se intentaba abrir.
+- **CU01 paso 6 / CU29:** los inicios de sesión no quedaban en auditoría. Ahora sí.
+- **UI del login:** formulario en la primera pantalla del móvil, errores accesibles en AA, foco
+  visible y tokens de color que faltaban.
+- **RNF01:** `api/.env.example` nunca estuvo en el repo (el `.gitignore` tenía un comentario al
+  final de la línea). La instalación ahora es un solo comando (`scripts/dev-setup.sh`), verificado
+  en un clon limpio.
+
+---
+
 # Changelog — Sesión de validación 2026-07-28
 
 Auditoría completa del sistema de Semilleros IDEAD (PWA + API Laravel) contra los casos

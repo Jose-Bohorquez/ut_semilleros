@@ -39,7 +39,11 @@ solicitud · CU23 mis solicitudes · CU24 gestionar solicitudes · CU25 registra
 propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 registrar auditoría
 (include) · CU30 consultar auditoría.
 
-Diferencias conocidas a cerrar (2026-09-28): RN14 (bloqueo tras 5 intentos) no existe; RN10
+**Avance de la validación 1 a 1** (acta por CU en `docs/validacion/CUxx.md`, versionada): CU01
+web ✅ (2026-09-28; E5 queda para CU02) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
+parcial (tokens de 8 h / 30 d).
+
+Diferencias conocidas a cerrar (2026-09-28): RN10
 (contraseña fuerte) no se aplica; RN06 (líder solo en sus semilleros) no se aplica; RN02/RN03
 (referencia de autorización escrita) sin campo; RN08 (códigos únicos) solo en CAT, áreas y grupos;
 RF15/CU28 reportes y RF16/RN09 consentimiento de datos no existen; CU02 no usa Google. El avance de
@@ -144,8 +148,15 @@ comunidades. God nodes: `User`, `apiFetch()`, `Controller`, `Seedbed`, `createCr
 - `graphify path "A" "B"`: para ver cómo un cambio en A afecta a B (p.ej. `crud.engine.js` →
   un módulo concreto).
 - `graphify explain "X"`: para entender un nodo y sus vecinos antes de modificarlo.
-- **Después de cada cambio de código corre `graphify update .`** (sin costo de LLM). Si cambiaste
-  docs, el refresco semántico es `/graphify --update`.
+- **Después de cada cambio, actualiza el grafo con el flujo incremental del skill**
+  (`/graphify . --update`): reextrae con AST el código cambiado y, con un subagente, los
+  documentos pequeños cambiados, y fusiona con `build_merge`.
+  **No uses `graphify update .` a secas si cambiaron documentos:** ese modo solo-código
+  reconstruye el grafo y descarta los nodos semánticos de los docs cambiados (2026-09-28: se
+  perdieron ~180 nodos de la especificación; se restauró desde git).
+- La especificación y la documentación técnica pesan ~260 KB. Reextraerlas cuesta ~200k tokens,
+  así que se reextraen en hitos (cada ~5 CU validados). Entre hitos conservan sus nodos y quedan
+  sin marcar en el manifest.
 
 ## Agentes disponibles (`.claude/agents/`)
 
@@ -186,10 +197,12 @@ El informe queda en `docs/qa/`.
 
 ### Entorno de pruebas local (Docker, aislado de producción)
 
-`api/.env` local contiene credenciales de producción: **no se edita**. En su lugar,
-`docker-compose.override.yml` (gitignored) fuerza como variables de entorno del contenedor la BD
-de Docker y `MAIL_MAILER=log`. Esas variables mandan sobre el `.env` porque Laravel usa Dotenv
-inmutable. **Nunca cachees la config** (`config:cache`) en local, porque eso rompería este
+`api/.env` local contiene credenciales de producción: **no se edita**. Las variables de desarrollo
+(BD de Docker, `MAIL_MAILER=log`, `CACHE_STORE=database`) están en `docker-compose.yml` desde el
+2026-09-28, y mandan sobre el `.env` porque Laravel usa Dotenv inmutable. El
+`docker-compose.override.yml` local quedó redundante. Instalación desde cero:
+`./scripts/dev-setup.sh`. Gotcha: con `CACHE_STORE=file` el rate limit de login no cuenta,
+porque `storage/` no es escribible en el contenedor. **Nunca cachees la config** (`config:cache`) en local, porque eso rompería este
 aislamiento. `.dockerignore` excluye `db/` (si no, el build falla por permisos). Para levantarlo:
 `docker compose up -d --build && docker exec ut_semilleros_api php artisan migrate --force`.
 

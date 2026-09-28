@@ -1577,6 +1577,23 @@ Route::prefix('v1')->group(function () {
 | Dominio institucional | `GoogleController` rechaza correos fuera de `@<dominio_institucional>` (parámetro `hd` + verificación en servidor). |
 | Respuestas | API Resources que ocultan campos sensibles (`password`, tokens); errores sin trazas en producción (`APP_DEBUG=false`). |
 
+#### Implementación real (verificado 2026-09-28)
+
+> El bloque anterior describe el diseño con MongoDB y rutas `/api/v1`. Por decisión del proyecto
+> (2026-09-28), **lo funcional lo manda la especificación y el stack es el real**: Laravel 12 +
+> MySQL, SPA en JavaScript vanilla y hosting compartido Hostinger (PHP 8.2).
+
+| Capa | Implementación actual |
+|---|---|
+| Rutas | Prefijo `/api` (sin versión). Públicas: `login`, `forgot-password`, `reset-password`. El resto va en el grupo `auth:sanctum` + `active`. |
+| Autenticación (CU01) | Token Sanctum que vence a las **8 h**, o a los **30 días** con «Recordarme» (A2). Cada login exitoso se registra en `audits` como `LOGIN` (CU29, RN07). |
+| Limitación de intentos (RN14) | `RateLimiter` en `AuthController::login`: 5 fallos por correo+IP en 60 s → **HTTP 429** con `retry_after`. El store de caché es `database`. |
+| Usuario inactivo | En el login: 403 «Su usuario está inactivo…» (CU01 E3). En cada petición, el middleware `active` (`EnsureUserIsActive`) responde 401 y revoca el token. Al inactivar se revocan todos sus tokens. |
+| Autorización | Middleware `role:` por ruta, más reglas en el servidor: el estudiante no puede fijar `user_id` ni `status`. |
+| Salida en el frontend | `core/escape.js` (`escapeHtml`, `safeUrl`, `safeImageSrc`) en todo dato que se inserta como HTML. |
+| Pruebas | PHPUnit: `tests/Feature/UseCases/CU01LoginTest.php` (un test por paso/alterno/excepción) y `tests/Feature/Security/SecurityRegressionTest.php`. |
+| Pendiente | Login de estudiantes con Google (CU02, RN04) y CU01 E5 (estudiante que intenta entrar al panel web). |
+
 Respuesta estándar:
 
 ```json
@@ -2133,6 +2150,27 @@ sudo supervisorctl reread && sudo supervisorctl update
 ```
 
 **Instalación local para desarrollo:** `composer install`, `npm install`, `.env` apuntando a Atlas M0 o a MongoDB local (`mongodb://127.0.0.1:27017`), `php artisan migrate --seed`, `composer run dev` (servidor + Vite).
+
+#### Instalación real (verificada 2026-09-28 en un clon limpio — RNF01)
+
+**Desarrollo local (Docker):** requiere Docker con Compose v2 y Git. No hace falta PHP, Composer
+ni Node en el equipo.
+
+```bash
+git clone https://github.com/Jose-Bohorquez/ut_semilleros.git && cd ut_semilleros
+./scripts/dev-setup.sh      # .env, contenedores, composer, APP_KEY, permisos, migraciones + datos de ejemplo
+```
+
+Servicios: aplicación en `http://localhost:8080`, API en `http://localhost:8000/api`,
+phpMyAdmin en `http://localhost:8081`. Las variables de desarrollo (MySQL de Docker,
+`MAIL_MAILER=log`, `CACHE_STORE=database`) están en `docker-compose.yml`. Pruebas:
+`docker compose exec -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: api php artisan test`.
+
+**Producción (Hostinger compartido, PHP 8.2, sin Node ni supervisor):** el frontend va en la raíz
+de `public_html/` y la API en `public_html/api/`. El `.htaccess` enruta `/api/*` a
+`api/public/index.php`. Se sube `api/vendor/` ya instalado. Para desplegar: respaldo en el
+servidor → `php -l` de cada PHP → `rsync --files-from` a la ruta exacta → `php artisan
+migrate --force` (nunca `--seed`) → `route:clear` + `config:clear` → validación en vivo.
 
 ### Manual técnico
 
