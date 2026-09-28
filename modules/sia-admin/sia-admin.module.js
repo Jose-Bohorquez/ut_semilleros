@@ -15,6 +15,7 @@ const LIMIT_LABELS = {
     user_per_day: "Usuario con sesión: preguntas por día", max_messages: "Preguntas por conversación",
     max_question_chars: "Largo máximo de la pregunta (caracteres)", max_answer_tokens: "Largo máximo de la respuesta (tokens)",
     global_requests_per_day: "Tope global: consultas por día", global_tokens_per_day: "Tope global: tokens por día",
+    per_key_requests_per_day: "Tope por cuenta de Groq: consultas por día",
 };
 let filter = "", page = 1;
 
@@ -48,13 +49,17 @@ async function render() {
 
     const content = `
       <div class="table-toolbar"><h2><i class="fas fa-robot"></i> SIA · Asistente</h2>
-        <span class="sia-status ${cfg.configured ? "ok" : "bad"}">${cfg.configured ? `Activo · ${escapeHtml(cfg.model)}` : "Sin API key configurada"}</span></div>
+        <span class="sia-status ${cfg.configured ? "ok" : "bad"}">${cfg.configured ? `Activo · ${escapeHtml(cfg.model)} · ${escapeHtml(cfg.accounts)} cuenta(s)` : "Sin API key configurada"}</span></div>
       <div class="sia-kpis">
         ${kpi("Consultas hoy", `${t.requests} / ${t.requests_cap}`, `${t.errors} errores · ${t.avg_ms} ms promedio`, pct(t.requests, t.requests_cap))}
         ${kpi("Tokens hoy", `${t.tokens.toLocaleString("es-CO")} / ${t.tokens_cap.toLocaleString("es-CO")}`, "Cupo gratis de Groq: 1.000 consultas/día", pct(t.tokens, t.tokens_cap))}
         ${kpi("Este mes", `${st.month.requests} consultas`, `${st.month.tokens.toLocaleString("es-CO")} tokens`)}
         ${kpi("Calificación promedio", c.avg_rating ? `${FACE[Math.round(c.avg_rating)] || ""} ${c.avg_rating} / 5` : "—", `${c.rated} calificadas · ${c.skipped} omitidas`)}
         ${kpi("Por revisar", c.unreviewed, "mal calificadas o con comentario")}
+        ${kpi("Respondidas sin API hoy", t.local, "saludos, identidad y respuestas corregidas")}
+      </div>
+      <div class="card sia-dist"><h3>Cuentas de Groq (rotación)</h3>
+        ${(st.keys || []).map(k => `<div class="sia-dist-row"><span class="sia-acct">${escapeHtml(k.label)}</span><div class="sia-bar"><span style="width:${pct(k.requests, k.cap)}%" class="${pct(k.requests, k.cap) >= 80 ? "is-hot" : ""}"></span></div><b>${escapeHtml(k.requests)}/${escapeHtml(k.cap)}</b>${k.cooling ? ' <span class="sia-cool" title="En enfriamiento por límite o error">⏸</span>' : ""}</div>`).join("") || "<p class='sia-empty'>Sin cuentas configuradas.</p>"}
       </div>
       <div class="card sia-dist"><h3>Distribución de calificaciones</h3>
         ${[5, 4, 3, 2, 1].map(r => `<div class="sia-dist-row"><span>${FACE[r]} ${r}</span><div class="sia-bar"><span style="width:${Math.round((dist[r] || 0) / maxD * 100)}%"></span></div><b>${dist[r] || 0}</b></div>`).join("")}

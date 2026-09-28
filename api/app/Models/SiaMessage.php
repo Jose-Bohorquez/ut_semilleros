@@ -8,7 +8,7 @@ class SiaMessage extends Model
 {
     protected $fillable = [
         'conversation_id', 'role', 'content', 'status',
-        'prompt_tokens', 'completion_tokens', 'latency_ms', 'model',
+        'prompt_tokens', 'completion_tokens', 'latency_ms', 'model', 'key_label', 'source',
     ];
 
     public function conversation()

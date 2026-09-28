@@ -22,7 +22,7 @@ class SiaTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['services.groq.key' => 'test-key', 'services.groq.model' => 'openai/gpt-oss-20b']);
+        config(['services.groq.key' => 'test-key', 'services.groq.keys' => null, 'services.groq.model' => 'openai/gpt-oss-20b']);  // aislado del entorno real
         RateLimiter::clear('sia:ip:h:' . hash('sha256', '127.0.0.1|' . config('app.key')));
         RateLimiter::clear('sia:ip:d:' . hash('sha256', '127.0.0.1|' . config('app.key')));
     }
@@ -85,14 +85,14 @@ class SiaTest extends TestCase
         SiaSetting::create(['key' => 'global_requests_per_day', 'value' => '1']);
         $c = SiaConversation::create(['token' => str_repeat('x', 48), 'ip_hash' => 'h']);
         SiaMessage::create(['conversation_id' => $c->id, 'role' => 'assistant', 'content' => 'x', 'status' => 'OK']);
-        $this->postJson('/api/sia/chat', ['message' => 'hola'])->assertStatus(429);
+        $this->postJson('/api/sia/chat', ['message' => '¿cómo instalo la aplicación?'])->assertStatus(429);
         Http::assertNothingSent();
     }
 
     public function test_groq_failure_returns_503_and_is_logged(): void
     {
         $this->fakeGroq('', 500);
-        $this->postJson('/api/sia/chat', ['message' => 'hola'])->assertStatus(503);
+        $this->postJson('/api/sia/chat', ['message' => '¿cómo instalo la aplicación?'])->assertStatus(503);
         $this->assertDatabaseHas('sia_messages', ['role' => 'assistant', 'status' => 'ERROR']);
     }
 
@@ -100,7 +100,7 @@ class SiaTest extends TestCase
     {
         $this->fakeGroq();
         $u = User::factory()->create(['role' => 'ESTUDIANTE']);
-        $this->withToken($u->createToken('t')->plainTextToken)->postJson('/api/sia/chat', ['message' => 'hola'])->assertStatus(200);
+        $this->withToken($u->createToken('t')->plainTextToken)->postJson('/api/sia/chat', ['message' => '¿cómo instalo la aplicación?'])->assertStatus(200);
         $this->assertDatabaseHas('sia_conversations', ['user_id' => $u->id]);
     }
 

@@ -11,18 +11,20 @@ class SiaSetting extends Model
     protected $keyType = 'string';
     protected $fillable = ['key', 'value'];
 
-    /* Límites anti-abuso (decisión de Jose, 2026-09-28: «moderados»).
-       El cupo gratis de Groq para gpt-oss-20b es 1000 requests/día y 8000 tokens/min. */
+    /* Límites anti-abuso. Etapa de pruebas (Jose, 2026-09-28): más margen por
+       persona y varias cuentas de Groq en rotación. Cada cuenta gratis da 1000
+       requests/día y 8000 tokens/min; per_key deja un 20 % de reserva. */
     public const DEFAULTS = [
-        'guest_per_hour'         => 10,
-        'guest_per_day'          => 20,
-        'user_per_day'           => 30,
-        'max_messages'           => 12,   // preguntas por conversación
-        'max_question_chars'     => 500,
-        'max_answer_tokens'      => 400,
-        'global_requests_per_day'=> 600,
-        'global_tokens_per_day'  => 400000,
-        'enabled'                => 1,
+        'guest_per_hour'           => 20,
+        'guest_per_day'            => 40,
+        'user_per_day'             => 60,
+        'max_messages'             => 20,   // preguntas por conversación
+        'max_question_chars'       => 500,
+        'max_answer_tokens'        => 400,
+        'global_requests_per_day'  => 2000,
+        'global_tokens_per_day'    => 2500000,
+        'per_key_requests_per_day' => 800,
+        'enabled'                  => 1,
     ];
 
     public static function all_values(): array

@@ -4,6 +4,7 @@ namespace App\Services\Sia;
 
 use App\Models\SiaKnowledge;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -39,9 +40,9 @@ TXT;
 
     /**
      * @param  array<int, array{role:string, content:string}>  $history  mensajes previos de la conversación
-     * @return array{answer:string, prompt_tokens:int, completion_tokens:int, latency_ms:int, model:string}
+     * @return array{answer:string, prompt_tokens:int, completion_tokens:int, latency_ms:int, model:string, key_label:string}
      */
-    public function ask(string $question, array $history, int $maxTokens): array
+    public function ask(string $question, array $history, int $maxTokens, int $perKeyPerDay = 800): array
     {
         $context = $this->buildContext($question);
 
@@ -51,38 +52,64 @@ TXT;
         }
         $messages[] = ['role' => 'user', 'content' => $question];
 
-        $model   = config('services.groq.model');
-        $started = microtime(true);
-
-        $response = Http::withToken((string) config('services.groq.key'))
-            ->acceptJson()
-            ->timeout(25)
-            ->post(rtrim(config('services.groq.base_url'), '/') . '/chat/completions', [
-                'model'                 => $model,
-                'messages'              => $messages,
-                'temperature'           => 0.2,
-                'max_completion_tokens' => $maxTokens,
-                'reasoning_effort'      => 'low',      // gpt-oss: menos tokens de razonamiento
-            ]);
-
-        $latency = (int) round((microtime(true) - $started) * 1000);
-
-        if (!$response->successful()) {
-            throw new SiaUnavailableException('Groq respondió HTTP ' . $response->status());
+        $model = config('services.groq.model');
+        $pool  = app(GroqKeyPool::class);
+        $cands = $pool->candidates($perKeyPerDay);
+        if (!$cands) {
+            throw new SiaUnavailableException('Sin cuentas de Groq disponibles (todas en enfriamiento o en su tope diario)');
         }
 
-        $answer = trim((string) data_get($response->json(), 'choices.0.message.content', ''));
-        if ($answer === '') {
-            throw new SiaUnavailableException('Respuesta vacía del modelo');
+        /* Rotación: si una cuenta responde 429 (cupo) o 401/403 (key inválida) se
+           enfría y se intenta con la siguiente; el usuario no nota el cambio. */
+        $deadline = microtime(true) + 20;   // tope total: el hosting corta PHP a los ~30 s
+        foreach ($cands as $acct) {
+            if (microtime(true) > $deadline) break;
+            $started  = microtime(true);
+            $response = Http::withToken($acct['key'])
+                ->acceptJson()
+                ->connectTimeout(5)
+                ->timeout(10)
+                ->post(rtrim(config('services.groq.base_url'), '/') . '/chat/completions', [
+                    'model'                 => $model,
+                    'messages'              => $messages,
+                    'temperature'           => 0.2,
+                    'max_completion_tokens' => $maxTokens,
+                    'reasoning_effort'      => 'low',      // gpt-oss: menos tokens de razonamiento
+                ]);
+            $latency = (int) round((microtime(true) - $started) * 1000);
+
+            if ($response->status() === 429) {
+                $daily = $response->header('x-ratelimit-remaining-requests') === '0';
+                $wait  = $daily ? (int) now()->diffInSeconds(now()->endOfDay()) + 1 : max(10, (int) ((float) $response->header('retry-after') ?: 60));
+                $pool->cool($acct['label'], $wait);
+                Log::warning("[SIA] {$acct['label']} con límite (429), enfriada {$wait}s");
+                continue;
+            }
+            if (in_array($response->status(), [401, 403], true)) {
+                $pool->cool($acct['label'], 3600);
+                Log::error("[SIA] {$acct['label']} rechazada ({$response->status()}): revisar/rotar la key");
+                continue;
+            }
+            if (!$response->successful()) {
+                throw new SiaUnavailableException('Groq respondió HTTP ' . $response->status());
+            }
+
+            $answer = trim((string) data_get($response->json(), 'choices.0.message.content', ''));
+            if ($answer === '') {
+                throw new SiaUnavailableException('Respuesta vacía del modelo');
+            }
+
+            return [
+                'answer'            => $answer,
+                'prompt_tokens'     => (int) data_get($response->json(), 'usage.prompt_tokens', 0),
+                'completion_tokens' => (int) data_get($response->json(), 'usage.completion_tokens', 0),
+                'latency_ms'        => $latency,
+                'model'             => (string) $model,
+                'key_label'         => $acct['label'],
+            ];
         }
 
-        return [
-            'answer'            => $answer,
-            'prompt_tokens'     => (int) data_get($response->json(), 'usage.prompt_tokens', 0),
-            'completion_tokens' => (int) data_get($response->json(), 'usage.completion_tokens', 0),
-            'latency_ms'        => $latency,
-            'model'             => (string) $model,
-        ];
+        throw new SiaUnavailableException('Todas las cuentas de Groq respondieron con límite o error');
     }
 
     /** Secciones de la memoria técnica + respuestas corregidas más relevantes. */

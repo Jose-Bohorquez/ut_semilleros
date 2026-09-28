@@ -44,6 +44,9 @@ return [
     /* SIA — asistente con IA (RF17). La key vive solo en .env del servidor. */
     'groq' => [
         'key'      => env('GROQ_API_KEY'),
+        /* Varias cuentas en rotación: "cta_01=gsk_…,cta_02=gsk_…". Si no se define,
+           se usa GROQ_API_KEY como única cuenta (cta_01). */
+        'keys'     => env('GROQ_API_KEYS'),
         'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
         'model'    => env('SIA_MODEL', 'openai/gpt-oss-20b'),
     ],
