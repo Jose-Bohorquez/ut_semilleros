@@ -42,7 +42,9 @@ propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 
 **Avance de la validación 1 a 1** (acta por CU en `docs/validacion/CUxx.md`, versionada): CU01
 web ✅ desplegado y validado en producción · PWA ✅ desplegada y validada en producción (2026-09-28) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
 parcial (tokens de 8 h / 30 d). CU02 + RF02 + RF16 + RNF02 ✅ en local (2026-09-28, acta
-`docs/validacion/CU02.md`); Google real pendiente del Client ID (`GOOGLE_CLIENT_ID` en `.env`).
+`docs/validacion/CU02.md`); **Client ID de Google ya instalado en producción (2026-09-29)** —
+el botón real ya aparece; falta la primera prueba real de un usuario con su cuenta de Google
+(la pantalla de consentimiento está en modo prueba, restringida a usuarios de prueba).
 CU03 + RF03 + RNF03 ✅ desplegados y validados en producción (2026-09-28, 14/14, ZAP 0 altos; acta `docs/validacion/CU03.md`). **Los teléfonos de
 coordinadores se cifran con APP_KEY: si se pierde o se regenera el `.env`, no se pueden leer.**
 CU04 + RF04 + RNF04 ✅ desplegados y validados en producción (2026-09-29, 235 tests + 18/18 local +
