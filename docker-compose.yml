@@ -32,7 +32,14 @@ services:
       DB_USERNAME: jose
       DB_PASSWORD: jose123
       MAIL_MAILER: log                 # ningún correo real sale del entorno local
+      LOG_LEVEL: debug                 # el driver "log" de correo escribe a nivel debug; con el
+                                        # LOG_LEVEL=error de producción, storage/logs/laravel.log
+                                        # quedaba vacío y nadie podía leer un correo en local
+                                        # (encontrado al probar CU04, 2026-09-29)
       CACHE_STORE: database            # igual que producción; el rate limit de login (RN14) lo usa
+      QUEUE_CONNECTION: sync           # CU04 E4 en producción usa "database" + cron; en local no hay
+                                        # worker corriendo, así que el correo de recuperación se
+                                        # procesa al instante para poder probarlo (log de Laravel)
     depends_on:
       - db
 

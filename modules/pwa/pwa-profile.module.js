@@ -8,6 +8,7 @@ import { getUser, setUser }   from "../../services/storage.service.js";
 import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
 import { escapeHtml, safeImageSrc } from "../../core/escape.js";
+import { PASSWORD_HINT, passwordPolicyError } from "../../core/password-policy.js";
 
 const ROLE_LABELS = {
     ADMIN_SISTEMA:   { label: "Administrador",   color: "#b91c1c" },
@@ -175,6 +176,7 @@ function renderProfile(user) {
                             </button>
                         </div>
                         <span class="pwa-field-error" id="err-password"></span>
+                        <span style="display:block;font-size:12px;color:var(--color-text-faint);margin-top:4px">${PASSWORD_HINT}</span>
                     </div>
 
                     <div class="pwa-form-group">
@@ -324,8 +326,9 @@ function bindEvents() {
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showError("email", "Ingresa un correo válido"); hasError = true;
         }
-        if (pass && pass.length < 8) {
-            showError("password", "Mínimo 8 caracteres"); hasError = true;
+        if (pass) {
+            const policyErr = passwordPolicyError(pass);
+            if (policyErr) { showError("password", policyErr); hasError = true; }
         }
         if (pass && pass !== conf) {
             showError("pass-confirm", "Las contraseñas no coinciden"); hasError = true;

@@ -8,6 +8,7 @@ use App\Models\Audit;
 use App\Models\User;
 use App\Services\Auth\GoogleAuthException;
 use App\Services\Auth\GoogleIdTokenVerifier;
+use App\Support\PasswordPolicy;
 
 use Illuminate\Http\Request;
 
@@ -339,11 +340,10 @@ class AuthController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'name'                  => 'required|string|max:255',
-            'email'                 => 'required|email|unique:users,email,' . $user->id,
-            'password'              => 'nullable|string|min:8|confirmed',
-            'password_confirmation' => 'nullable|string',
-        ]);
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => PasswordPolicy::optional(),   /* RN10 */
+        ], PasswordPolicy::messages());
 
         $data = [
             'name'  => $validated['name'],
@@ -401,15 +401,37 @@ class AuthController extends Controller
 
         ]);
 
-        $status = Password::sendResetLink(
+        $email = Str::lower($request->input('email'));
 
-            $request->only('email')
+        /* CU04 E3: más de 3 solicitudes en 10 minutos para el mismo correo →
+           429 y no se manda nada más. Se cuenta por correo (no por IP): así
+           protege una casilla ajena aunque el atacante rote de IP, y no
+           bloquea a otro usuario que pida su propio enlace desde la misma
+           red. Se cuenta ANTES de intentar el envío, igual que RN14 en el
+           login (evita que N peticiones paralelas se salten el límite). */
+        $throttleKey = 'forgot-password:' . $email;
 
-        );
+        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
 
+            return response()->json([
+
+                'message' => 'Demasiadas solicitudes para este correo. Intenta de nuevo más tarde.',
+
+                'retry_after' => RateLimiter::availableIn($throttleKey)
+
+            ], 429);
+        }
+
+        RateLimiter::hit($throttleKey, 600);
+
+        Password::sendResetLink(['email' => $email]);
+
+        /* CU04 paso 5: el mensaje NUNCA revela si el correo existe (antes se
+           devolvía el texto de Laravel, que sí lo revelaba: «No encontramos
+           un usuario con ese correo» vs «Te hemos enviado el enlace…»). */
         return response()->json([
 
-            'message' => __($status)
+            'message' => 'Si el correo está registrado, recibirá un enlace para recuperar su contraseña.'
 
         ]);
     }
@@ -425,11 +447,11 @@ class AuthController extends Controller
 
             'email' => 'required|email',
 
-            'password' => 'required|min:6|confirmed',
+            'password' => PasswordPolicy::required(),   /* RN10 */
 
             'activation' => 'sometimes|boolean'
 
-        ]);
+        ], PasswordPolicy::messages());
 
         /* Activación (correo de registro): enlace de 7 días, solo para cuentas
            que nunca se activaron. Así un enlace de «olvidé mi contraseña» no
@@ -437,40 +459,71 @@ class AuthController extends Controller
         $pending = User::where('email', $request->input('email'))->value('email_verified_at') === null;
         $broker  = $request->boolean('activation') && $pending ? 'activations' : null;
 
-        $status = Password::broker($broker)->reset(
+        $resetUser = null;
 
-            $request->only(
-                'email',
-                'password',
-                'password_confirmation',
-                'token'
-            ),
+        /* Todo en una sola transacción (review 2026-09-29): guardar la
+           contraseña, revocar los tokens (paso 10) y auditar deben ocurrir
+           juntos o no ocurrir — si la auditoría fallara después de guardar
+           la contraseña, no debe quedar una contraseña nueva con sesiones
+           viejas todavía vigentes. */
+        $status = DB::transaction(function () use ($broker, $request, &$resetUser) {
 
-            function ($user, $password) {
+            $status = Password::broker($broker)->reset(
 
-                $user->forceFill([
+                $request->only(
+                    'email',
+                    'password',
+                    'password_confirmation',
+                    'token'
+                ),
 
-                    'password' => Hash::make($password),
+                function ($user, $password) use (&$resetUser) {
 
-                    /* definir la contraseña desde el correo verifica el correo */
-                    'email_verified_at' => $user->email_verified_at ?? now(),
+                    $user->forceFill([
 
-                ])->save();
+                        'password' => Hash::make($password),
+
+                        /* definir la contraseña desde el correo verifica el correo */
+                        'email_verified_at' => $user->email_verified_at ?? now(),
+
+                    ])->save();
+
+                    $resetUser = $user;
+                }
+            );
+
+            /* Paso 10 / RNF03: la contraseña nueva invalida TODAS las sesiones
+               abiertas de ese usuario (no solo el dispositivo que la cambió) —
+               si alguien tenía acceso con la contraseña vieja, la pierde. */
+            if ($status === Password::PASSWORD_RESET) {
+                $resetUser->tokens()->delete();
+
+                Audit::create([
+                    'user_id'    => $resetUser->id,
+                    'action'     => 'PASSWORD_RESET',
+                    'table_name' => 'users',
+                    'record_id'  => $resetUser->id,
+                ]);
             }
-        );
+
+            return $status;
+        });
 
         if ($status !== Password::PASSWORD_RESET) {
 
+            /* CU04 E1: token vencido, ya usado, o correo sin coincidencia */
             throw ValidationException::withMessages([
 
-                'email' => [__($status)]
+                'email' => [$status === Password::INVALID_TOKEN || $status === Password::INVALID_USER
+                    ? 'El enlace no es válido o expiró.'
+                    : __($status)]
 
             ]);
         }
 
         return response()->json([
 
-            'message' => __($status)
+            'message' => 'Contraseña actualizada correctamente'
 
         ]);
     }

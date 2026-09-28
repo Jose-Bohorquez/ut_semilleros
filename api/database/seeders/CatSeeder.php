@@ -13,6 +13,7 @@ class CatSeeder extends Seeder
             [
                 'name'    => 'CAT Bucaramanga',
                 'code'    => 'CAT-BGA',
+                'email'   => 'cat.bucaramanga@ut.edu.co',
                 'address' => 'Calle 35 # 28-40',
                 'city'    => 'Bucaramanga',
                 'phone1'  => '6076340000',
@@ -21,6 +22,7 @@ class CatSeeder extends Seeder
             [
                 'name'    => 'CAT Bogotá',
                 'code'    => 'CAT-BOG',
+                'email'   => 'cat.bogota@ut.edu.co',
                 'address' => 'Carrera 7 # 32-16',
                 'city'    => 'Bogotá',
                 'phone1'  => '6013200000',
@@ -29,6 +31,7 @@ class CatSeeder extends Seeder
             [
                 'name'    => 'CAT Medellín',
                 'code'    => 'CAT-MED',
+                'email'   => 'cat.medellin@ut.edu.co',
                 'address' => 'Avenida El Poblado # 10-5',
                 'city'    => 'Medellín',
                 'phone1'  => '6044440000',
@@ -37,6 +40,7 @@ class CatSeeder extends Seeder
             [
                 'name'    => 'CAT Cali',
                 'code'    => 'CAT-CAL',
+                'email'   => 'cat.cali@ut.edu.co',
                 'address' => 'Calle 5 # 38-25',
                 'city'    => 'Cali',
                 'phone1'  => '6023920000',
@@ -45,6 +49,7 @@ class CatSeeder extends Seeder
             [
                 'name'    => 'CAT Barranquilla',
                 'code'    => 'CAT-BAQ',
+                'email'   => 'cat.barranquilla@ut.edu.co',
                 'address' => 'Carrera 46 # 67-90',
                 'city'    => 'Barranquilla',
                 'phone1'  => '6053800000',
@@ -53,6 +58,7 @@ class CatSeeder extends Seeder
             [
                 'name'    => 'CAT Manizales',
                 'code'    => 'CAT-MAN',
+                'email'   => 'cat.manizales@ut.edu.co',
                 'address' => 'Calle 27 # 15-60',
                 'city'    => 'Manizales',
                 'phone1'  => '6068810000',

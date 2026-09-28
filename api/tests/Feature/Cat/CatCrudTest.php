@@ -32,8 +32,9 @@ class CatCrudTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $response = $this->postJson('/api/cats', [
-            'name' => 'CAT Bucaramanga',
-            'code' => 'CAT-BGA',
+            'name'   => 'CAT Bucaramanga',
+            'code'   => 'CAT-BGA',
+            'phone1' => '6076340000',
         ]);
         $response->assertStatus(201);
         $this->assertDatabaseHas('cats', ['code' => 'CAT-BGA']);
@@ -59,8 +60,10 @@ class CatCrudTest extends TestCase
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $cat      = Cat::create(['name' => 'Original', 'code' => 'CAT-OR', 'status' => 'ACTIVO']);
         $response = $this->putJson("/api/cats/{$cat->id}", [
-            'name' => 'Actualizado',
-            'code' => 'CAT-OR',
+            'name'   => 'Actualizado',
+            'code'   => 'CAT-OR',
+            'phone1' => '6076340000',
+            'status' => 'ACTIVO',
         ]);
         $response->assertStatus(200);
         $this->assertDatabaseHas('cats', ['id' => $cat->id, 'name' => 'Actualizado']);

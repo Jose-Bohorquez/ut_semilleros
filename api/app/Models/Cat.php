@@ -13,6 +13,7 @@ class Cat extends Model
         'code',
         'address',
         'city',
+        'email',
         'phone1',
         'phone2',
         'phone3',

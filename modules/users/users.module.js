@@ -277,7 +277,9 @@ fields: [
  { name:"email", label:"Email", type:"text" },
 
  { name:"password", label:"Contraseña", type:"password", required:false,
-   hint:"Déjala vacía para enviar un correo de activación (el usuario define su propia contraseña)." },
+   hint:"Déjala vacía para enviar un correo de activación (el usuario define su propia contraseña). RN10: mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo." },
+
+ { name:"password_confirmation", label:"Confirmar contraseña", type:"password", required:false },
 
  {
   name:"role",

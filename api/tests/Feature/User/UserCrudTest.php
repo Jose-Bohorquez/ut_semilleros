@@ -33,7 +33,9 @@ class UserCrudTest extends TestCase
 
             'email' => 'nuevo@test.com',
 
-            'password' => '123456',
+            'password' => 'Nueva#Clave2026',   /* RN10 */
+
+            'password_confirmation' => 'Nueva#Clave2026',
 
             'role' => 'ESTUDIANTE',
 

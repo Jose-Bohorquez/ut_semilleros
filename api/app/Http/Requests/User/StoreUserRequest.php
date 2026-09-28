@@ -3,12 +3,18 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Support\PasswordPolicy;
 
 class StoreUserRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return auth()->check();
+    }
+
+    public function messages(): array
+    {
+        return PasswordPolicy::messages();
     }
 
     public function rules(): array
@@ -35,13 +41,9 @@ class StoreUserRequest extends FormRequest
                y se le envía al usuario un correo de activación para que
                defina la suya (Jose, 2026-08-31). Si sí la manda (flujo viejo
                desde el formulario individual), se usa esa y no se envía
-               correo — se mantiene igual que antes. */
-            'password' => [
-
-                'nullable',
-                'min:6'
-
-            ],
+               correo — se mantiene igual que antes. RN10 aplica en ambos casos
+               cuando el admin escribe la contraseña a mano. */
+            'password' => PasswordPolicy::optional(),
 
             'role' => [
 

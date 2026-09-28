@@ -9,6 +9,7 @@
 
 import { apiFetch } from "../../services/api.service.js";
 import { escapeHtml }      from "../../core/escape.js";
+import { PASSWORD_HINT, passwordPolicyError } from "../../core/password-policy.js";
 
 export const resetPasswordModule = {
     init() {
@@ -75,8 +76,9 @@ function render({ token, email, isActivation }) {
                                 ${isActivation ? "Crea tu contraseña" : "Nueva contraseña"}
                             </label>
                             <input type="password" id="rp-password" name="password" class="login-input"
-                                   placeholder="Mínimo 6 caracteres" autocomplete="new-password" required minlength="6">
+                                   placeholder="Mínimo 8 caracteres" autocomplete="new-password" required minlength="8">
                             <span class="login-field-error" id="err-rp-password"></span>
+                            <span style="display:block;font-size:12px;color:var(--color-text-4);margin-top:4px">${PASSWORD_HINT}</span>
                         </div>
 
                         <div class="login-input-group">
@@ -85,8 +87,14 @@ function render({ token, email, isActivation }) {
                                 Confirmar contraseña
                             </label>
                             <input type="password" id="rp-password-confirm" name="password_confirmation" class="login-input"
-                                   placeholder="Repite la contraseña" autocomplete="new-password" required minlength="6">
+                                   placeholder="Repite la contraseña" autocomplete="new-password" required minlength="8">
                             <span class="login-field-error" id="err-rp-password-confirm"></span>
+                        </div>
+
+                        <div id="rpRetryLink" style="display:none;text-align:center;margin-top:8px">
+                            <a href="/forgot-password" style="font-size:13px;color:var(--color-primary)">
+                                Solicitar un enlace nuevo
+                            </a>
                         </div>
 
                         <button type="submit" class="login-submit-btn" id="rpSubmitBtn">
@@ -115,9 +123,12 @@ function bindEvents({ token, email, isActivation = false }) {
         errPass.textContent = "";
         errConfirm.textContent = "";
         banner.style.display = "none";
+        document.getElementById("rpRetryLink").style.display = "none";
 
-        if (password.length < 6) {
-            errPass.textContent = "Debe tener al menos 6 caracteres";
+        /* CU04 E2 / RN10 */
+        const policyErr = passwordPolicyError(password);
+        if (policyErr) {
+            errPass.textContent = policyErr;
             return;
         }
         if (password !== confirm) {
@@ -155,6 +166,11 @@ function bindEvents({ token, email, isActivation = false }) {
                 border-radius:8px;font-size:14px;background:var(--color-error-light,#fee2e2);
                 border:1px solid var(--color-error-border,#fca5a5);color:var(--color-error-text,#991b1b)`;
             banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message)}`;
+
+            /* CU04 E1: token vencido o ya usado → ofrecer pedir uno nuevo */
+            if (err.status === 422 && /no es válido o expiró/.test(err.message)) {
+                document.getElementById("rpRetryLink").style.display = "block";
+            }
 
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check"></i> Guardar';

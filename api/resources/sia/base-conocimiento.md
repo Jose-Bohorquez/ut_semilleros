@@ -19,7 +19,8 @@ Mensajes posibles: «Credenciales incorrectas» (el correo o la contraseña no c
 2. Escribe tu correo y presiona el botón para enviar el enlace.
 3. Revisa tu correo (también la carpeta de spam) y abre el enlace de recuperación; es válido por 60 minutos.
 4. Escribe tu nueva contraseña dos veces y confírmala. Luego inicia sesión con ella.
-Usa una contraseña segura: mínimo 8 caracteres, combinando mayúsculas, minúsculas, números y símbolos. Nadie de la universidad te pedirá tu contraseña.
+El sistema siempre responde «si el correo está registrado, recibirá un enlace», aunque el correo no exista en la base de datos: es normal, así no se revela qué correos están registrados. Si pides el enlace varias veces seguidas, solo el último enlace enviado funciona (los anteriores quedan sin validez), y no se pueden pedir más de 3 en 10 minutos para el mismo correo. Al cambiar tu contraseña, se cierran todas tus sesiones abiertas en cualquier dispositivo; debes iniciar sesión de nuevo con la nueva contraseña.
+Usa una contraseña segura: mínimo 8 caracteres, con al menos una mayúscula, una minúscula, un número y un símbolo (ej: @, #, %, !). Esta misma regla aplica al crear una cuenta, al activar tu cuenta y en tu perfil. Nadie de la universidad te pedirá tu contraseña.
 
 ## Activar mi cuenta nueva
 Cuando un administrador crea tu cuenta (por ejemplo en una carga masiva), recibes el correo «Activa tu cuenta · Semilleros UT». Abre el enlace del correo (válido por 7 días), crea tu contraseña en la pantalla «Activa tu cuenta» y después inicia sesión. Si el enlace venció, usa «¿Olvidó su contraseña?» con tu correo para recibir uno nuevo. Si nunca te llegó el correo, revisa spam y promociones; si tampoco está, escribe por WhatsApp al número del botón verde «Reportar bug».

@@ -8,6 +8,7 @@ import { LayoutView }           from "../layout/layout.view.js";
 import { initLayoutController } from "../layout/layout.controller.js";
 import { getUser }              from "../services/storage.service.js";
 import { escapeHtml }           from "./escape.js";
+import { passwordPolicyError }  from "./password-policy.js";
 
 export function createCrudModule(config) {
 
@@ -289,7 +290,6 @@ export function createCrudModule(config) {
     function validateField(input, msgEl) {
         const value = input.value.trim();
         const type  = input.type;
-        const name  = input.name;
 
         if (!value) {
             showFieldError(input, msgEl, "Este campo es obligatorio");
@@ -299,9 +299,10 @@ export function createCrudModule(config) {
             showFieldError(input, msgEl, "Ingrese un correo electrónico válido");
             return false;
         }
-        if (type === "password" && value.length < 8) {
-            showFieldError(input, msgEl, "La contraseña debe tener al menos 8 caracteres");
-            return false;
+        /* RN10: no solo longitud — mayúscula, minúscula, número y símbolo. */
+        if (type === "password" && input.name !== "password_confirmation") {
+            const err = passwordPolicyError(value);
+            if (err) { showFieldError(input, msgEl, err); return false; }
         }
         clearFieldError(input, msgEl);
         return true;
@@ -315,6 +316,28 @@ export function createCrudModule(config) {
                 errors.push(input);
             }
         });
+
+        /* Un campo password opcional (ej: "cambiar contraseña" al editar un
+           usuario) no lleva [required], pero si el admin escribió algo debe
+           cumplir RN10 igual — el bucle de arriba lo salta por completo. */
+        form.querySelectorAll('input[type="password"]:not([required])').forEach(input => {
+            if (!input.value) return;
+            const msgEl = form.querySelector(`#err-${input.name}`);
+            if (input.name === "password_confirmation") return;   /* se valida abajo */
+            if (!validateField(input, msgEl)) errors.push(input);
+        });
+
+        /* Contraseña y confirmación deben coincidir cuando ambas tienen valor
+           (server-side también lo exige con "confirmed", esto es solo para
+           no esperar el viaje de ida y vuelta al servidor). */
+        const pass = form.querySelector('input[name="password"]');
+        const conf = form.querySelector('input[name="password_confirmation"]');
+        if (pass?.value && conf && pass.value !== conf.value) {
+            const msgEl = form.querySelector("#err-password_confirmation");
+            showFieldError(conf, msgEl, "Las contraseñas no coinciden");
+            errors.push(conf);
+        }
+
         return errors;
     }
 

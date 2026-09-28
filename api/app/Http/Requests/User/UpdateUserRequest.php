@@ -4,12 +4,18 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Support\PasswordPolicy;
 
 class UpdateUserRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return auth()->check();
+    }
+
+    public function messages(): array
+    {
+        return PasswordPolicy::messages();
     }
 
     public function rules(): array
@@ -45,7 +51,14 @@ class UpdateUserRequest extends FormRequest
                 'required',
                 'in:ACTIVO,INACTIVO'
 
-            ]
+            ],
+
+            /* Antes NO estaba en las reglas: $request->validated()['password']
+               nunca existía y el admin no podía cambiar la contraseña de un
+               usuario desde la edición (bug encontrado en la revisión de
+               RN10, 2026-09-28). Opcional: en blanco, la contraseña actual
+               no cambia. */
+            'password' => PasswordPolicy::optional(),
         ];
     }
 }

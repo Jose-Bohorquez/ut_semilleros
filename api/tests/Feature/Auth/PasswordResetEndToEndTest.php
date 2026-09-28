@@ -51,9 +51,9 @@ class PasswordResetEndToEndTest extends TestCase
 
                 'token' => $token,
 
-                'password' => 'nueva123',
+                'password' => 'Nueva#2026',   /* RN10 */
 
-                'password_confirmation' => 'nueva123'
+                'password_confirmation' => 'Nueva#2026'
 
             ]
         );
@@ -74,7 +74,7 @@ class PasswordResetEndToEndTest extends TestCase
 
                 'email' => 'admin@test.com',
 
-                'password' => 'nueva123'
+                'password' => 'Nueva#2026'
 
             ]
         );

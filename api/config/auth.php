@@ -95,7 +95,13 @@ return [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
-            'throttle' => 60,
+            /* CU04 E3 ya lo controla (3 solicitudes / 10 min por correo, con
+               429 explícito en AuthController::forgotPassword). Con este
+               throttle interno en 60 se daba un caso raro: un reenvío rápido
+               (ej. corregir un correo mal escrito) no mandaba nada, pero el
+               mensaje seguía diciendo «recibirá un enlace», sin avisar por
+               qué. 0 = sin límite interno duplicado; RateLimiter manda. */
+            'throttle' => 0,
         ],
 
         /* Activación de cuentas nuevas (correo de registro). Mismo mecanismo y

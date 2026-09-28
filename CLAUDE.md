@@ -45,6 +45,10 @@ parcial (tokens de 8 h / 30 d). CU02 + RF02 + RF16 + RNF02 ✅ en local (2026-09
 `docs/validacion/CU02.md`); Google real pendiente del Client ID (`GOOGLE_CLIENT_ID` en `.env`).
 CU03 + RF03 + RNF03 ✅ desplegados y validados en producción (2026-09-28, 14/14, ZAP 0 altos; acta `docs/validacion/CU03.md`). **Los teléfonos de
 coordinadores se cifran con APP_KEY: si se pierde o se regenera el `.env`, no se pueden leer.**
+CU04 + RF04 + RNF04 ✅ en local (2026-09-29, 234 tests + 18/18 E2E; acta `docs/validacion/CU04.md`).
+RN10 (contraseña fuerte) ya aplica en todo el sistema. Manuales de usuario/técnico/instalación en
+`docs/manuales/`. **CU04 E4 (reintento de correo) en producción necesita un cron con `queue:work`
+— ver `docs/manuales/manual_tecnico.md` §5 — si no, los correos de recuperación quedan encolados.**
 
 **Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
 (`GOOGLE_ALLOWED_DOMAINS`, por defecto `ut.edu.co`, y claim `hd` igual). Única excepción: un
@@ -58,10 +62,9 @@ operación en `docs/sia/README.md`. La memoria técnica que usa SIA está en
 `api/resources/sia/base-conocimiento.md`: **actualízala cuando cambie una función del sistema**.
 La key (`GROQ_API_KEY`) vive solo en `.env` o en el override local; nunca en git.
 
-Diferencias conocidas a cerrar (2026-09-28): RN10
-(contraseña fuerte) no se aplica; RN06 (líder solo en sus semilleros) no se aplica; RN02/RN03
-(referencia de autorización escrita) sin campo; RN08 (códigos únicos) en CAT, áreas, grupos,
-facultades y programas (falta semillero); RF15/CU28 reportes no existen. El avance de
+Diferencias conocidas a cerrar (2026-09-29): RN06 (líder solo en sus semilleros) no se aplica;
+RN02/RN03 (referencia de autorización escrita) sin campo; RN08 (códigos únicos) en CAT, áreas,
+grupos, facultades y programas (falta semillero); RF15/CU28 reportes no existen. El avance de
 la validación 1 a 1 queda en `docs/qa/` (no versionado mientras haya vulnerabilidades abiertas).
 
 ## Antes de trabajar aquí

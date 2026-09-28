@@ -13,17 +13,23 @@ fields:[
 
  {name:"name",label:"Nombre",type:"text"},
 
- {name:"code",label:"Código",type:"text"},
+ /* RF04 / RN08: código único (el servidor lo normaliza a mayúsculas) */
+ {name:"code",label:"Código",type:"text",hint:"Único. Ej: CAT-BGA"},
 
- {name:"address",label:"Dirección",type:"text"},
+ {name:"address",label:"Dirección",type:"text",required:false},
 
- {name:"city",label:"Ciudad",type:"text"},
+ {name:"city",label:"Ciudad",type:"text",required:false},
 
- {name:"phone1",label:"Teléfono 1",type:"text"},
+ {name:"email",label:"Correo",type:"email",required:false},
 
- {name:"phone2",label:"Teléfono 2",type:"text"},
+ /* Ninguno de los 3 es obligatorio por sí solo, pero se exige al menos uno
+    (el servidor lo valida; aquí solo se explica en el formulario). */
+ {name:"phone1",label:"Teléfono principal",type:"text",required:false,
+   hint:"Se exige al menos un teléfono entre los 3 campos."},
 
- {name:"phone3",label:"Teléfono 3",type:"text"},
+ {name:"phone2",label:"Teléfono 2",type:"text",required:false},
+
+ {name:"phone3",label:"Teléfono 3",type:"text",required:false},
 
  {
   name:"status",
