@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SiaController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\ProgramController;
@@ -33,6 +34,14 @@ Route::post('/register',         [AuthController::class, 'register']);
 Route::post('/login',            [AuthController::class, 'login']);
 Route::post('/forgot-password',  [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password',   [AuthController::class, 'resetPassword']);
+
+/* SIA — asistente con IA (RF17 propuesto). Público: también se usa en el login.
+   Límites por IP/usuario/conversación y tope global en SiaController; el throttle
+   por minuto frena ráfagas antes de tocar la BD. */
+Route::middleware('throttle:15,1')->group(function () {
+    Route::post('/sia/chat',  [SiaController::class, 'chat']);
+    Route::post('/sia/close', [SiaController::class, 'close']);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -387,4 +396,21 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
     Route::post('/push-subscriptions',   [PushSubscriptionController::class, 'store']);
     Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy']);
+    /*
+    |----------------------------------------------------------------------
+    | SIA — panel del administrador (RF17): consumo, feedback, conocimiento
+    |----------------------------------------------------------------------
+    */
+    Route::middleware('role:ADMIN_SISTEMA')->prefix('sia/admin')->group(function () {
+        Route::get('/stats',                  [SiaController::class, 'stats']);
+        Route::get('/conversations',          [SiaController::class, 'conversations']);
+        Route::get('/conversations/{id}',     [SiaController::class, 'conversation']);
+        Route::put('/conversations/{id}/review', [SiaController::class, 'review']);
+        Route::get('/knowledge',              [SiaController::class, 'knowledgeIndex']);
+        Route::post('/knowledge',             [SiaController::class, 'knowledgeStore']);
+        Route::put('/knowledge/{id}',         [SiaController::class, 'knowledgeUpdate']);
+        Route::get('/settings',               [SiaController::class, 'settings']);
+        Route::put('/settings',               [SiaController::class, 'settingsUpdate']);
+    });
+
 });

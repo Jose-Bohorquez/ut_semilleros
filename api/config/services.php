@@ -41,4 +41,11 @@ return [
         'subject'     => env('VAPID_SUBJECT', 'mailto:admin@example.com'),
     ],
 
+    /* SIA — asistente con IA (RF17). La key vive solo en .env del servidor. */
+    'groq' => [
+        'key'      => env('GROQ_API_KEY'),
+        'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
+        'model'    => env('SIA_MODEL', 'openai/gpt-oss-20b'),
+    ],
+
 ];
