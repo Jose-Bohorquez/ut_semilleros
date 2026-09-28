@@ -43,7 +43,7 @@ propuestas · CU27 evaluar propuestas (Administrativo) · CU28 reportes · CU29 
 web ✅ desplegado y validado en producción · PWA ✅ desplegada y validada en producción (2026-09-28) · RNF01 ✅ (instalación desde un clon limpio) · RNF03
 parcial (tokens de 8 h / 30 d). CU02 + RF02 + RF16 + RNF02 ✅ en local (2026-09-28, acta
 `docs/validacion/CU02.md`); Google real pendiente del Client ID (`GOOGLE_CLIENT_ID` en `.env`).
-CU03 + RF03 + RNF03 ✅ en local (2026-09-28, acta `docs/validacion/CU03.md`). **Los teléfonos de
+CU03 + RF03 + RNF03 ✅ desplegados y validados en producción (2026-09-28, 14/14, ZAP 0 altos; acta `docs/validacion/CU03.md`). **Los teléfonos de
 coordinadores se cifran con APP_KEY: si se pierde o se regenera el `.env`, no se pueden leer.**
 
 **Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
