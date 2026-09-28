@@ -3,7 +3,7 @@
    Service Worker de la PWA del Sistema de Semilleros
    ========================================================= */
 
-const CACHE_NAME = "semilleros-v13";
+const CACHE_NAME = "semilleros-v14";
 
 /* Archivos del shell (raramente cambian → cache first) */
 const SHELL_URLS = [
@@ -23,7 +23,10 @@ const SHELL_URLS = [
 
 /* Extensiones de JS/módulos → network first (cambian con cada deploy) */
 function isJsModule(url) {
-    return url.pathname.endsWith(".js") && !url.pathname.includes("sw");
+    /* Excluir solo el propio SW. Antes era !includes("sw"), que también
+       atrapaba "pa-sw-ord": reset-password y forgot-password quedaban en
+       cache-first y no recibían correcciones (review 2026-09-27). */
+    return url.pathname.endsWith(".js") && !url.pathname.endsWith("/service-worker.js");
 }
 
 /* API calls → never cache */
@@ -90,10 +93,14 @@ self.addEventListener("fetch", event => {
     /* API → nunca cachear */
     if (isApiCall(url)) return;
 
-    /* JS modules → network first (siempre versión fresca) */
+    /* JS modules → network first (siempre versión fresca).
+       cache:"no-cache" obliga a revalidar con el servidor (304 si no cambió):
+       sin esto el fetch devolvía la copia de la caché HTTP del navegador
+       (Cache-Control max-age=300) y una corrección desplegada tardaba hasta
+       5 min en llegar — verificado 2026-09-27 con el fix de XSS. */
     if (isJsModule(url)) {
         event.respondWith(
-            fetch(request)
+            fetch(request, { cache: "no-cache" })
                 .then(response => {
                     /* Fix #3: solo cachear respuestas exitosas */
                     if (response.ok) {

@@ -5,6 +5,7 @@
    ─────────────────────────────────────────────────────────────────── */
 
 import { apiFetch } from "../../services/api.service.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 export const forgotPasswordModule = {
     init() {
@@ -89,7 +90,7 @@ function bindEvents() {
             banner.style.cssText = `display:flex;align-items:center;gap:8px;padding:12px 14px;
                 border-radius:8px;font-size:14px;background:var(--color-success-light,#dcfce7);
                 border:1px solid var(--color-success-border,#86efac);color:var(--color-success-text,#166534)`;
-            banner.innerHTML = `<i class="fas fa-check-circle"></i> ${data?.message || "Si el correo existe, recibirás un enlace en unos minutos."}`;
+            banner.innerHTML = `<i class="fas fa-check-circle"></i> ${escapeHtml(data?.message || "Si el correo existe, recibirás un enlace en unos minutos.")}`;
 
             document.getElementById("forgotPasswordForm").reset();
 
@@ -97,7 +98,7 @@ function bindEvents() {
             banner.style.cssText = `display:flex;align-items:center;gap:8px;padding:12px 14px;
                 border-radius:8px;font-size:14px;background:var(--color-error-light,#fee2e2);
                 border:1px solid var(--color-error-border,#fca5a5);color:var(--color-error-text,#991b1b)`;
-            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${err.message}`;
+            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message)}`;
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar enlace';

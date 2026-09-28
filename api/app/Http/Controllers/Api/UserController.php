@@ -255,6 +255,12 @@ class UserController extends Controller
 
         $user->save();
 
+        /* Mismo criterio que toggleStatus: inactivar desde el formulario de
+           edición también revoca sus sesiones (C-04, 2026-09-27). */
+        if ($user->status === 'INACTIVO') {
+            $user->tokens()->delete();
+        }
+
         return response()->json([
 
             'message' => 'Usuario actualizado correctamente',
@@ -281,6 +287,14 @@ class UserController extends Controller
             : 'ACTIVO';
 
         $user->save();
+
+        /* Al inactivar, revocar todas sus sesiones: los tokens Sanctum no
+           vencen, así que sin esto el usuario seguía entrando con el token
+           que ya tenía (C-04, 2026-09-27). El middleware 'active' cubre además
+           los tokens de usuarios inactivados antes de este cambio. */
+        if ($user->status === 'INACTIVO') {
+            $user->tokens()->delete();
+        }
 
         return response()->json([
 

@@ -1,6 +1,7 @@
 /* #archivo: /frontend/modules/dashboard/dashboard.view.js */
 
 import { getUser } from "../../services/storage.service.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 export function DashboardView() {
 
@@ -48,7 +49,7 @@ export function DashboardView() {
 
     <!-- ── WELCOME ─────────────────────────────────── -->
     <div class="dashboard-welcome">
-        <h1>${greeting}, ${user?.name?.split(" ")[0] || "usuario"} 👋</h1>
+        <h1>${greeting}, ${escapeHtml(user?.name?.split(" ")[0] || "usuario")} 👋</h1>
         <p>Sistema de Semilleros de Investigación — Universidad del Tolima, IDEAD</p>
         <div class="accent-divider"></div>
     </div>

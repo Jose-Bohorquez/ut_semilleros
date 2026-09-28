@@ -3,6 +3,7 @@
 import { createCrudModule } from "../../core/crud.engine.js";
 import { seedbedMembersModule } from "../seedbed-members/seedbed-members.module.js";
 import { apiFetch } from "../../services/api.service.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 /* =========================================================
    OBJETIVOS ANIDADOS EN EL MISMO FORMULARIO DE SEMILLERO
@@ -13,7 +14,7 @@ import { apiFetch } from "../../services/api.service.js";
 function objectiveRowHtml(id = "", content = "") {
     const safe = String(content).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     return `
-    <div class="objective-row" data-objective-id="${id}" style="display:flex;gap:6px;margin-bottom:8px;align-items:flex-start">
+    <div class="objective-row" data-objective-id="${escapeHtml(id)}" style="display:flex;gap:6px;margin-bottom:8px;align-items:flex-start">
         <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
             <button type="button" class="btn btn-ghost btn-sm moveObjectiveUpBtn" title="Subir">
                 <i class="fas fa-chevron-up"></i>

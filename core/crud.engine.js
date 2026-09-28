@@ -7,6 +7,7 @@ import { apiFetch }            from "../services/api.service.js";
 import { LayoutView }           from "../layout/layout.view.js";
 import { initLayoutController } from "../layout/layout.controller.js";
 import { getUser }              from "../services/storage.service.js";
+import { escapeHtml }           from "./escape.js";
 
 export function createCrudModule(config) {
 
@@ -64,7 +65,7 @@ export function createCrudModule(config) {
             APROBADA:  '<span class="badge badge-approved">APROBADA</span>',
             RECHAZADA: '<span class="badge badge-rejected">RECHAZADA</span>',
         };
-        return map[value] || `<span class="badge">${value}</span>`;
+        return map[value] || `<span class="badge">${escapeHtml(value)}</span>`;
     }
 
 
@@ -145,7 +146,7 @@ export function createCrudModule(config) {
 
                 if (f.type === "relation") {
                     const rel = record[f.relation.slice(0, -1)];
-                    return `<td data-label="${f.label}">${rel ? rel[f.display] : (record[f.name] ?? "")}</td>`;
+                    return `<td data-label="${f.label}">${escapeHtml(rel ? rel[f.display] : (record[f.name] ?? ""))}</td>`;
                 }
 
                 const val = record[f.name] ?? "";
@@ -155,7 +156,7 @@ export function createCrudModule(config) {
                     return `<td data-label="${f.label}">${statusBadge(val)}</td>`;
                 }
 
-                return `<td data-label="${f.label}">${val}</td>`;
+                return `<td data-label="${f.label}">${escapeHtml(val)}</td>`;
 
             }).join("");
 
@@ -165,7 +166,7 @@ export function createCrudModule(config) {
             if (!noEdit) {
 
                 actions += `
-                <button class="btn btn-sm btn-secondary editBtn-${entity}" data-id="${record.id}" title="Editar">
+                <button class="btn btn-sm btn-secondary editBtn-${entity}" data-id="${escapeHtml(record.id)}" title="Editar">
                     <i class="fas fa-edit"></i> Editar
                 </button>`;
 
@@ -173,7 +174,7 @@ export function createCrudModule(config) {
                     const isActive = record.status === "ACTIVO";
                     actions += `
                     <button class="btn btn-sm ${isActive ? "btn-warning" : "btn-success"} toggleBtn-${entity}"
-                        data-id="${record.id}" data-status="${record.status ?? ""}"
+                        data-id="${escapeHtml(record.id)}" data-status="${escapeHtml(record.status)}"
                         title="${isActive ? "Inactivar" : "Activar"}">
                         <i class="fas fa-${isActive ? "toggle-on" : "toggle-off"}"></i>
                         ${isActive ? "Inactivar" : "Activar"}
@@ -184,7 +185,7 @@ export function createCrudModule(config) {
             if (!isReadonly && config.actions) {
                 config.actions.forEach(action => {
                     actions += `
-                    <button class="btn btn-sm btn-secondary ${action.class}" data-id="${record.id}">
+                    <button class="btn btn-sm btn-secondary ${action.class}" data-id="${escapeHtml(record.id)}">
                         <i class="fas fa-users"></i> ${action.label}
                     </button>`;
                 });
@@ -378,7 +379,7 @@ export function createCrudModule(config) {
             if (f.type === "select") {
                 const options = f.options.map(opt => {
                     const selected = record && record[f.name] === opt.value ? "selected" : "";
-                    return `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
+                    return `<option value="${escapeHtml(opt.value)}" ${selected}>${escapeHtml(opt.label)}</option>`;
                 }).join("");
 
                 inputs.push(`
@@ -401,7 +402,7 @@ export function createCrudModule(config) {
                     const items   = relData?.[f.relation] || [];
                     const options = items.map(item => {
                         const selected = record && record[f.name] == item.id ? "selected" : "";
-                        return `<option value="${item.id}" ${selected}>${item[f.display] ?? item.id}</option>`;
+                        return `<option value="${escapeHtml(item.id)}" ${selected}>${escapeHtml(item[f.display] ?? item.id)}</option>`;
                     }).join("");
 
                     inputs.push(`
@@ -435,7 +436,7 @@ export function createCrudModule(config) {
                             <input type="hidden"
                                    id="field-${f.name}"
                                    name="${f.name}"
-                                   value="${selfId}">
+                                   value="${escapeHtml(selfId)}">
                             <div style="
                                 padding: 10px 14px;
                                 border: 1px solid var(--color-border);
@@ -446,7 +447,7 @@ export function createCrudModule(config) {
                                 display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-user-circle"
                                    style="color:var(--color-primary);font-size:1.1rem;flex-shrink:0"></i>
-                                <span>${selfName}</span>
+                                <span>${escapeHtml(selfName)}</span>
                                 <span style="font-size:var(--text-xs);color:var(--color-text-faint);margin-left:auto">
                                     asignado automáticamente
                                 </span>
@@ -529,7 +530,7 @@ export function createCrudModule(config) {
                     type="${inputType}"
                     id="field-${f.name}"
                     name="${f.name}"
-                    value="${inputType !== "password" ? inputValue : ""}"
+                    value="${inputType !== "password" ? escapeHtml(inputValue) : ""}"
                     ${extraAttrs}
                     ${isRequired ? "required" : ""}>
                 ${f.hint ? `<span class="optional-hint" style="display:block;margin-top:4px">${f.hint}</span>` : ""}
@@ -655,7 +656,7 @@ export function createCrudModule(config) {
 
             const result = await Swal.fire({
                 title:             `¿${label.charAt(0).toUpperCase() + label.slice(1)} registro?`,
-                html:              `Se cambiará el estado de <strong>${name}</strong>.`,
+                html:              `Se cambiará el estado de <strong>${escapeHtml(name)}</strong>.`,
                 icon:              "warning",
                 showCancelButton:  true,
                 confirmButtonText: `Sí, ${label}`,

@@ -7,6 +7,7 @@
 
 import { createCrudModule } from "../../core/crud.engine.js";
 import { apiFetch }         from "../../services/api.service.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 /* ─────────────────────────────────────────────────────────────────
    Importación masiva de usuarios (Jose, 2026-08-31)
@@ -20,11 +21,6 @@ import { apiFetch }         from "../../services/api.service.js";
 
 const ROLES = ["ADMIN_SISTEMA", "ADMINISTRATIVO", "LIDER_SEMILLERO", "ESTUDIANTE"];
 
-function escapeHtml(str) {
-    return String(str ?? "")
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
 
 /* Convierte "jaaldanah" (usuario de correo) en una sugerencia legible tipo
    "Jaaldanah" — es solo una capitalización del texto crudo, no un nombre
@@ -250,7 +246,7 @@ function bindImportModalEvents() {
             resultBanner.style.cssText = `display:block;padding:12px 14px;border-radius:8px;font-size:14px;
                 background:var(--color-success-light,#dcfce7);border:1px solid var(--color-success-border,#86efac);
                 color:var(--color-success-text,#166534)`;
-            resultBanner.innerHTML = `<i class="fas fa-check-circle"></i> ${response?.message || "Importación procesada."}`;
+            resultBanner.innerHTML = `<i class="fas fa-check-circle"></i> ${escapeHtml(response?.message || "Importación procesada.")}`;
 
             submitBtn.style.display = "none";
 

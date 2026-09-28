@@ -1,6 +1,7 @@
 /* #archivo: /frontend/layout/layout.view.js */
 
 import { getUser } from "../services/storage.service.js";
+import { escapeHtml, safeImageSrc } from "../core/escape.js";
 
 /* =========================================================
    Bottom nav items por rol
@@ -135,7 +136,7 @@ export function LayoutView(content = "") {
                 <a href="/profile" data-link style="text-decoration:none;display:flex;align-items:center;gap:6px"
                    title="Ver perfil">
                     ${user?.profile_photo
-                        ? `<img src="${user.profile_photo}"
+                        ? `<img src="${safeImageSrc(user.profile_photo)}"
                                style="width:28px;height:28px;border-radius:50%;
                                       object-fit:cover;border:2px solid rgba(255,255,255,0.4);
                                       flex-shrink:0"
@@ -145,10 +146,10 @@ export function LayoutView(content = "") {
                                         display:flex;align-items:center;justify-content:center;
                                         font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
                                         border:2px solid rgba(255,255,255,0.3)">
-                               ${(user?.name || "?").split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase()}
+                               ${escapeHtml((user?.name || "?").split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase())}
                            </div>`
                     }
-                    <span class="username">${user?.name?.split(" ")[0] || ""}</span>
+                    <span class="username">${escapeHtml(user?.name?.split(" ")[0])}</span>
                 </a>
                 <!-- Campana de notificaciones -->
                 <a href="/notifications" data-link id="bellBtn"

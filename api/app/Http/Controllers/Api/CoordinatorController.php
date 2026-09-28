@@ -44,6 +44,12 @@ class CoordinatorController extends Controller
 
         ]);
 
+        /* Solo ADMIN_SISTEMA decide el estado (RF07). Un LIDER_SEMILLERO crea
+           coordinadores siempre ACTIVOS (C-16, 2026-09-27). */
+        if (auth()->user()->role !== 'ADMIN_SISTEMA') {
+            $validated['status'] = 'ACTIVO';
+        }
+
         $coordinator = Coordinator::create($validated);
 
         return response()->json([
@@ -74,6 +80,13 @@ class CoordinatorController extends Controller
             "status"=>"required|in:ACTIVO,INACTIVO"
 
         ]);
+
+        /* Activar/inactivar es exclusivo de ADMIN_SISTEMA vía toggle-status
+           (api.php, RF07). El LIDER_SEMILLERO puede editar datos pero no el
+           estado: antes lo cambiaba mandando status en este PUT (C-16). */
+        if (auth()->user()->role !== 'ADMIN_SISTEMA') {
+            $validated['status'] = $coordinator->status;
+        }
 
         $coordinator->update($validated);
 

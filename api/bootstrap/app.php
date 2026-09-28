@@ -26,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             'role' => \App\Http\Middleware\RoleMiddleware::class,
 
+            /* Usuario INACTIVO no puede usar su token (C-04, 2026-09-27) */
+            'active' => \App\Http\Middleware\EnsureUserIsActive::class,
+
             /*
             |--------------------------------------------------------------------------
             | Reemplazo Authenticate API

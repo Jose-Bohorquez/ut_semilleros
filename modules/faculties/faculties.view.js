@@ -1,12 +1,13 @@
 /* #archivo: /frontend/modules/faculties/faculties.view.js */
+import { escapeHtml }      from "../../core/escape.js";
 
 export function FacultiesView(faculties = []) {
 
     const rows = faculties.map(f => `
         <tr>
-            <td>${f.id}</td>
-            <td>${f.name}</td>
-            <td>${f.status}</td>
+            <td>${escapeHtml(f.id)}</td>
+            <td>${escapeHtml(f.name)}</td>
+            <td>${escapeHtml(f.status)}</td>
         </tr>
     `).join("");
 

@@ -3,6 +3,7 @@
 import { apiFetch } from "../../services/api.service.js";
 import { LayoutView } from "../../layout/layout.view.js";
 import { initLayoutController } from "../../layout/layout.controller.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 
 export const projectMembersModule = {
@@ -30,17 +31,17 @@ async function renderMembers(projectId,members){
         return `
         <tr>
 
-            <td>${member.id}</td>
-            <td>${member.name}</td>
-            <td>${member.email}</td>
-            <td>${member.pivot.role}</td>
+            <td>${escapeHtml(member.id)}</td>
+            <td>${escapeHtml(member.name)}</td>
+            <td>${escapeHtml(member.email)}</td>
+            <td>${escapeHtml(member.pivot.role)}</td>
 
             <td>
 
                 <button 
                 class="removeProjectMemberBtn"
                 data-project="${projectId}"
-                data-user="${member.id}">
+                data-user="${escapeHtml(member.id)}">
                 Eliminar
                 </button>
 
@@ -142,8 +143,8 @@ document.addEventListener("click", async function(e){
         const users = await apiFetch("/users");
 
         const options = users.users.map(u => `
-            <option value="${u.id}">
-                ${u.name} (${u.email})
+            <option value="${escapeHtml(u.id)}">
+                ${escapeHtml(u.name)} (${escapeHtml(u.email)})
             </option>
         `).join("");
 

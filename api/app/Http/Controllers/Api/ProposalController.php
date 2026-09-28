@@ -37,6 +37,15 @@ class ProposalController extends Controller
 
         ]);
 
+        /* Seguridad (hallazgo C-02, 2026-09-27): el ESTUDIANTE crea
+           propuestas solo a su nombre y siempre PENDIENTE — se ignora lo que
+           mande el cliente (antes podía crearla ya APROBADA o como autor otro
+           usuario). La aprobación es exclusiva de update-status (L, ADM). */
+        if (auth()->user()->role === 'ESTUDIANTE') {
+            $validated['user_id'] = auth()->id();
+            $validated['status']  = 'PENDIENTE';
+        }
+
         $proposal = Proposal::create($validated);
 
         return response()->json([
@@ -77,11 +86,13 @@ class ProposalController extends Controller
 
         ]);
 
-        /* El estudiante no puede cambiar el estado desde este endpoint —
-           siempre se conserva el estado actual, aunque el frontend ya
-           siempre manda PENDIENTE. */
+        /* El estudiante no puede cambiar el estado ni el autor desde este
+           endpoint — se conservan los actuales, aunque el frontend ya manda
+           PENDIENTE y su propio id. (C-02, 2026-09-27: antes podía pasarle su
+           propuesta a otro usuario con un PUT de user_id.) */
         if (auth()->user()->role === 'ESTUDIANTE') {
-            $validated['status'] = $proposal->status;
+            $validated['status']  = $proposal->status;
+            $validated['user_id'] = $proposal->user_id;
         }
 
         $proposal->update($validated);

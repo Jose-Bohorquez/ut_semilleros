@@ -12,6 +12,7 @@ import { getUser }             from "../../services/storage.service.js";
 import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
 import { navigateTo }          from "../../core/router.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 const STATUS_MAP = {
     PENDIENTE: { label: "Pendiente",  cls: "badge-pwa-warning" },
@@ -69,7 +70,7 @@ function renderList(requests) {
                <p>Aún no has enviado solicitudes de ingreso a ningún semillero.</p>
            </div>`
         : requests.map(req => {
-            const st = STATUS_MAP[req.status] || { label: req.status, cls: "badge-pwa-neutral" };
+            const st = STATUS_MAP[req.status] || { label: escapeHtml(req.status), cls: "badge-pwa-neutral" };
             const seedbedName = req.seedbed?.name || `Semillero #${req.seedbed_id}`;
             const date = req.created_at
                 ? new Date(req.created_at).toLocaleDateString("es-CO", { day:"2-digit", month:"short", year:"numeric" })
@@ -81,7 +82,7 @@ function renderList(requests) {
                     <i class="fas fa-seedling"></i>
                 </div>
                 <div class="card-body">
-                    <div class="card-title">${seedbedName}</div>
+                    <div class="card-title">${escapeHtml(seedbedName)}</div>
                     <div class="card-subtitle">
                         <span class="badge-pwa ${st.cls}">${st.label}</span>
                     </div>
@@ -186,7 +187,7 @@ function renderError(msg) {
     <div style="padding:var(--space-4)">
         <div class="alert-warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span>Error al cargar solicitudes: ${msg}</span>
+            <span>Error al cargar solicitudes: ${escapeHtml(msg)}</span>
         </div>
     </div>`);
     initLayoutController();
@@ -259,7 +260,7 @@ function bindEvents() {
                 border-radius:var(--radius-btn);font-size:var(--text-sm);
                 background:var(--color-error-light);border:1px solid var(--color-error-border);
                 color:var(--color-error-text)`;
-            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(msg)}`;
 
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar solicitud';
@@ -275,7 +276,7 @@ async function loadSeedbedsSelect() {
         const activos = (data.seedbeds || []).filter(s => s.status === "ACTIVO");
         select.innerHTML = activos.length
             ? `<option value="">Selecciona un semillero...</option>` +
-              activos.map(s => `<option value="${s.id}">${s.name}</option>`).join("")
+              activos.map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)}</option>`).join("")
             : `<option value="">No hay semilleros disponibles</option>`;
     } catch {
         select.innerHTML = `<option value="">Error cargando semilleros</option>`;

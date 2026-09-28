@@ -7,6 +7,7 @@ import { apiFetch }           from "../../services/api.service.js";
 import { getUser, setUser }   from "../../services/storage.service.js";
 import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
+import { escapeHtml, safeImageSrc } from "../../core/escape.js";
 
 const ROLE_LABELS = {
     ADMIN_SISTEMA:   { label: "Administrador",   color: "#b91c1c" },
@@ -31,7 +32,7 @@ function renderProfile(user) {
     const photo    = user?.profile_photo || null;
 
     const avatarHtml = photo
-        ? `<img id="avatarImg" src="${photo}"
+        ? `<img id="avatarImg" src="${safeImageSrc(photo)}"
                style="width:88px;height:88px;border-radius:50%;object-fit:cover;
                       border:3px solid rgba(255,255,255,0.5);display:block">`
         : `<div id="avatarInitials"
@@ -40,7 +41,7 @@ function renderProfile(user) {
                       align-items:center;justify-content:center;
                       font-size:2rem;font-weight:700;color:#fff;
                       border:3px solid rgba(255,255,255,0.3)">
-               ${initials}
+               ${escapeHtml(initials)}
            </div>`;
 
     const content = `
@@ -79,17 +80,17 @@ function renderProfile(user) {
             <!-- Nombre y rol -->
             <div>
                 <h2 style="margin:0;font-size:var(--text-xl);font-weight:700;color:#fff">
-                    ${user?.name || ""}
+                    ${escapeHtml(user?.name)}
                 </h2>
                 <p style="margin:4px 0 0;font-size:var(--text-sm);color:rgba(255,255,255,0.85)">
-                    ${user?.email || ""}
+                    ${escapeHtml(user?.email)}
                 </p>
             </div>
 
             <span style="padding:4px 14px;border-radius:var(--radius-full);
                           background:rgba(255,255,255,0.2);font-size:var(--text-xs);
                           font-weight:600;color:#fff;letter-spacing:0.05em">
-                ${roleInfo.label}
+                ${escapeHtml(roleInfo.label)}
             </span>
 
             <!-- Acciones de foto -->
@@ -135,7 +136,7 @@ function renderProfile(user) {
                         Nombre completo <span style="color:var(--color-error)">*</span>
                     </label>
                     <input class="pwa-input" id="prof-name" name="name"
-                           type="text" value="${user?.name || ""}" required>
+                           type="text" value="${escapeHtml(user?.name)}" required>
                     <span class="pwa-field-error" id="err-name"></span>
                 </div>
 
@@ -144,7 +145,7 @@ function renderProfile(user) {
                         Correo electrónico <span style="color:var(--color-error)">*</span>
                     </label>
                     <input class="pwa-input" id="prof-email" name="email"
-                           type="email" value="${user?.email || ""}" required>
+                           type="email" value="${escapeHtml(user?.email)}" required>
                     <span class="pwa-field-error" id="err-email"></span>
                 </div>
 
@@ -257,7 +258,7 @@ function bindEvents() {
 
         } catch (err) {
             showBanner("error",
-                `<i class="fas fa-exclamation-circle"></i> ${err.message || "Error al subir la foto"}`);
+                `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message || "Error al subir la foto")}`);
         } finally {
             if (btn) {
                 btn.disabled = false;
@@ -293,7 +294,7 @@ function bindEvents() {
                 '<i class="fas fa-check-circle"></i> Foto de perfil eliminada');
         } catch (err) {
             showBanner("error",
-                `<i class="fas fa-exclamation-circle"></i> ${err.message}`);
+                `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message)}`);
         }
     });
 
@@ -348,7 +349,7 @@ function bindEvents() {
             setTimeout(() => { renderProfile(res.user); bindEvents(); }, 1200);
         } catch (err) {
             showBanner("error",
-                `<i class="fas fa-exclamation-circle"></i> ${err.message}`);
+                `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message)}`);
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check"></i> Guardar cambios';
@@ -376,7 +377,7 @@ function updateAvatarPreview(base64) {
 
 function showError(field, msg) {
     const el = document.getElementById(`err-${field}`);
-    if (el) el.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+    if (el) el.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(msg)}`;
 }
 
 function clearErrors() {

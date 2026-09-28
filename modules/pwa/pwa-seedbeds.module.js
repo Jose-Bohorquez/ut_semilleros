@@ -5,6 +5,7 @@
 import { apiFetch }            from "../../services/api.service.js";
 import { LayoutView }           from "../../layout/layout.view.js";
 import { initLayoutController } from "../../layout/layout.controller.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 export const pwaSeedbedsModule = {
 
@@ -51,13 +52,13 @@ function renderList(seedbeds) {
             const prog = s.program?.name || "";
             const initials = s.name.split(" ").slice(0,2).map(w => w[0]).join("").toUpperCase();
             return `
-            <div class="pwa-card seedbed-card" data-id="${s.id}" style="cursor:pointer">
+            <div class="pwa-card seedbed-card" data-id="${escapeHtml(s.id)}" style="cursor:pointer">
                 <div class="card-avatar avatar-green" style="font-size:1rem;font-weight:700">
-                    ${initials}
+                    ${escapeHtml(initials)}
                 </div>
                 <div class="card-body">
-                    <div class="card-title">${s.name}</div>
-                    ${prog ? `<div class="card-subtitle"><i class="fas fa-graduation-cap" style="margin-right:4px"></i>${prog}</div>` : ""}
+                    <div class="card-title">${escapeHtml(s.name)}</div>
+                    ${prog ? `<div class="card-subtitle"><i class="fas fa-graduation-cap" style="margin-right:4px"></i>${escapeHtml(prog)}</div>` : ""}
                     <div class="card-meta">
                         <span class="badge-pwa badge-pwa-success" style="margin-top:4px;display:inline-flex">Activo</span>
                     </div>
@@ -126,7 +127,7 @@ function renderError(msg) {
     <div style="padding:var(--space-4)">
         <div class="alert-warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span>Error al cargar semilleros: ${msg}</span>
+            <span>Error al cargar semilleros: ${escapeHtml(msg)}</span>
         </div>
     </div>`);
     initLayoutController();
@@ -175,7 +176,7 @@ function openDetail(seedbed) {
             <div style="display:flex;justify-content:space-between;align-items:center;
                          padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
                 <span style="font-size:var(--text-sm);color:var(--color-text-muted)">Programa</span>
-                <span style="font-size:var(--text-sm);font-weight:500">${seedbed.program.name}</span>
+                <span style="font-size:var(--text-sm);font-weight:500">${escapeHtml(seedbed.program.name)}</span>
             </div>` : ""}
             <div style="display:flex;justify-content:space-between;align-items:center;
                          padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
@@ -229,7 +230,7 @@ async function loadObjectivesForSeedbed(seedbedId) {
                 ${i + 1}
             </div>
             <p style="margin:0;font-size:var(--text-sm);color:var(--color-text-2);line-height:1.5">
-                ${o.content}
+                ${escapeHtml(o.content)}
             </p>
         </div>`).join("");
     } catch {

@@ -12,6 +12,7 @@ import { apiFetch }           from "../../services/api.service.js";
 import { getUser }             from "../../services/storage.service.js";
 import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 const STATUS_MAP = {
     PENDIENTE: { label: "Pendiente",  cls: "badge-pwa-warning", editable: true  },
@@ -65,13 +66,13 @@ function renderList(proposals) {
                <p>Aún no has creado ninguna propuesta de investigación.</p>
            </div>`
         : proposals.map(p => {
-            const st = STATUS_MAP[p.status] || { label: p.status, cls: "badge-pwa-neutral", editable: false };
+            const st = STATUS_MAP[p.status] || { label: escapeHtml(p.status), cls: "badge-pwa-neutral", editable: false };
             const date = p.created_at
                 ? new Date(p.created_at).toLocaleDateString("es-CO", { day:"2-digit", month:"short", year:"numeric" })
                 : "";
             const editBtn = st.editable
                 ? `<button class="btn btn-sm btn-secondary editProposalBtn"
-                           data-id="${p.id}" style="margin-top:var(--space-2)">
+                           data-id="${escapeHtml(p.id)}" style="margin-top:var(--space-2)">
                        <i class="fas fa-edit"></i> Editar
                    </button>`
                 : `<p style="font-size:var(--text-xs);color:var(--color-text-faint);margin-top:var(--space-1)">
@@ -85,7 +86,7 @@ function renderList(proposals) {
                         <i class="fas fa-lightbulb"></i>
                     </div>
                     <div class="card-body">
-                        <div class="card-title">${p.title}</div>
+                        <div class="card-title">${escapeHtml(p.title)}</div>
                         <div class="card-subtitle">
                             <span class="badge-pwa ${st.cls}">${st.label}</span>
                         </div>
@@ -97,7 +98,7 @@ function renderList(proposals) {
                 ${p.description ? `<p style="font-size:var(--text-sm);color:var(--color-text-2);
                     padding:0 var(--space-2);margin:0;line-height:1.5;
                     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
-                    ${p.description}</p>` : ""}
+                    ${escapeHtml(p.description)}</p>` : ""}
                 <div style="padding:0 var(--space-2)">${editBtn}</div>
             </div>`;
         }).join("");
@@ -196,7 +197,7 @@ function renderError(msg) {
     <div style="padding:var(--space-4)">
         <div class="alert-warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <span>Error al cargar propuestas: ${msg}</span>
+            <span>Error al cargar propuestas: ${escapeHtml(msg)}</span>
         </div>
     </div>`);
     initLayoutController();
@@ -280,7 +281,7 @@ function bindListEvents() {
                 border-radius:var(--radius-btn);font-size:var(--text-sm);
                 background:var(--color-error-light);border:1px solid var(--color-error-border);
                 color:var(--color-error-text)`;
-            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${err.message}`;
+            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message)}`;
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check"></i> <span id="saveBtnText">Guardar</span>';
         }

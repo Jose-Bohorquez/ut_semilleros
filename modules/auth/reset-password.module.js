@@ -8,6 +8,7 @@
    ─────────────────────────────────────────────────────────────────── */
 
 import { apiFetch } from "../../services/api.service.js";
+import { escapeHtml }      from "../../core/escape.js";
 
 export const resetPasswordModule = {
     init() {
@@ -62,7 +63,7 @@ function render({ token, email, isActivation }) {
                     </div>
 
                     <p style="text-align:center;font-size:13px;color:var(--color-text-4);margin:-12px 0 16px">
-                        <i class="fas fa-user"></i> ${email}
+                        <i class="fas fa-user"></i> ${escapeHtml(email)}
                     </p>
 
                     <div id="rpBanner" style="display:none;margin-bottom:16px"></div>
@@ -151,7 +152,7 @@ function bindEvents({ token, email }) {
             banner.style.cssText = `display:flex;align-items:center;gap:8px;padding:12px 14px;
                 border-radius:8px;font-size:14px;background:var(--color-error-light,#fee2e2);
                 border:1px solid var(--color-error-border,#fca5a5);color:var(--color-error-text,#991b1b)`;
-            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${err.message}`;
+            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message)}`;
 
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check"></i> Guardar';

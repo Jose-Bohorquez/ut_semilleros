@@ -37,6 +37,16 @@ class RequestController extends Controller
 
         ]);
 
+        /* Seguridad (hallazgo C-02, 2026-09-27): un ESTUDIANTE solo puede
+           postularse a sí mismo y siempre queda PENDIENTE — el user_id y el
+           status que mande el cliente se ignoran. Antes podía crear su
+           postulación ya APROBADA o a nombre de otro estudiante. La
+           aprobación solo ocurre por PUT /requests/{id}/update-status (L, ADM). */
+        if (auth()->user()->role === 'ESTUDIANTE') {
+            $validated['user_id'] = auth()->id();
+            $validated['status']  = 'PENDIENTE';
+        }
+
         /* Regla de negocio (Jose, 2026-07-28): un estudiante no puede tener
            más de una postulación activa a la vez. Si ya tiene una PENDIENTE
            (esperando revisión) o APROBADA (ya es integrante de un semillero),

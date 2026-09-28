@@ -7,6 +7,7 @@ import { getUser }             from "../../services/storage.service.js";
 import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
 import { updateBellBadge }     from "./notifications.badge.js";
+import { escapeHtml, safeUrl } from "../../core/escape.js";
 
 const ROLE_CAN_SEND = ["ADMIN_SISTEMA", "ADMINISTRATIVO", "LIDER_SEMILLERO"];
 
@@ -172,7 +173,7 @@ function renderCard(n, tab) {
 
     return `
     <div class="pwa-card notif-card ${!n.is_read && tab==="received"?"notif-unread":""}"
-         data-id="${n.id}" data-read="${n.is_read}"
+         data-id="${escapeHtml(n.id)}" data-read="${escapeHtml(n.is_read)}"
          style="flex-direction:column;align-items:flex-start;gap:var(--space-2);
                 ${!n.is_read && tab==="received" ? "border-left:3px solid var(--color-primary);" : ""}">
 
@@ -184,16 +185,16 @@ function renderCard(n, tab) {
             <div style="flex:1;min-width:0">
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                     <span style="font-weight:600;font-size:var(--text-base);color:var(--color-text)">
-                        ${n.title}
+                        ${escapeHtml(n.title)}
                     </span>
                     <span class="badge-pwa ${tm.cls}" style="font-size:10px">${tm.label}</span>
                 </div>
                 <p style="margin:4px 0 0;font-size:var(--text-sm);color:var(--color-text-2);
                            line-height:1.5;word-break:break-word">
-                    ${n.message}
+                    ${escapeHtml(n.message)}
                 </p>
                 ${n.link ? `
-                <a href="${n.link}" target="_blank" rel="noopener"
+                <a href="${safeUrl(n.link)}" target="_blank" rel="noopener"
                    style="display:inline-flex;align-items:center;gap:4px;
                           margin-top:6px;font-size:var(--text-xs);
                           color:var(--color-primary);text-decoration:none">
@@ -206,9 +207,9 @@ function renderCard(n, tab) {
         <div style="display:flex;align-items:center;gap:var(--space-3);
                      padding-top:var(--space-2);border-top:1px solid var(--color-border-light);
                      width:100%;font-size:var(--text-xs);color:var(--color-text-faint)">
-            <span><i class="fas fa-user" style="margin-right:3px"></i>${n.sender_name}</span>
+            <span><i class="fas fa-user" style="margin-right:3px"></i>${escapeHtml(n.sender_name)}</span>
             <span><i class="fas fa-clock" style="margin-right:3px"></i>${date}</span>
-            ${tab === "sent" ? `<span title="Destinatarios"><i class="fas fa-users" style="margin-right:3px"></i>${target}</span>` : ""}
+            ${tab === "sent" ? `<span title="Destinatarios"><i class="fas fa-users" style="margin-right:3px"></i>${escapeHtml(target)}</span>` : ""}
         </div>
     </div>`;
 }
@@ -422,7 +423,7 @@ function bindEvents(received, sent, canSend, activeTab) {
             });
             await loadAndRender("sent");
         } catch (err) {
-            showComposerBanner("error", err.message || "Error al enviar");
+            showComposerBanner("error", escapeHtml(err.message || "Error al enviar"));
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar notificación';
@@ -468,7 +469,7 @@ async function loadTargetValues(targetType) {
             let seedbeds = (await apiFetch("/seedbeds")).seedbeds || [];
             /* LIDER_SEMILLERO solo puede ver sus propios semilleros (backend valida también) */
             sel.innerHTML = seedbeds.map(s =>
-                `<option value="${s.id}">${s.name}</option>`
+                `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)}</option>`
             ).join("") || `<option value="">Sin semilleros disponibles</option>`;
         } catch { sel.innerHTML = `<option value="">Error cargando</option>`; }
         return;
@@ -480,7 +481,7 @@ async function loadTargetValues(targetType) {
         try {
             const users = (await apiFetch("/users")).users || [];
             sel.innerHTML = users.map(u =>
-                `<option value="${u.id}">${u.name} (${u.role})</option>`
+                `<option value="${escapeHtml(u.id)}">${escapeHtml(u.name)} (${escapeHtml(u.role)})</option>`
             ).join("") || `<option value="">Sin usuarios</option>`;
         } catch { sel.innerHTML = `<option value="">Sin acceso a la lista</option>`; }
     }
@@ -500,7 +501,7 @@ function targetLabel(type, value) {
 
 function showComposerErr(field, msg) {
     const el = document.getElementById(`err-notif-${field}`);
-    if (el) el.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+    if (el) el.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(msg)}`;
 }
 
 function showComposerBanner(type, html) {

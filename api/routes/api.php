@@ -55,7 +55,7 @@ Route::post('/reset-password',   [AuthController::class, 'resetPassword']);
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
