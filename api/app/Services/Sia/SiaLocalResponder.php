@@ -21,9 +21,15 @@ class SiaLocalResponder
             'pattern' => '/\b(quien|que)\s+(eres|es\s+sia)\b|\bque\s+(haces|puedes\s+hacer|sabes\s+hacer)\b|\bpara\s+que\s+sirves\b|\bpresentate\b/u',
             'answer'  => "Soy **SIA**, el Sistema Integrado de Asistencia del Sistema de Semilleros de Investigación del IDEAD – Universidad del Tolima. Te ayudo con dudas de uso: iniciar sesión, recuperar tu contraseña, instalar la app, postularte a un semillero, registrar propuestas y qué puede hacer cada rol.\nPara reportar un error del sistema usa el botón verde de WhatsApp «Reportar bug».",
         ],
+        /* Más información del desarrollador: solo si la piden (Jose, 2026-09-28:
+           «no quiero ser egocéntrico»; la respuesta básica va resumida). */
+        'creator_more' => [
+            'pattern' => '/\b(mas|otra)\s+(informacion|info|datos)\b.*\b(jose|bohorquez|creador|desarrollador|autor)\b|\b(quien\s+es|sobre|contacto\s+de|contactar\s+a|perfil\s+de|conocer\s+a|redes\s+de)\s+(jose|bohorquez|creador|el\s+creador|el\s+desarrollador|tu\s+creador)\b|\b(linkedin|github|portafolio|portfolio)\b/u',
+            'answer'  => "**José Bohórquez**\n\n- Desarrollador autodidacta\n- Especialista en Genesys Cloud\n- Técnico en Programación de Software (TPS)\n- Tecnólogo en Análisis y Desarrollo de Sistemas de Información (ADSO)\n- Estudiante de la Facultad de Ingeniería\n\n**Contacto**\n\n- Teléfono / WhatsApp: +57 317 877 3186\n- LinkedIn: https://www.linkedin.com/in/jose-bohorquez-full-stack-software-developer/\n- GitHub: https://github.com/Jose-Bohorquez\n- Portafolio: https://jose-bohorquez.github.io/",
+        ],
         'creator' => [
             'pattern' => '/\b(quien|quienes)\s+(te\s+)?(creo|crearon|hizo|hicieron|desarrollo|desarrollaron|programo|diseno)\b|\b(creador|creadores|desarrollador|desarrolladores|autor|autores)\b/u',
-            'answer'  => "El Sistema de Semilleros IDEAD y SIA fueron desarrollados por **José Bohórquez** (aprendiz SENA – Análisis y Desarrollo de Software) para el IDEAD de la Universidad del Tolima, a partir del diseño original INITIUM (2020) de Ema Herrera y Nelly Mahecha.\nSi encontraste un error, repórtalo con el botón verde de WhatsApp «Reportar bug».",
+            'answer'  => "El Sistema de Semilleros IDEAD y SIA fueron desarrollados por **José Bohórquez**, desarrollador autodidacta y estudiante de la Facultad de Ingeniería, para el IDEAD de la Universidad del Tolima.\n\nParten del diseño original **INITIUM (2020)** de Ema Herrera y Nelly Mahecha, a quienes agradecemos.\n\nSi encontraste un error, repórtalo con el botón verde de WhatsApp «Reportar bug».",
         ],
         'contact' => [
             'pattern' => '/\b(hablar|hablo|comunicarme|comunico|contactar|contacto|contacto|escribir|escribo|escribirle|comunicarse)\b.*\b(creador|creadores|desarrollador|soporte|administrador|alguien|persona|humano)\b|\bsoporte\s+tecnico\b|\bnumero\s+de\s+contacto\b/u',
@@ -50,8 +56,10 @@ class SiaLocalResponder
 
         /* Saludo / gracias / despedida solo si no viene otra pregunta en el mismo mensaje */
         $rest = $this->meaningful($norm);
-        foreach (['identity', 'creator', 'contact'] as $intent) {
-            if (preg_match(self::INTENTS[$intent]['pattern'], $norm) && count($rest) <= 4 && substr_count($norm, ' ') < 8) {
+        foreach (['identity', 'creator_more', 'creator', 'contact'] as $intent) {
+            /* «más información sobre José Bohórquez» tiene más palabras útiles que un «¿quién eres?» */
+            [$maxWords, $maxSpaces] = $intent === 'creator_more' ? [8, 14] : [4, 8];
+            if (preg_match(self::INTENTS[$intent]['pattern'], $norm) && count($rest) <= $maxWords && substr_count($norm, ' ') < $maxSpaces) {
                 return ['answer' => self::INTENTS[$intent]['answer'], 'source' => 'LOCAL', 'intent' => $intent];
             }
         }

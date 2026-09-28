@@ -78,4 +78,20 @@ class AccountActivationTest extends TestCase
         $this->assertStringContainsString('7 días', $html);
         $this->assertStringNotContainsString('tratamiento de datos</strong> (Ley 1581', $html);   /* solo para estudiantes */
     }
+
+    /* Marca «Semilleros UT» (no APP_NAME) y WhatsApp al pie en ambos correos */
+    public function test_mails_use_semilleros_ut_brand_and_whatsapp(): void
+    {
+        $u = $this->pending(['name' => 'Duban Rodríguez']);
+        $act = (new AccountActivationNotification('tok'))->toMail($u);
+        $this->assertSame('Activa tu cuenta · Semilleros UT', $act->subject);
+        $this->assertSame('Semilleros UT', $act->from[1]);
+        $html = (string) $act->render();
+        $this->assertStringContainsString('wa.me/573178773186', $html);
+        $this->assertStringNotContainsString('PWA UT Semilleros', $html);
+
+        $reset = (new \App\Notifications\CustomResetPasswordNotification('tok'))->toMail($u);
+        $this->assertSame('Recupera tu contraseña · Semilleros UT', $reset->subject);
+        $this->assertStringContainsString('wa.me/573178773186', (string) $reset->render());
+    }
 }

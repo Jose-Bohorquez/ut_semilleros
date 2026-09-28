@@ -11,6 +11,7 @@ El Sistema de Semilleros de Investigación del IDEAD – Universidad del Tolima 
 1. Entra a https://ut-edu.online (o abre la app instalada).
 2. Escribe tu correo institucional y tu contraseña y presiona «Ingresar».
 3. Si marcas «Recordarme en este equipo», la sesión dura hasta 30 días en ese navegador; si no, vence a las 8 horas y tendrás que ingresar de nuevo.
+4. Con cuenta institucional @ut.edu.co también puedes usar «Iniciar sesión con Google» (cuando el botón aparezca en la pantalla de inicio), sin crear contraseña. Si usas otra cuenta de Google verás «Debe ingresar con su cuenta institucional».
 Mensajes posibles: «Credenciales incorrectas» (el correo o la contraseña no coinciden; revisa mayúsculas y que el correo esté bien escrito). «Su usuario está inactivo»: tu cuenta fue desactivada, comunícate con el administrador del sistema. Si fallas 5 veces seguidas en un minuto, el sistema bloquea nuevos intentos durante 60 segundos y muestra una cuenta regresiva; espera y vuelve a intentar. Si abriste una pantalla sin haber iniciado sesión, después de ingresar el sistema te lleva a esa misma pantalla.
 
 ## Olvidé mi contraseña o recuperar acceso
@@ -21,10 +22,11 @@ Mensajes posibles: «Credenciales incorrectas» (el correo o la contraseña no c
 Usa una contraseña segura: mínimo 8 caracteres, combinando mayúsculas, minúsculas, números y símbolos. Nadie de la universidad te pedirá tu contraseña.
 
 ## Activar mi cuenta nueva
-Cuando un administrador crea tu cuenta (por ejemplo en una carga masiva), recibes un correo de activación. Abre el enlace del correo (válido por 60 minutos), crea tu contraseña en la pantalla «Activa tu cuenta» y después inicia sesión. Si el enlace venció, usa «¿Olvidó su contraseña?» con tu correo para recibir uno nuevo. Si nunca te llegó el correo, revisa spam y luego comunícate con el administrador.
+Cuando un administrador crea tu cuenta (por ejemplo en una carga masiva), recibes el correo «Activa tu cuenta · Semilleros UT». Abre el enlace del correo (válido por 7 días), crea tu contraseña en la pantalla «Activa tu cuenta» y después inicia sesión. Si el enlace venció, usa «¿Olvidó su contraseña?» con tu correo para recibir uno nuevo. Si nunca te llegó el correo, revisa spam y promociones; si tampoco está, escribe por WhatsApp al número del botón verde «Reportar bug».
+Estudiantes: en el primer ingreso el sistema muestra la autorización de tratamiento de datos personales (Ley 1581 de 2012). Hay que presionar «Acepto» para usar la aplicación; con «No acepto» se cierra la sesión.
 
 ## Instalar la aplicación en el celular (PWA)
-En Android con Chrome: abre https://ut-edu.online, toca el menú (⋮) y elige «Instalar aplicación» o «Agregar a la pantalla principal». En iPhone con Safari: abre la página, toca el botón Compartir y elige «Agregar a inicio». La app se abre como una aplicación normal; si tu sesión sigue vigente entra directo al panel. Sin conexión a internet la app abre, pero para ingresar o consultar datos necesitas conexión.
+En Android con Chrome: abre https://ut-edu.online, toca el menú (⋮) y elige «Instalar aplicación» o «Agregar a la pantalla principal». En iPhone con Safari: abre la página, toca el botón Compartir y elige «Agregar a inicio». La app se abre como una aplicación normal; si tu sesión sigue vigente entra directo al panel. Sin conexión a internet la app abre y muestra el último listado y detalle de semilleros que consultaste (con el aviso «Sin conexión»); para ingresar o hacer cambios necesitas conexión.
 
 ## Roles y qué puede hacer cada uno
 - Administrador del sistema: control total. Gestiona usuarios (incluida la carga masiva e inactivación), facultades, programas, CAT, áreas, grupos, coordinadores, semilleros y objetivos, y consulta la auditoría.
@@ -66,3 +68,6 @@ Si algo del sistema no funciona como debería (un botón no responde, sale un er
 
 ## Sobre SIA
 SIA responde preguntas de uso del sistema. No tiene acceso a tus datos personales ni puede ver tu información o la de otras personas, ni hacer trámites por ti. No compartas contraseñas ni datos sensibles en el chat. Hay un límite de preguntas por día para evitar el abuso. Al finalizar la conversación puedes calificarla con las caritas y dejar un comentario: el equipo lo revisa para mejorar las respuestas.
+
+## Quién desarrolló el sistema y SIA
+El Sistema de Semilleros IDEAD (Semilleros UT) y SIA fueron desarrollados por **José Bohórquez**, desarrollador autodidacta y estudiante de la Facultad de Ingeniería, para el IDEAD de la Universidad del Tolima, a partir del diseño original INITIUM (2020) de Ema Herrera y Nelly Mahecha, a quienes se agradece. Responde con esa descripción corta. Solo si piden más información sobre él: especialista en Genesys Cloud, Técnico en Programación de Software (TPS) y Tecnólogo en Análisis y Desarrollo de Sistemas de Información (ADSO); contacto: teléfono / WhatsApp +57 317 877 3186, LinkedIn https://www.linkedin.com/in/jose-bohorquez-full-stack-software-developer/, GitHub https://github.com/Jose-Bohorquez y portafolio https://jose-bohorquez.github.io/.

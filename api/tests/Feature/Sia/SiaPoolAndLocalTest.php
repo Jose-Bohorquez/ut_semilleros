@@ -75,7 +75,21 @@ class SiaPoolAndLocalTest extends TestCase
         }
         Http::assertNothingSent();
         $this->assertSame(6, SiaMessage::where('role', 'assistant')->where('source', 'LOCAL')->count());
-        $this->assertStringContainsString('José Bohórquez', $this->postJson('/api/sia/chat', ['message' => '¿quién te creó?'])->json('answer'));
+        $basic = $this->postJson('/api/sia/chat', ['message' => '¿quién te creó?'])->json('answer');
+        $this->assertStringContainsString('José Bohórquez', $basic);
+        /* La respuesta básica es resumida: sin títulos ni contacto (Jose, 2026-09-28) */
+        $this->assertStringNotContainsString('linkedin', strtolower($basic));
+    }
+
+    /* Solo si piden más información aparecen títulos y contacto; sin llamar a la API */
+    public function test_more_info_about_the_developer_is_local_and_only_on_request(): void
+    {
+        Http::fake();
+        $more = $this->postJson('/api/sia/chat', ['message' => 'dame más información sobre José Bohórquez'])->json('answer');
+        $this->assertStringContainsString('linkedin.com/in/jose-bohorquez', $more);
+        $this->assertStringContainsString('jose-bohorquez.github.io', $more);
+        $this->assertStringContainsString('Genesys Cloud', $more);
+        Http::assertNothingSent();
     }
 
     public function test_greeting_with_real_question_goes_to_api(): void

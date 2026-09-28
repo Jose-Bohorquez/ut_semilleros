@@ -34,11 +34,16 @@ const store = {
     del: k => { try { sessionStorage.removeItem(k); } catch {} },
 };
 
-/* Markdown mínimo y seguro: se escapa TODO y luego se permiten **negrita** y saltos de línea. */
+/* Markdown mínimo y seguro: se escapa TODO y luego se permiten **negrita**,
+   viñetas («- »), enlaces https y saltos de línea (una línea en blanco = espacio). */
 function format(text) {
     return escapeHtml(text)
         .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\n/g, "<br>");
+        .replace(/https:\/\/[^\s<]+[^\s<.,;:)»]/g, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url.replace(/^https:\/\/(www\.)?/, "")}</a>`)
+        .replace(/^- (.*)$/gm, '<span class="sia-li">$1</span>')
+        .replace(/\n\n/g, '<span class="sia-gap"></span>')
+        .replace(/\n/g, "<br>")
+        .replace(/<\/span><br>/g, "</span>");
 }
 
 function whatsappUrl() {

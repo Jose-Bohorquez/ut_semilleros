@@ -12,6 +12,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Services\Auth\GoogleIdTokenVerifier;
+use App\Support\MailBrand;
 
 class AccountActivationNotification extends Notification
 {
@@ -57,13 +58,14 @@ class AccountActivationNotification extends Notification
     /** Datos de la plantilla (también los usa la vista previa de pruebas). */
     public static function viewData(object $notifiable, string $activationUrl): array
     {
-        $appUrl = rtrim(env('FRONTEND_URL', 'https://ut-edu.online'), '/');
+        $appUrl = MailBrand::appUrl();
         $email  = strtolower((string) $notifiable->email);
         $domain = substr(strrchr($email, '@') ?: '', 1);
         $role   = $notifiable->role ?? 'ESTUDIANTE';
 
         return [
-            'firstName'     => ucfirst(mb_strtolower(trim(explode(' ', trim((string) $notifiable->name))[0] ?? ''))),
+            'firstName'     => MailBrand::firstName($notifiable->name),
+            'whatsappUrl'   => MailBrand::whatsappUrl('correo de registro'),
             'email'         => $email,
             'roleLabel'     => self::ROLES[$role] ?? 'Usuario',
             'capabilities'  => self::CAPABILITIES[$role] ?? [],
@@ -78,7 +80,7 @@ class AccountActivationNotification extends Notification
 
     public function toMail($notifiable): MailMessage
     {
-        $frontendUrl = rtrim(env('FRONTEND_URL', 'https://ut-edu.online'), '/');
+        $frontendUrl = MailBrand::appUrl();
 
         $activationUrl = $frontendUrl
             . '/reset-password?token=' . $this->token
@@ -86,7 +88,8 @@ class AccountActivationNotification extends Notification
             . '&activation=1';
 
         return (new MailMessage)
-            ->subject('Activa tu cuenta — Sistema de Semilleros IDEAD')
+            ->from(...MailBrand::from())
+            ->subject('Activa tu cuenta · Semilleros UT')
             ->view('emails.activation', self::viewData($notifiable, $activationUrl));
     }
 }
