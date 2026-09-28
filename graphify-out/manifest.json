@@ -396,10 +396,10 @@
     "semantic_hash": "16b993e2a057b8a3d04fb02959ee0cee"
   },
   "api/config/services.php": {
-    "mtime": 1780193356.0,
-    "seen": 1788451349.49822,
-    "ast_hash": "c0566a4bf4ca0f0cd7d5a5d03561b059",
-    "semantic_hash": "c0566a4bf4ca0f0cd7d5a5d03561b059"
+    "mtime": 1790600751.435645,
+    "seen": 1790601998.2202358,
+    "ast_hash": "5c65689077a7202d8e9da624be981fd7",
+    "semantic_hash": "5c65689077a7202d8e9da624be981fd7"
   },
   "api/config/session.php": {
     "mtime": 1780193356.0,
@@ -690,10 +690,10 @@
     "semantic_hash": "f9f90b3bab40fd1d366e9b54466deac7"
   },
   "api/routes/api.php": {
-    "mtime": 1790530292.3251338,
-    "seen": 1790566943.320279,
-    "ast_hash": "3f4fd2851d20b6438fe1fc781a4ced93",
-    "semantic_hash": "3f4fd2851d20b6438fe1fc781a4ced93"
+    "mtime": 1790578780.7977717,
+    "seen": 1790601998.220239,
+    "ast_hash": "df65a4824644a3d390b0e1eec277992c",
+    "semantic_hash": "df65a4824644a3d390b0e1eec277992c"
   },
   "api/routes/console.php": {
     "mtime": 1780193357.0,
@@ -840,10 +840,10 @@
     "semantic_hash": "60c40741a9c5b915a5e5542cfb23bc25"
   },
   "app.js": {
-    "mtime": 1785217217.8103406,
-    "seen": 1788451349.4982681,
-    "ast_hash": "a5ddaf76c66c2a4b5c6e05bc926e0c39",
-    "semantic_hash": "a5ddaf76c66c2a4b5c6e05bc926e0c39"
+    "mtime": 1790579248.6746924,
+    "seen": 1790601998.2202413,
+    "ast_hash": "7282705178acb690d0815cbd470236ca",
+    "semantic_hash": "7282705178acb690d0815cbd470236ca"
   },
   "core/crud.engine.js": {
     "mtime": 1790529549.6463294,
@@ -858,10 +858,10 @@
     "semantic_hash": "6bd4308ae6749380cd57cc0b455b6a19"
   },
   "core/router.js": {
-    "mtime": 1790575624.8672416,
-    "seen": 1790575879.6878297,
-    "ast_hash": "b5fe0a521e9cbc5daaf5caf3ac72a0ac",
-    "semantic_hash": "b5fe0a521e9cbc5daaf5caf3ac72a0ac"
+    "mtime": 1790579561.6822758,
+    "seen": 1790601998.2202425,
+    "ast_hash": "471310ebbe4cd9758822df7211d919e4",
+    "semantic_hash": "471310ebbe4cd9758822df7211d919e4"
   },
   "layout/layout.controller.js": {
     "mtime": 1785244005.6032438,
@@ -870,10 +870,10 @@
     "semantic_hash": "5060dc7104811592b86cd449d8c1bf25"
   },
   "layout/layout.view.js": {
-    "mtime": 1790529709.280696,
-    "seen": 1790566943.3203032,
-    "ast_hash": "9e141d272f1b33009e049b50def4288b",
-    "semantic_hash": "9e141d272f1b33009e049b50def4288b"
+    "mtime": 1790579561.6825411,
+    "seen": 1790601998.220244,
+    "ast_hash": "5554f2cacb52db2c039c6ba56b191cdc",
+    "semantic_hash": "5554f2cacb52db2c039c6ba56b191cdc"
   },
   "manifest.json": {
     "mtime": 1785215171.058839,
@@ -1080,10 +1080,10 @@
     "semantic_hash": "059e5db8c3369ef0233e0c9cf600f38a"
   },
   "service-worker.js": {
-    "mtime": 1790575523.8014445,
-    "seen": 1790575879.6878388,
-    "ast_hash": "806b77407d4944ca19dcf2446f6b7958",
-    "semantic_hash": "806b77407d4944ca19dcf2446f6b7958"
+    "mtime": 1790579561.7503529,
+    "seen": 1790601998.2202458,
+    "ast_hash": "a91b180379675a63ba11245b157f7336",
+    "semantic_hash": "a91b180379675a63ba11245b157f7336"
   },
   "services/api.service.js": {
     "mtime": 1790573727.5850194,
@@ -1276,5 +1276,95 @@
     "seen": 1790573291.4928586,
     "ast_hash": "c665159563d694ef355f21b2eb95cb20",
     "semantic_hash": "c665159563d694ef355f21b2eb95cb20"
+  },
+  "api/app/Http/Controllers/Api/SiaController.php": {
+    "mtime": 1790601000.897229,
+    "seen": 1790601998.2202225,
+    "ast_hash": "c18e0d06f162b816bd1085926b1b76ed",
+    "semantic_hash": "c18e0d06f162b816bd1085926b1b76ed"
+  },
+  "api/app/Models/SiaConversation.php": {
+    "mtime": 1790578645.4688005,
+    "seen": 1790601998.2202268,
+    "ast_hash": "3f1e86ab17becea56ee2728eabec1648",
+    "semantic_hash": "3f1e86ab17becea56ee2728eabec1648"
+  },
+  "api/app/Models/SiaKnowledge.php": {
+    "mtime": 1790578645.4758003,
+    "seen": 1790601998.2202287,
+    "ast_hash": "be028f6850cb21c205d08af4ca3cf534",
+    "semantic_hash": "be028f6850cb21c205d08af4ca3cf534"
+  },
+  "api/app/Models/SiaMessage.php": {
+    "mtime": 1790600751.4358053,
+    "seen": 1790601998.2202299,
+    "ast_hash": "31939bdaad7314b9ebf04e08e4b96367",
+    "semantic_hash": "31939bdaad7314b9ebf04e08e4b96367"
+  },
+  "api/app/Models/SiaSetting.php": {
+    "mtime": 1790600751.435913,
+    "seen": 1790601998.2202308,
+    "ast_hash": "8c832b55b700b1932b73c192b4f797fc",
+    "semantic_hash": "8c832b55b700b1932b73c192b4f797fc"
+  },
+  "api/app/Services/Sia/GroqKeyPool.php": {
+    "mtime": 1790600751.4404895,
+    "seen": 1790601998.2202318,
+    "ast_hash": "93168d478bbf1a1b8217e6a4466be497",
+    "semantic_hash": "93168d478bbf1a1b8217e6a4466be497"
+  },
+  "api/app/Services/Sia/SiaAssistant.php": {
+    "mtime": 1790601263.700264,
+    "seen": 1790601998.2202325,
+    "ast_hash": "8abf749cdd7af7cecb123cd8084593ef",
+    "semantic_hash": "8abf749cdd7af7cecb123cd8084593ef"
+  },
+  "api/app/Services/Sia/SiaLocalResponder.php": {
+    "mtime": 1790601107.5156305,
+    "seen": 1790601998.220233,
+    "ast_hash": "caf09ae024581e7931c71b6e333bd931",
+    "semantic_hash": "caf09ae024581e7931c71b6e333bd931"
+  },
+  "api/app/Services/Sia/SiaUnavailableException.php": {
+    "mtime": 1790578677.0254576,
+    "seen": 1790601998.2202337,
+    "ast_hash": "130d458b26da7116ed5bf158756d31b4",
+    "semantic_hash": "130d458b26da7116ed5bf158756d31b4"
+  },
+  "api/database/migrations/2026_09_28_000001_create_sia_tables.php": {
+    "mtime": 1790578586.7784462,
+    "seen": 1790601998.2202368,
+    "ast_hash": "03ee46d4473eb6df6ee178b1d85026e8",
+    "semantic_hash": "03ee46d4473eb6df6ee178b1d85026e8"
+  },
+  "api/database/migrations/2026_09_28_000002_add_key_and_source_to_sia_messages.php": {
+    "mtime": 1790600751.4184897,
+    "seen": 1790601998.2202375,
+    "ast_hash": "544fb1316c34ba165ef55832c617c783",
+    "semantic_hash": "544fb1316c34ba165ef55832c617c783"
+  },
+  "api/tests/Feature/Sia/SiaPoolAndLocalTest.php": {
+    "mtime": 1790601069.6355312,
+    "seen": 1790601998.2202396,
+    "ast_hash": "d32ed0be9928f52de84bf23abf19affa",
+    "semantic_hash": "d32ed0be9928f52de84bf23abf19affa"
+  },
+  "api/tests/Feature/Sia/SiaTest.php": {
+    "mtime": 1790601422.8747444,
+    "seen": 1790601998.2202404,
+    "ast_hash": "c01eb9d7ff7d36004f7c6c44bc325095",
+    "semantic_hash": "c01eb9d7ff7d36004f7c6c44bc325095"
+  },
+  "core/sia.widget.js": {
+    "mtime": 1790580623.9344969,
+    "seen": 1790601998.220243,
+    "ast_hash": "2f643dd59ed948be8edd4bbdee8d3146",
+    "semantic_hash": "2f643dd59ed948be8edd4bbdee8d3146"
+  },
+  "modules/sia-admin/sia-admin.module.js": {
+    "mtime": 1790601220.1469252,
+    "seen": 1790601998.2202444,
+    "ast_hash": "77f48e704f9c7acc03387e03fbf95d3b",
+    "semantic_hash": "77f48e704f9c7acc03387e03fbf95d3b"
   }
 }
