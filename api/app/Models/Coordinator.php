@@ -12,4 +12,13 @@ class Coordinator extends Model
         'phone',
         'status'
     ];
+
+    /* RNF03 / RNF12: dato personal cifrado en reposo con APP_KEY. Si se pierde
+       o cambia APP_KEY, estos teléfonos no se pueden leer: respaldar el .env. */
+    protected function casts(): array
+    {
+        return [
+            'phone' => 'encrypted',
+        ];
+    }
 }

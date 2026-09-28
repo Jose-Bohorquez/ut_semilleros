@@ -4,7 +4,7 @@
    «Acepto» guarda la fecha en el servidor; «No acepto» cierra la sesión. */
 
 import { apiFetch } from "../../services/api.service.js";
-import { getToken, getUser, setUser, removeToken, removeUser, setTokenExpiry,
+import { getToken, getUser, setUser, clearLocalSession, setLoginFlash,
          clearOfflineCache, consumeIntendedRoute } from "../../services/storage.service.js";
 import { navigateTo } from "../../core/router.js";
 import { escapeHtml } from "../../core/escape.js";
@@ -63,7 +63,7 @@ function view(user) {
 }
 
 function endLocalSession() {
-    removeToken(); removeUser(); setTokenExpiry(null); clearOfflineCache();
+    clearLocalSession(); clearOfflineCache();
 }
 
 export const consentModule = {
@@ -109,7 +109,7 @@ export const consentModule = {
                la sesión en este dispositivo (el token vence solo a las 8 h). */
             try { await apiFetch("/consent", { method: "POST", body: JSON.stringify({ accept: false }) }); } catch {}
             endLocalSession();
-            try { sessionStorage.setItem("ut_login_flash", REJECT_MSG); } catch {}
+            setLoginFlash(REJECT_MSG);
             navigateTo("/");
         });
     },

@@ -163,10 +163,10 @@ export function LayoutView(content = "") {
                         aria-label="Cambiar tema" title="Cambiar modo claro/oscuro">
                     <i id="themeIcon" class="fas fa-sun"></i>
                 </button>
-                <button id="logoutBtn" class="btn btn-sm"
+                <button id="logoutBtn" class="btn btn-sm" aria-label="Cerrar sesión" title="Cerrar sesión"
                         style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span class="pwa-hide-label">Salir</span>
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                    <span class="pwa-hide-label">Cerrar sesión</span>
                 </button>
             </div>
 

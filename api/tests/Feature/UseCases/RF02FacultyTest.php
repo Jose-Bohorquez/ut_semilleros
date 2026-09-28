@@ -77,7 +77,7 @@ class RF02FacultyTest extends TestCase
         $f = Faculty::create(['code' => 'F', 'name' => 'F', 'status' => 'ACTIVO']);
         $p = Program::create(['name' => 'P', 'faculty_id' => $f->id, 'status' => 'ACTIVO']);
         $f->update(['status' => 'INACTIVO']);
-        $this->putJson("/api/programs/{$p->id}", ['name' => 'P2', 'faculty_id' => $f->id, 'status' => 'ACTIVO'])->assertOk();
+        $this->putJson("/api/programs/{$p->id}", ['code' => 'P2', 'type' => 'PREGRADO', 'name' => 'P2', 'faculty_id' => $f->id, 'status' => 'ACTIVO'])->assertOk();
     }
 
     /* …ni en semilleros (a través del programa) */

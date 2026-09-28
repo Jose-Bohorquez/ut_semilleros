@@ -96,9 +96,13 @@ export function initLayoutController() {
     }
 
     /* Logout — se añade al botón que acaba de renderizar */
-    document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+    document.getElementById("logoutBtn")?.addEventListener("click", async e => {
+        const btn = e.currentTarget;
+        if (btn.disabled) return;   /* doble clic */
+        btn.disabled = true;
+        btn.setAttribute("aria-busy", "true");
         await logout();
-        navigateTo("/");
+        navigateTo("/");   /* CU03 paso 4 */
     });
 
     /* Theme toggle — se añade al botón que acaba de renderizar */

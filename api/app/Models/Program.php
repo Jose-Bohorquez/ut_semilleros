@@ -9,7 +9,9 @@ class Program extends Model
 {
 
     protected $fillable = [
+        'code',
         'name',
+        'type',
         'faculty_id',
         'status'
     ];

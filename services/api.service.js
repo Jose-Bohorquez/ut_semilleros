@@ -4,7 +4,8 @@
    Servicio central para comunicación con la API Laravel
    ========================================================= */
 
-import { getToken, getUser, rememberIntendedRoute, clearOfflineCache } from "./storage.service.js";
+import { getToken, getUser, rememberIntendedRoute, clearLocalSession, setLoginFlash, SESSION_EXPIRED_MSG,
+         getPendingRevokes, setPendingRevokes } from "./storage.service.js";
 import { showOfflineBanner } from "../core/offline-banner.js";
 
 /* =========================================================
@@ -30,14 +31,24 @@ function buildUrl(endpoint = "") {
     return `${cleanBase}${cleanEndpoint}`;
 }
 
-function clearAuthSession() {
-    try {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-    } catch (e) {
-        console.warn("No se pudo limpiar localStorage:", e);
+/* CU03 E1: revoca en el servidor los tokens de cierres de sesión hechos sin
+   conexión. Se llama al abrir la app y al recuperar la conexión. Un token que
+   ya no sirve (401) también se descarta: ya no es un riesgo. */
+export async function flushPendingRevokes() {
+    const pending = getPendingRevokes();   /* ya sin los vencidos */
+    setPendingRevokes(pending);
+    if (!pending.length || !navigator.onLine) return;
+    const left = [];
+    for (const entry of pending) {
+        try {
+            const r = await fetch(buildUrl("/logout"), { method: "POST", headers: { Accept: "application/json", Authorization: `Bearer ${entry.t}` } });
+            /* 2xx revocado · 401 ya no sirve · 5xx/429 el servidor falló: reintentar */
+            if (r.status >= 500 || r.status === 429) left.push(entry);
+        } catch {
+            left.push(entry);   /* sigue sin red: se intenta en la próxima conexión */
+        }
     }
-    clearOfflineCache();
+    setPendingRevokes(left);
 }
 
 /* =========================================================
@@ -137,7 +148,11 @@ export async function apiFetch(endpoint, options = {}) {
         if (response.status === 401 && token) {
             console.warn("Token inválido o sesión expirada");
             rememberIntendedRoute();
-            clearAuthSession();
+            clearLocalSession();
+            /* CU03 A1: «Su sesión expiró»; si el servidor explica otra causa
+               (usuario inactivado, C-04) se muestra esa. */
+            const why = typeof data === "object" && data?.message;
+            setLoginFlash(why && /inactiv/i.test(why) ? why : SESSION_EXPIRED_MSG);
             window.location.href = "/";
             return;
         }

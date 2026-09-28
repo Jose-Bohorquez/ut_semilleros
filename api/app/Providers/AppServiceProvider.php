@@ -51,6 +51,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerAuditObservers();
+
+        /* RNF03 «limitación de peticiones»: 120 por minuto por usuario (o por IP
+           sin sesión). El panel carga varias listas en paralelo; 60 se quedaba
+           corto. El login (RN14) y SIA tienen límites propios más estrictos. */
+        \Illuminate\Support\Facades\RateLimiter::for('api', function (\Illuminate\Http\Request $request) {
+            /* El límite corre ANTES de auth:sanctum: se resuelve el usuario desde el
+               token aquí mismo. Con $request->user() salía siempre null y el límite
+               quedaba por IP (en el Wi-Fi del campus muchos estudiantes comparten IP). */
+            $user = $request->bearerToken() ? $request->user('sanctum') : null;
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(120)
+                ->by($user ? 'u:' . $user->id : 'ip:' . $request->ip());
+        });
     }
 
     /**

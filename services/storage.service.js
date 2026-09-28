@@ -93,14 +93,17 @@ export function hasValidSession() {
        la API, que responde 401 si el token ya no sirve. */
     if (!exp) return true;
     if (Date.parse(exp) > Date.now()) return true;
-    removeToken(); removeUser(); setTokenExpiry(null); clearOfflineCache();
+    clearLocalSession();
+    setLoginFlash(SESSION_EXPIRED_MSG);   /* CU03 A1 */
     return false;
 }
 
 
 /* =========================================================
-   RNF02 — copias sin conexión (ver api.service.js). Se borran todas al
-   cerrar sesión o cuando la sesión vence.
+   RNF02 — copias sin conexión (ver api.service.js). CU03 paso 3: al cerrar
+   sesión se CONSERVAN (son el listado público de semilleros y sus
+   objetivos, guardado por usuario); solo se borran al rechazar la
+   autorización de datos.
    ========================================================= */
 
 export function clearOfflineCache() {
@@ -114,4 +117,55 @@ export function clearOfflineCache() {
 /* RF16 / RN09: el estudiante debe haber aceptado el tratamiento de datos */
 export function needsDataConsent(user = getUser()) {
     return !!user && user.role === "ESTUDIANTE" && !user.data_consent_at;
+}
+
+
+/* =========================================================
+   CU03 — Cerrar sesión
+   ========================================================= */
+
+export const SESSION_EXPIRED_MSG = "Su sesión expiró. Inicie sesión de nuevo.";
+
+/* Conversación de SIA: puede tener datos personales; no debe verla quien use
+   el dispositivo después (paso 3). */
+const SIA_KEYS = ["sia_token", "sia_log", "sia_open", "sia_must_rate"];
+
+/* Paso 3: borra el token y los datos personales guardados en el dispositivo.
+   Conserva la caché pública de semilleros y las preferencias (tema). */
+export function clearLocalSession() {
+    removeToken(); removeUser(); setTokenExpiry(null);
+    try { SIA_KEYS.forEach(k => sessionStorage.removeItem(k)); } catch {}
+}
+
+/* Mensaje que muestra el login al llegar (A1 sesión vencida, RF16 «No acepto») */
+export function setLoginFlash(msg) {
+    try { sessionStorage.setItem("ut_login_flash", msg); } catch {}
+}
+
+/* E1: sin conexión el cierre local se completa igual y el token se revoca
+   en el servidor en la siguiente conexión (api.service.js → flushPendingRevokes). */
+const PENDING_KEY = "pending_revoke";
+
+export function queueRevoke(token) {
+    if (!token) return;
+    /* Se guarda con el vencimiento del token: pasado ese momento ya no sirve
+       y se descarta sin llamar al servidor (un dispositivo que no vuelve a
+       tener red no conserva un token útil indefinidamente). */
+    let exp = null;
+    try { exp = localStorage.getItem("token_expires_at"); } catch {}
+    const expMs = Date.parse(exp || "") || Date.now() + 30 * 24 * 3600e3;
+    const list = getPendingRevokes().filter(e => e.t !== token);
+    list.push({ t: token, exp: expMs });
+    setPendingRevokes(list.slice(-5));
+}
+
+export function getPendingRevokes() {
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem(PENDING_KEY) || "[]"); } catch {}
+    return (Array.isArray(list) ? list : [])
+        .filter(e => e && typeof e.t === "string" && e.exp > Date.now());
+}
+
+export function setPendingRevokes(list) {
+    try { list.length ? localStorage.setItem(PENDING_KEY, JSON.stringify(list)) : localStorage.removeItem(PENDING_KEY); } catch {}
 }

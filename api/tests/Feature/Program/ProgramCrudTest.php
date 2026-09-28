@@ -39,6 +39,8 @@ class ProgramCrudTest extends TestCase
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $faculty = $this->faculty();
         $response = $this->postJson('/api/programs', [
+            'code'       => 'ISIS',
+            'type'       => 'PREGRADO',
             'name'       => 'Ingeniería de Sistemas',
             'faculty_id' => $faculty->id,
             'status'     => 'ACTIVO',
@@ -51,16 +53,20 @@ class ProgramCrudTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $response = $this->postJson('/api/programs', [
+            'code'   => 'SF',
+            'type'   => 'PREGRADO',
             'name'   => 'Sin facultad',
             'status' => 'ACTIVO',
         ]);
-        $response->assertStatus(422);
+        $response->assertStatus(422)->assertJsonValidationErrors(['faculty_id']);
     }
 
     public function test_program_create_rejects_nonexistent_faculty(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $response = $this->postJson('/api/programs', [
+            'code'       => 'TST',
+            'type'       => 'PREGRADO',
             'name'       => 'Test',
             'faculty_id' => 9999,
             'status'     => 'ACTIVO',
@@ -74,6 +80,8 @@ class ProgramCrudTest extends TestCase
         $faculty  = $this->faculty();
         $program  = Program::create(['name' => 'Original', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
         $response = $this->putJson("/api/programs/{$program->id}", [
+            'code'       => 'ACT',
+            'type'       => 'POSGRADO',
             'name'       => 'Actualizado',
             'faculty_id' => $faculty->id,
             'status'     => 'ACTIVO',

@@ -22,6 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
         |--------------------------------------------------------------------------
         */
 
+        /* RNF03: cabeceras de seguridad y límite general de peticiones de la API
+           (el límite «api» se define en AppServiceProvider). */
+        /* Global (no solo el grupo api): así también cubre 404 y errores (ZAP 2026-09-28) */
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->throttleApi('api');
+
         $middleware->alias([
 
             'role' => \App\Http\Middleware\RoleMiddleware::class,

@@ -367,10 +367,21 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request
-            ->user()
-            ->currentAccessToken()
-            ->delete();
+        /* CU03 paso 2: revoca el token de este dispositivo (los de otros
+           dispositivos siguen vigentes) y lo deja en la auditoría. Token y
+           auditoría juntos, como en el login. */
+        $user = $request->user();
+
+        DB::transaction(function () use ($user) {
+            $user->currentAccessToken()?->delete();
+
+            Audit::create([
+                'user_id'    => $user->id,
+                'action'     => 'LOGOUT',
+                'table_name' => 'users',
+                'record_id'  => $user->id,
+            ]);
+        });
 
         return response()->json([
 
