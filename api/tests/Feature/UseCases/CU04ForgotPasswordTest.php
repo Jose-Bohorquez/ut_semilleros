@@ -154,4 +154,14 @@ class CU04ForgotPasswordTest extends TestCase
             return $n instanceof \Illuminate\Contracts\Queue\ShouldQueue;
         });
     }
+
+    /* E4: si el envío falla (SMTP caído, cola en modo síncrono), nunca se
+       filtra como 500 — la respuesta sigue siendo el mensaje genérico. */
+    public function test_e4_mail_failure_never_surfaces_as_a_server_error(): void
+    {
+        $this->user();
+        Notification::shouldReceive('send')->andThrow(new \RuntimeException('SMTP caído'));
+        $this->postJson('/api/forgot-password', ['email' => self::EMAIL])
+            ->assertOk()->assertJsonFragment(['message' => 'Si el correo está registrado, recibirá un enlace para recuperar su contraseña.']);
+    }
 }

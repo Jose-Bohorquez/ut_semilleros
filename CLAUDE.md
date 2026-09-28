@@ -45,10 +45,12 @@ parcial (tokens de 8 h / 30 d). CU02 + RF02 + RF16 + RNF02 ✅ en local (2026-09
 `docs/validacion/CU02.md`); Google real pendiente del Client ID (`GOOGLE_CLIENT_ID` en `.env`).
 CU03 + RF03 + RNF03 ✅ desplegados y validados en producción (2026-09-28, 14/14, ZAP 0 altos; acta `docs/validacion/CU03.md`). **Los teléfonos de
 coordinadores se cifran con APP_KEY: si se pierde o se regenera el `.env`, no se pueden leer.**
-CU04 + RF04 + RNF04 ✅ en local (2026-09-29, 234 tests + 18/18 E2E; acta `docs/validacion/CU04.md`).
-RN10 (contraseña fuerte) ya aplica en todo el sistema. Manuales de usuario/técnico/instalación en
-`docs/manuales/`. **CU04 E4 (reintento de correo) en producción necesita un cron con `queue:work`
-— ver `docs/manuales/manual_tecnico.md` §5 — si no, los correos de recuperación quedan encolados.**
+CU04 + RF04 + RNF04 ✅ desplegados y validados en producción (2026-09-29, 235 tests + 18/18 local +
+9/9 producción; acta `docs/validacion/CU04.md`). RN10 (contraseña fuerte) ya aplica en todo el
+sistema. Manuales de usuario/técnico/instalación en `docs/manuales/`. **Hostinger no permite
+`crontab` por SSH: `QUEUE_CONNECTION` de producción quedó en `sync` (correo se envía al instante,
+sin los 3 reintentos de E4) hasta que Jose agregue el cron desde hPanel (pasos en
+`docs/manuales/manual_tecnico.md` §5 y en el acta) y confirme para volverlo a `database`.**
 
 **Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
 (`GOOGLE_ALLOWED_DOMAINS`, por defecto `ut.edu.co`, y claim `hd` igual). Única excepción: un

@@ -424,7 +424,19 @@ class AuthController extends Controller
 
         RateLimiter::hit($throttleKey, 600);
 
-        Password::sendResetLink(['email' => $email]);
+        try {
+            Password::sendResetLink(['email' => $email]);
+        } catch (\Throwable $e) {
+            /* E4: si el correo de un solo uso falla al enviarse (SMTP caído,
+               dominio que rechaza el mensaje, etc.) esto NUNCA debe filtrarse
+               como un 500 al usuario — seguiría revelando por descarte que el
+               correo sí existe. Con la cola (producción) esto casi no pasa
+               aquí, porque el envío se reintenta en segundo plano; pero si la
+               cola está en modo síncrono (sin cron todavía) un fallo de SMTP
+               sí llega hasta aquí. Se registra para diagnóstico y se responde
+               igual que siempre. */
+            Log::error('[CU04] Falló el envío del correo de recuperación', ['error' => $e->getMessage()]);
+        }
 
         /* CU04 paso 5: el mensaje NUNCA revela si el correo existe (antes se
            devolvía el texto de Laravel, que sí lo revelaba: «No encontramos
