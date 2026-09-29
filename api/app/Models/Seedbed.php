@@ -9,10 +9,19 @@ class Seedbed extends Model
 {
 
     protected $fillable = [
+        'code',
         'name',
         'description',
         'program_id',
+        'group_id',
+        'cat_id',
+        'coordinator_id',
         'area_id',
+        'mision',
+        'vision',
+        'justificacion',
+        'objetivo_general',
+        'authorization_reference',
         'status'
     ];
 
@@ -30,6 +39,22 @@ class Seedbed extends Model
     public function area()
     {
         return $this->belongsTo(Area::class);
+    }
+
+    /** CU13: grupo de investigación, CAT y coordinador del semillero. */
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    public function cat()
+    {
+        return $this->belongsTo(Cat::class);
+    }
+
+    public function coordinator()
+    {
+        return $this->belongsTo(Coordinator::class);
     }
 
 

@@ -119,8 +119,22 @@ corregidos: faltaba el campo "documento" (único, migración nueva `coordinators
 nullable) — se usaba el correo como único en su lugar; y el Líder podía escribir coordinadores
 (con un fix C-16 previo parcheándolo, evidencia de que era real) cuando la spec dice que aquí
 (a diferencia de CU11) Líder y Administrativo son solo-consulta — corregido en backend, router y
-sidebar. 297 tests en total. Sigue pendiente E4 (mensaje genérico de fallo de conexión,
-transversal CU07-CU12).
+sidebar. 297 tests en total.
+
+CU13 (Registrar semillero) + RF13 sí coinciden en número (a diferencia de CU06-12). **El CU más
+grande trabajado hasta ahora**, dividido en 2 rondas (decisión de Jose). Ronda A ✅ desplegada
+(acta `docs/validacion/CU13.md`): migración con 9 campos que faltaban por completo (`code`,
+`group_id`, `cat_id`, `coordinator_id`, `mision`, `vision`, `justificacion`,
+`objetivo_general` mín. 10 caracteres, `authorization_reference` RN03/RNF06 — todos nullable,
+los 2 semilleros ya en producción no los tienen, se les exigirá al próximo editarlos); RN06
+aplicado (el líder solo edita/togglea sus propios semilleros, 403 si no; Admin sin restricción,
+Administrativo tampoco por decisión previa del proyecto); el líder que crea queda asignado
+responsable automáticamente. De paso se corrigió el bug histórico **C-13** (`GET /seedbeds/{id}`
+existía como ruta desde antes pero `show()` no, daba 500) y un `TypeError` real encontrado al
+probar (`activeAreaRule()` con tipo de retorno incorrecto). **Ronda B pendiente**:
+programa/área pasan de FK simple a selección múltiple — cambio de esquema más invasivo, toca
+RF05/CU10 ya cerrado. 305 tests en total. Sigue pendiente E4 (mensaje genérico de fallo de
+conexión, transversal CU07-CU13).
 
 **Nota transversal (2026-09-29):** desde CU06, la red local de Docker (puertos 8080/8000) quedó
 inalcanzable desde el host (contenedores sanos, problema de iptables/docker-proxy que necesita

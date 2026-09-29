@@ -41,6 +41,9 @@ fields:[
 
  {name:"id",label:"ID"},
 
+ /* CU13 / RN08: código único */
+ {name:"code",label:"Código",type:"text",hint:"Único."},
+
  {name:"name",label:"Nombre",type:"text"},
 
  {
@@ -66,6 +69,46 @@ fields:[
   relation:"areas",
   display:"name"
  },
+
+ /* CU13: grupo, CAT y coordinador (opcionales) */
+ {
+  name:"group_id",
+  label:"Grupo de investigación",
+  type:"relation",
+  relation:"groups",
+  display:"name",
+  required:false
+ },
+
+ {
+  name:"cat_id",
+  label:"CAT",
+  type:"relation",
+  relation:"cats",
+  display:"name",
+  required:false
+ },
+
+ {
+  name:"coordinator_id",
+  label:"Coordinador",
+  type:"relation",
+  relation:"coordinators",
+  display:"name",
+  required:false
+ },
+
+ /* CU13 paso 8: mínimo 10 caracteres (el servidor lo exige) */
+ {name:"objetivo_general",label:"Objetivo general",type:"textarea",hint:"Mínimo 10 caracteres."},
+
+ /* RN03 / RNF06: aprobación escrita del área administrativa */
+ {name:"authorization_reference",label:"Referencia de aprobación",type:"text",hint:"Ej: Acta 045 de 2026 (RN03)."},
+
+ {name:"mision",label:"Misión",type:"textarea",required:false},
+
+ {name:"vision",label:"Visión",type:"textarea",required:false},
+
+ {name:"justificacion",label:"Justificación",type:"textarea",required:false},
 
  {
   name:"status",

@@ -95,9 +95,9 @@ class RF02FacultyTest extends TestCase
         $f = Faculty::create(['code' => 'F', 'name' => 'F', 'status' => 'ACTIVO']);
         $p = Program::create(['name' => 'P', 'faculty_id' => $f->id, 'status' => 'ACTIVO']);
         $area = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
-        $s = Seedbed::create(['name' => 'S', 'program_id' => $p->id, 'area_id' => $area->id, 'status' => 'ACTIVO']);
+        $s = Seedbed::create(['code' => 'SB-' . uniqid(), 'name' => 'S', 'program_id' => $p->id, 'area_id' => $area->id, 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO']);
         $f->update(['status' => 'INACTIVO']);
-        $this->putJson("/api/seedbeds/{$s->id}", ['name' => 'S2', 'program_id' => $p->id, 'area_id' => $area->id, 'status' => 'ACTIVO'])->assertOk();
+        $this->putJson("/api/seedbeds/{$s->id}", ['code' => $s->code, 'name' => 'S2', 'program_id' => $p->id, 'area_id' => $area->id, 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO'])->assertOk();
     }
 
     /* RN07: altas y cambios quedan en la auditoría (AuditObserver) */

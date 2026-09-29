@@ -85,7 +85,7 @@ class RF05AreaTest extends TestCase
             ->assertStatus(422)->assertJsonValidationErrors(['area_id']);
 
         $area = Area::create(['code' => 'ON', 'name' => 'On', 'status' => 'ACTIVO']);
-        $this->postJson('/api/seedbeds', ['name' => 'S', 'program_id' => $p->id, 'area_id' => $area->id, 'status' => 'ACTIVO'])
+        $this->postJson('/api/seedbeds', ['code' => 'SB-' . uniqid(), 'name' => 'S', 'program_id' => $p->id, 'area_id' => $area->id, 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO'])
             ->assertCreated();
     }
 
@@ -94,9 +94,9 @@ class RF05AreaTest extends TestCase
     {
         $p = $this->program();
         $area = Area::create(['code' => 'A', 'name' => 'A', 'status' => 'ACTIVO']);
-        $s = Seedbed::create(['name' => 'S', 'program_id' => $p->id, 'area_id' => $area->id, 'status' => 'ACTIVO']);
+        $s = Seedbed::create(['code' => 'SB-' . uniqid(), 'name' => 'S', 'program_id' => $p->id, 'area_id' => $area->id, 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO']);
         $area->update(['status' => 'INACTIVO']);
-        $this->putJson("/api/seedbeds/{$s->id}", ['name' => 'S2', 'program_id' => $p->id, 'area_id' => $area->id, 'status' => 'ACTIVO'])
+        $this->putJson("/api/seedbeds/{$s->id}", ['code' => $s->code, 'name' => 'S2', 'program_id' => $p->id, 'area_id' => $area->id, 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO'])
             ->assertOk();
     }
 
