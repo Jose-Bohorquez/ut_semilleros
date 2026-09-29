@@ -1,22 +1,31 @@
-<?php # archiv: backend/app/Http/Controllers/Api/CoordinatorController.php
-# archivo: backend/app/Http/Controllers/Api/CoordinatorController.php
+<?php # archivo: backend/app/Http/Controllers/Api/CoordinatorController.php
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Coordinator;
 
+/**
+ * RF07 — Gestión de coordinadores (CU12, actor: Administrador del sistema;
+ * Líder y Administrativo solo consultan, A5). Nombre, documento (único,
+ * RN08), correo y teléfono (cifrado en reposo, RNF12).
+ */
 class CoordinatorController extends Controller
 {
+    private const MESSAGES = [
+        'name.required'     => 'El nombre es obligatorio.',
+        'document.unique'   => 'Ya existe un coordinador con ese documento.',
+        'email.required'    => 'El correo es obligatorio.',
+        'email.unique'      => 'Ya existe un coordinador con ese correo.',
+        'status.in'         => 'El estado debe ser ACTIVO o INACTIVO.',
+    ];
 
-    /**
-     * Listar coordinadores
-     */
     public function index()
     {
 
-        $coordinators = Coordinator::get();
+        $coordinators = Coordinator::orderBy('name')->get();
 
         return response()->json([
             "coordinators"=>$coordinators
@@ -24,31 +33,24 @@ class CoordinatorController extends Controller
 
     }
 
-
-
     /**
-     * Crear coordinador
+     * Detalle de un coordinador (CU12-A1): fechas y estado. Sin relaciones
+     * en el esquema (no hay FK de otras tablas hacia coordinators).
      */
+    public function show($id)
+    {
+        $coordinator = Coordinator::findOrFail($id);
+
+        return response()->json([
+            'coordinator' => $coordinator,
+        ]);
+    }
+
     public function store(Request $request)
     {
 
-        $validated = $request->validate([
-
-            "name"=>"required|string|max:255",
-
-            "email"=>"required|email|unique:coordinators,email",
-
-            "phone"=>"nullable|string|max:50",
-
-            "status"=>"required|in:ACTIVO,INACTIVO"
-
-        ]);
-
-        /* Solo ADMIN_SISTEMA decide el estado (RF07). Un LIDER_SEMILLERO crea
-           coordinadores siempre ACTIVOS (C-16, 2026-09-27). */
-        if (auth()->user()->role !== 'ADMIN_SISTEMA') {
-            $validated['status'] = 'ACTIVO';
-        }
+        $validated = $request->validate($this->rules(null), self::MESSAGES);
+        $validated['status'] = $validated['status'] ?? 'ACTIVO';
 
         $coordinator = Coordinator::create($validated);
 
@@ -59,34 +61,12 @@ class CoordinatorController extends Controller
 
     }
 
-
-
-    /**
-     * Actualizar coordinador
-     */
     public function update(Request $request,$id)
     {
 
         $coordinator = Coordinator::findOrFail($id);
 
-        $validated = $request->validate([
-
-            "name"=>"required|string|max:255",
-
-            "email"=>"required|email|unique:coordinators,email,".$id,
-
-            "phone"=>"nullable|string|max:50",
-
-            "status"=>"required|in:ACTIVO,INACTIVO"
-
-        ]);
-
-        /* Activar/inactivar es exclusivo de ADMIN_SISTEMA vía toggle-status
-           (api.php, RF07). El LIDER_SEMILLERO puede editar datos pero no el
-           estado: antes lo cambiaba mandando status en este PUT (C-16). */
-        if (auth()->user()->role !== 'ADMIN_SISTEMA') {
-            $validated['status'] = $coordinator->status;
-        }
+        $validated = $request->validate($this->rules($id), self::MESSAGES);
 
         $coordinator->update($validated);
 
@@ -112,6 +92,17 @@ class CoordinatorController extends Controller
             "coordinator"=>$coordinator
         ]);
 
+    }
+
+    private function rules(?int $ignoreId): array
+    {
+        return [
+            'name'     => 'required|string|max:255',
+            'document' => ['nullable', 'string', 'max:50', Rule::unique('coordinators', 'document')->ignore($ignoreId)],
+            'email'    => ['required', 'email', Rule::unique('coordinators', 'email')->ignore($ignoreId)],
+            'phone'    => 'nullable|string|max:50',
+            'status'   => ($ignoreId ? 'required' : 'sometimes') . '|in:ACTIVO,INACTIVO',
+        ];
     }
 
 }

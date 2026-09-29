@@ -8,6 +8,7 @@ class Coordinator extends Model
 {
         protected $fillable = [
         'name',
+        'document',
         'email',
         'phone',
         'status'

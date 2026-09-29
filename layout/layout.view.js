@@ -74,6 +74,7 @@ export function LayoutView(content = "") {
         <a href="/products"         data-link><i class="fas fa-flask"></i>           Productos</a>
         <a href="/results"          data-link><i class="fas fa-chart-bar"></i>       Resultados</a>
         <a href="/groups"           data-link><i class="fas fa-object-group"></i>    Grupos</a>
+        <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
         `;
     }
 
@@ -84,7 +85,6 @@ export function LayoutView(content = "") {
         <a href="/admin/programs"   data-link><i class="fas fa-graduation-cap"></i>  Programas</a>
         <a href="/cats"             data-link><i class="fas fa-map-marker-alt"></i>  CAT</a>
         <a href="/areas"            data-link><i class="fas fa-layer-group"></i>     Áreas</a>
-        <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
 
         ${section("Sistema")}
         <a href="/admin/users"      data-link><i class="fas fa-users"></i>          Usuarios</a>
@@ -101,6 +101,7 @@ export function LayoutView(content = "") {
         <a href="/results"          data-link><i class="fas fa-chart-bar"></i>       Resultados</a>
         <a href="/projects"         data-link><i class="fas fa-project-diagram"></i> Proyectos</a>
         <a href="/groups"           data-link><i class="fas fa-object-group"></i>    Grupos</a>
+        <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
         `;
     }
 

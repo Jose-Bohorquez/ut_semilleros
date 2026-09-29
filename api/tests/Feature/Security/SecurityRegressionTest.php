@@ -108,20 +108,22 @@ class SecurityRegressionTest extends TestCase
         $this->assertSame('t2', $proposal->title);
     }
 
-    /* ── C-16: el líder no cambia el estado de un coordinador por PUT ── */
+    /* ── C-16 (histórico) / CU12-A5 (2026-09-29): el líder ya no escribe
+       coordinadores en absoluto — antes solo se le bloqueaba cambiar el
+       estado por PUT, ahora el PUT entero le da 403 (alineado a la spec). ── */
 
-    public function test_leader_cannot_change_coordinator_status_via_update(): void
+    public function test_leader_cannot_update_coordinator_at_all(): void
     {
         $coord = Coordinator::create(['name' => 'C', 'email' => 'qa_sec_c@example.test', 'status' => 'ACTIVO']);
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
 
         $this->putJson("/api/coordinators/{$coord->id}", [
             'name' => 'C2', 'email' => 'qa_sec_c@example.test', 'status' => 'INACTIVO',
-        ])->assertStatus(200);
+        ])->assertStatus(403);
 
         $coord->refresh();
         $this->assertSame('ACTIVO', $coord->status);
-        $this->assertSame('C2', $coord->name);
+        $this->assertSame('C', $coord->name);
     }
 
     public function test_admin_can_still_change_coordinator_status_via_update(): void
@@ -164,15 +166,17 @@ class SecurityRegressionTest extends TestCase
         $this->assertSame(0, $user->tokens()->count());
     }
 
-    public function test_leader_creates_coordinators_always_active(): void
+    /* CU12-A5 (2026-09-29): el líder ya no puede crear coordinadores en
+       absoluto (antes se le permitía, siempre en estado ACTIVO). */
+    public function test_leader_cannot_create_coordinators(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
 
         $this->postJson('/api/coordinators', [
             'name' => 'C', 'email' => 'qa_sec_c3@example.test', 'status' => 'INACTIVO',
-        ])->assertStatus(201);
+        ])->assertStatus(403);
 
-        $this->assertDatabaseHas('coordinators', ['email' => 'qa_sec_c3@example.test', 'status' => 'ACTIVO']);
+        $this->assertDatabaseMissing('coordinators', ['email' => 'qa_sec_c3@example.test']);
     }
 
     public function test_inactivating_user_via_update_form_revokes_tokens(): void

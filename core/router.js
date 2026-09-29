@@ -188,10 +188,9 @@ export const routes = {
 
         if (!requireAuth()) return;
 
-        /* Jose, 2026-07-28: el link solo aparece en el menú de ADMIN_SISTEMA —
-           si un rol no tiene la opción a la vista, tampoco debe poder entrar
-           por URL directa y encontrarse una pantalla rota/vacía. */
-        if (!requireRole(["ADMIN_SISTEMA"])) return;
+        /* CU12-A5 (2026-09-29): Líder y Administrativo consultan (solo
+           lectura vía noCreateFor/noEditFor); solo Admin escribe. */
+        if (!requireRole(["ADMIN_SISTEMA", "LIDER_SEMILLERO", "ADMINISTRATIVO"])) return;
 
         const module = await import("../modules/coordinators/coordinators.module.js");
 

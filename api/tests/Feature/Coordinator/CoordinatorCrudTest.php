@@ -92,4 +92,56 @@ class CoordinatorCrudTest extends TestCase
         $this->assertDatabaseHas('coordinators', ['id' => $coord->id, 'status' => 'INACTIVO']);
         $this->assertDatabaseHas('coordinators', ['id' => $coord->id]);
     }
+
+    /* ───── CU12-A5: solo ADMIN_SISTEMA escribe ───── */
+
+    public function test_lider_cannot_create_coordinator(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        $response = $this->postJson('/api/coordinators', ['name' => 'X', 'email' => 'x@x.com', 'status' => 'ACTIVO']);
+        $response->assertStatus(403);
+    }
+
+    public function test_lider_can_read_coordinators(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        $this->getJson('/api/coordinators')->assertStatus(200);
+    }
+
+    public function test_administrativo_cannot_update_coordinator(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMINISTRATIVO']));
+        $coord = Coordinator::create(['name' => 'Test', 'email' => 'adm@test.com', 'status' => 'ACTIVO']);
+        $this->putJson("/api/coordinators/{$coord->id}", ['name' => 'Y', 'email' => 'adm@test.com', 'status' => 'ACTIVO'])
+            ->assertStatus(403);
+    }
+
+    /* ───── documento único (RN08) ───── */
+
+    public function test_document_must_be_unique(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        Coordinator::create(['name' => 'Primero', 'document' => '123456', 'email' => 'a@test.com', 'status' => 'ACTIVO']);
+        $this->postJson('/api/coordinators', ['name' => 'Segundo', 'document' => '123456', 'email' => 'b@test.com', 'status' => 'ACTIVO'])
+            ->assertStatus(422)->assertJsonValidationErrors(['document']);
+    }
+
+    public function test_can_create_coordinator_without_document(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $this->postJson('/api/coordinators', ['name' => 'Sin Documento', 'email' => 'sd@test.com', 'status' => 'ACTIVO'])
+            ->assertCreated();
+    }
+
+    /* CU12-A1 */
+    public function test_show_returns_detail(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $coord = Coordinator::create(['name' => 'Test', 'document' => '999', 'email' => 'det@test.com', 'status' => 'ACTIVO']);
+
+        $this->getJson("/api/coordinators/{$coord->id}")
+            ->assertOk()
+            ->assertJsonPath('coordinator.document', '999')
+            ->assertJsonStructure(['coordinator' => ['created_at', 'updated_at']]);
+    }
 }

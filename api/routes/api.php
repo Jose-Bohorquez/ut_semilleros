@@ -210,22 +210,22 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     /*
     |----------------------------------------------------------------------
     | COORDINADORES (RF07 / CU07)
-    |   GET  → A, L, ADM
-    |   POST/PUT → A, L
-    |   TOGGLE   → A
+    |   GET  → A, L, ADM (A5: L y ADM solo consulta)
+    |   WRITE → A (CU12, 2026-09-29: antes L también escribía — desalineado
+    |     con la spec, corregido; Jose aprobó restringir solo a A)
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
-         ->get('/coordinators', [CoordinatorController::class, 'index']);
-
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO')->group(function () {
-        Route::post('/coordinators',                 [CoordinatorController::class, 'store']);
-        Route::put('/coordinators/{id}',             [CoordinatorController::class, 'update']);
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+        Route::get('/coordinators',      [CoordinatorController::class, 'index']);
+        Route::get('/coordinators/{id}', [CoordinatorController::class, 'show']);
     });
 
-    Route::middleware('role:ADMIN_SISTEMA')
-         ->put('/coordinators/{id}/toggle-status',   [CoordinatorController::class, 'toggleStatus']);
+    Route::middleware('role:ADMIN_SISTEMA')->group(function () {
+        Route::post('/coordinators',                 [CoordinatorController::class, 'store']);
+        Route::put('/coordinators/{id}',             [CoordinatorController::class, 'update']);
+        Route::put('/coordinators/{id}/toggle-status', [CoordinatorController::class, 'toggleStatus']);
+    });
 
     /*
     |----------------------------------------------------------------------

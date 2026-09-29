@@ -30,10 +30,10 @@
     "semantic_hash": "5b9d789985e4617c30e616edad385e44"
   },
   "api/app/Http/Controllers/Api/CoordinatorController.php": {
-    "mtime": 1790530945.6114163,
-    "seen": 1790566943.3201914,
-    "ast_hash": "412297cbbd9cc2412b09868732919bd4",
-    "semantic_hash": "412297cbbd9cc2412b09868732919bd4"
+    "mtime": 1790711725.4861155,
+    "seen": 1790711974.9539206,
+    "ast_hash": "e1c60c2a85449226d21783f2a9e1298e",
+    "semantic_hash": "e1c60c2a85449226d21783f2a9e1298e"
   },
   "api/app/Http/Controllers/Api/FacultyController.php": {
     "mtime": 1790701575.6790268,
@@ -198,10 +198,10 @@
     "semantic_hash": "0b999a7de5dd14cff58c5c03baeee716"
   },
   "api/app/Models/Coordinator.php": {
-    "mtime": 1790612705.1355484,
-    "seen": 1790613383.423282,
-    "ast_hash": "35e69401ebfe9c954dbfd84b1f84b8e4",
-    "semantic_hash": "35e69401ebfe9c954dbfd84b1f84b8e4"
+    "mtime": 1790711696.6284258,
+    "seen": 1790711974.9545813,
+    "ast_hash": "cca65b1988471bd22830b4b16646dfff",
+    "semantic_hash": "cca65b1988471bd22830b4b16646dfff"
   },
   "api/app/Models/Faculty.php": {
     "mtime": 1790701552.9752293,
@@ -690,10 +690,10 @@
     "semantic_hash": "f9f90b3bab40fd1d366e9b54466deac7"
   },
   "api/routes/api.php": {
-    "mtime": 1790710935.9462776,
-    "seen": 1790711171.174602,
-    "ast_hash": "ecf7e602f676ca7ea484fbab37533e15",
-    "semantic_hash": "ecf7e602f676ca7ea484fbab37533e15"
+    "mtime": 1790711738.7719727,
+    "seen": 1790711974.9567223,
+    "ast_hash": "ac6c93e88efc0db71171b835fa111510",
+    "semantic_hash": "ac6c93e88efc0db71171b835fa111510"
   },
   "api/routes/console.php": {
     "mtime": 1780193357.0,
@@ -744,10 +744,10 @@
     "semantic_hash": "abb0eab06b52e11d59dc79f3a8e79d9f"
   },
   "api/tests/Feature/Coordinator/CoordinatorCrudTest.php": {
-    "mtime": 1780193357.0,
-    "seen": 1788451349.4982593,
-    "ast_hash": "666e8a0daf5a0f3e3c18bf2425d8641c",
-    "semantic_hash": "666e8a0daf5a0f3e3c18bf2425d8641c"
+    "mtime": 1790711851.0657651,
+    "seen": 1790711974.9568768,
+    "ast_hash": "7bc36bbfcbba120e7f1759515c8599b3",
+    "semantic_hash": "7bc36bbfcbba120e7f1759515c8599b3"
   },
   "api/tests/Feature/ExampleTest.php": {
     "mtime": 1780193357.0,
@@ -858,10 +858,10 @@
     "semantic_hash": "8c45d8d785c1d3f87c907328558fd974"
   },
   "core/router.js": {
-    "mtime": 1790710967.93985,
-    "seen": 1790711171.1755304,
-    "ast_hash": "bf765d9f41a9c984c1f2daaa77f2a8a8",
-    "semantic_hash": "bf765d9f41a9c984c1f2daaa77f2a8a8"
+    "mtime": 1790711757.4667716,
+    "seen": 1790711974.9575734,
+    "ast_hash": "cb40c9bf3e7aaaf5e66fe728e54914ba",
+    "semantic_hash": "cb40c9bf3e7aaaf5e66fe728e54914ba"
   },
   "layout/layout.controller.js": {
     "mtime": 1790612076.6412797,
@@ -870,10 +870,10 @@
     "semantic_hash": "26d08d82a3bceb944efb3a748aab3690"
   },
   "layout/layout.view.js": {
-    "mtime": 1790711012.458255,
-    "seen": 1790711171.1755722,
-    "ast_hash": "b5cd1b85dfab4ec55b08d21133c4f3bf",
-    "semantic_hash": "b5cd1b85dfab4ec55b08d21133c4f3bf"
+    "mtime": 1790711782.9318388,
+    "seen": 1790711974.9576056,
+    "ast_hash": "6ffcf8476ba33180bc34aa3a742f59e5",
+    "semantic_hash": "6ffcf8476ba33180bc34aa3a742f59e5"
   },
   "manifest.json": {
     "mtime": 1785215171.058839,
@@ -930,10 +930,10 @@
     "semantic_hash": "d5319c2a96fc2575fdb9f6998a1c2b7c"
   },
   "modules/coordinators/coordinators.module.js": {
-    "mtime": 1780193382.0,
-    "seen": 1788451349.498276,
-    "ast_hash": "1d7d97609f03f3379834aa3732c29572",
-    "semantic_hash": "1d7d97609f03f3379834aa3732c29572"
+    "mtime": 1790711806.8462405,
+    "seen": 1790711974.957773,
+    "ast_hash": "a0ade905095fb3f456ee9a6956e60710",
+    "semantic_hash": "a0ade905095fb3f456ee9a6956e60710"
   },
   "modules/dashboard/dashboard.controller.js": {
     "mtime": 1790654680.2588084,
@@ -1236,10 +1236,10 @@
     "semantic_hash": "7546c05d7e0dc00fb935c556edbf5c7f"
   },
   "api/tests/Feature/Security/SecurityRegressionTest.php": {
-    "mtime": 1790631500.054463,
-    "seen": 1790648810.8883593,
-    "ast_hash": "900815f0f5fa8ea22b46a7b5aebf51ac",
-    "semantic_hash": "900815f0f5fa8ea22b46a7b5aebf51ac"
+    "mtime": 1790711900.4142344,
+    "seen": 1790711974.957073,
+    "ast_hash": "b02ef6da709b50ed54ea442643f01f01",
+    "semantic_hash": "b02ef6da709b50ed54ea442643f01f01"
   },
   "core/escape.js": {
     "mtime": 1790530922.8623226,
@@ -1642,5 +1642,11 @@
     "seen": 1790709513.9316092,
     "ast_hash": "806d4368eecc7d300b13f9e5d08934d4",
     "semantic_hash": "806d4368eecc7d300b13f9e5d08934d4"
+  },
+  "api/database/migrations/2026_09_29_000007_add_document_to_coordinators.php": {
+    "mtime": 1790711686.7065325,
+    "seen": 1790711974.956287,
+    "ast_hash": "0d8eb9b3273be4a68817a91ffbe5fe29",
+    "semantic_hash": "0d8eb9b3273be4a68817a91ffbe5fe29"
   }
 }

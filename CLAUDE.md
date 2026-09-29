@@ -110,8 +110,17 @@ CU11 tampoco liga con RF11/RNF11 — RF11 es propuestas (CU25-27), RNF11 es mant
 a diferencia de CU07-10) — el código se lo impedía en 3 capas (backend `role:`, router, sidebar
 sin enlace). Ya corregido: escriben `ADMIN_SISTEMA` y `LIDER_SEMILLERO`, `ADMINISTRATIVO` solo
 consulta. También se corrigió que el código de grupo no se normalizaba a mayúsculas (RN08) y que
-`status` no se validaba. 291 tests en total. Sigue pendiente E4 (mensaje genérico de fallo de
-conexión, transversal CU07-CU11).
+`status` no se validaba. 291 tests en total.
+
+CU12 tampoco liga con RF12/RNF12 — RF12 es integrantes (CU21), RNF12 es protección de datos
+personales (transversal, ya cumplida: teléfono de coordinador cifrado). CU12 + RF07
+(coordinadores) ✅ desplegado en producción (acta `docs/validacion/CU12.md`). 2 hallazgos reales
+corregidos: faltaba el campo "documento" (único, migración nueva `coordinators.document`
+nullable) — se usaba el correo como único en su lugar; y el Líder podía escribir coordinadores
+(con un fix C-16 previo parcheándolo, evidencia de que era real) cuando la spec dice que aquí
+(a diferencia de CU11) Líder y Administrativo son solo-consulta — corregido en backend, router y
+sidebar. 297 tests en total. Sigue pendiente E4 (mensaje genérico de fallo de conexión,
+transversal CU07-CU12).
 
 **Nota transversal (2026-09-29):** desde CU06, la red local de Docker (puertos 8080/8000) quedó
 inalcanzable desde el host (contenedores sanos, problema de iptables/docker-proxy que necesita
