@@ -53,6 +53,12 @@ sistema. Manuales de usuario/técnico/instalación en `docs/manuales/`. **Hostin
 `crontab` por SSH: `QUEUE_CONNECTION` de producción quedó en `sync` (correo se envía al instante,
 sin los 3 reintentos de E4) hasta que Jose agregue el cron desde hPanel (pasos en
 `docs/manuales/manual_tecnico.md` §5 y en el acta) y confirme para volverlo a `database`.**
+CU05 + RF05 + RNF05 ✅ desplegados y validados en producción (2026-09-29, 256 tests + 18/18 local +
+validación por API en vivo; acta `docs/validacion/CU05.md`). Perfil con teléfono cifrado y cambio
+de contraseña con verificación; áreas de conocimiento obligatorias en semilleros/propuestas
+(bug de rol ESTUDIANTE en `GET /areas` corregido); referencia de autorización (RN02) obligatoria
+para roles no-ESTUDIANTE. Incluye el rediseño de UX/UI del dashboard (sidebar agrupado, gráficas
+balanceadas, fix del eje del gráfico "Semilleros por facultad").
 
 **Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
 (`GOOGLE_ALLOWED_DOMAINS`, por defecto `ut.edu.co`, y claim `hd` igual). Única excepción: un

@@ -42,11 +42,14 @@ TXT;
      * @param  array<int, array{role:string, content:string}>  $history  mensajes previos de la conversación
      * @return array{answer:string, prompt_tokens:int, completion_tokens:int, latency_ms:int, model:string, key_label:string}
      */
-    public function ask(string $question, array $history, int $maxTokens, int $perKeyPerDay = 800): array
+    public function ask(string $question, array $history, int $maxTokens, int $perKeyPerDay = 800, ?string $role = null): array
     {
         $context = $this->buildContext($question);
+        $roleLine = $role
+            ? "El usuario que pregunta tiene el rol: {$role}. Usa el CONOCIMIENTO (sección \"Roles y qué puede hacer cada uno\") para decir si SU rol puede hacer lo que pide; si no puede pero otro rol sí, dile cuál rol y qué debería hacer (por ejemplo, pedírselo a ese rol). Nunca digas que puede hacer algo que su rol no permite."
+            : "El usuario que pregunta no inició sesión (visitante). No conoces su rol: si la respuesta depende del rol, pídele que inicie sesión o dale la respuesta general sin asumir un rol.";
 
-        $messages = [['role' => 'system', 'content' => self::SYSTEM_PROMPT . "\n\nCONOCIMIENTO:\n" . $context]];
+        $messages = [['role' => 'system', 'content' => self::SYSTEM_PROMPT . "\n\n{$roleLine}\n\nCONOCIMIENTO:\n" . $context]];
         foreach (array_slice($history, -6) as $m) {
             $messages[] = ['role' => $m['role'], 'content' => Str::limit($m['content'], 800, '')];
         }

@@ -109,7 +109,7 @@ class SiaController extends Controller
         $conv->increment('message_count');
 
         try {
-            $r = $this->assistant->ask($data['message'], $history, $cfg['max_answer_tokens'], $cfg['per_key_requests_per_day']);
+            $r = $this->assistant->ask($data['message'], $history, $cfg['max_answer_tokens'], $cfg['per_key_requests_per_day'], $user?->role);
         } catch (SiaUnavailableException|\Illuminate\Http\Client\ConnectionException $e) {
             Log::warning('[SIA] ' . $e->getMessage());
             SiaMessage::create(['conversation_id' => $conv->id, 'role' => 'assistant', 'content' => '', 'status' => 'ERROR']);
