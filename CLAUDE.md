@@ -93,9 +93,13 @@ Jose antes de tocarlo (podría romper CAT ya registrados con solo `phone2`/`phon
 auto-inactivarse / inactivar al último `ADMIN_SISTEMA` activo — `guardAgainstLockout()` en
 `UserController`), CU06-E4 (`POST /users/{id}/resend-activation`, botón "Reenviar activación"),
 y A1 (endpoint `show()` + botón "Ver" con `Swal`) en Facultades/Programas/CAT. `phone1` de CAT
-se mantiene como "al menos uno de 3" (decisión de Jose, no se fuerza estricto). 281 tests en
-total. Sigue pendiente CU06-A1 (último acceso / semilleros del líder — necesita migración
-`last_login_at`) y E4 (mensaje genérico de fallo de conexión) en CU07/08/09.
+se mantiene como "al menos uno de 3" (decisión de Jose, no se fuerza estricto).
+
+**Ronda 3 (2026-09-29):** CU06-A1 resuelto — `users.last_login_at` (migración nueva, se
+actualiza en cada login exitoso desde `issueSession()`) y `led_seedbeds` en
+`UserController::show()` (semilleros donde el usuario es `LIDER` en el pivot `seedbed_user`,
+solo para rol `LIDER_SEMILLERO`). **CU06 queda completo.** 284 tests en total. Sigue pendiente
+E4 (mensaje genérico de fallo de conexión) en CU07/08/09.
 
 **Nota transversal (2026-09-29):** desde CU06, la red local de Docker (puertos 8080/8000) quedó
 inalcanzable desde el host (contenedores sanos, problema de iptables/docker-proxy que necesita

@@ -58,9 +58,17 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        /* CU06-A1: "para líderes, los semilleros a su cargo" (pivot
+           seedbed_user.role = LIDER). */
+        $seedbeds = $user->role === 'LIDER_SEMILLERO'
+            ? $user->seedbeds()->wherePivot('role', 'LIDER')->get(['seedbeds.id', 'seedbeds.name', 'seedbeds.status'])
+            : null;
+
         return response()->json([
 
-            'user' => new UserResource($user)
+            'user' => new UserResource($user),
+
+            'led_seedbeds' => $seedbeds,
 
         ]);
     }

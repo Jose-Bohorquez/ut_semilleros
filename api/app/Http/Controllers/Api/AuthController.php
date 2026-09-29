@@ -119,9 +119,9 @@ class AuthController extends Controller
     {
         $token = DB::transaction(function () use ($user, $expiresAt, $extra) {
 
-            if (!$user->exists || $extra) {
-                $user->forceFill($extra)->save();
-            }
+            /* CU06-A1: último acceso, siempre se actualiza (antes solo se
+               guardaba si había $extra o el usuario era nuevo). */
+            $user->forceFill($extra + ['last_login_at' => now()])->save();
 
             $plain = $user->createToken(
                 'auth_token',

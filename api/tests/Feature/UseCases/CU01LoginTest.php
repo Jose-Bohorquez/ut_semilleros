@@ -119,4 +119,15 @@ class CU01LoginTest extends TestCase
         $token = $user->createToken('t', ['*'], now()->subMinute())->plainTextToken;
         $this->withToken($token)->getJson('/api/me')->assertStatus(401);
     }
+
+    /* CU06-A1: cada login exitoso actualiza last_login_at */
+    public function test_successful_login_updates_last_login_at(): void
+    {
+        $user = $this->user();
+        $this->assertNull($user->fresh()->last_login_at);
+
+        $this->login()->assertStatus(200);
+
+        $this->assertNotNull($user->fresh()->last_login_at);
+    }
 }

@@ -35,6 +35,9 @@ class UserResource extends JsonResource
             /* RF16: la PWA pide la autorización de datos si viene null */
             'data_consent_at' => $this->data_consent_at,
 
+            /* CU06-A1: último inicio de sesión, visible en el detalle */
+            'last_login_at' => $this->last_login_at,
+
             'created_at' => $this->created_at,
 
             'updated_at' => $this->updated_at,

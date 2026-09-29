@@ -222,4 +222,34 @@ class UserCrudTest extends TestCase
 
         ]);
     }
+
+    /** CU06-A1: el detalle de un líder incluye los semilleros a su cargo. */
+    public function test_show_includes_led_seedbeds_for_lider(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        Sanctum::actingAs($admin);
+
+        $lider = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
+        $faculty = \App\Models\Faculty::create(['code' => 'F1', 'name' => 'F', 'status' => 'ACTIVO']);
+        $program = \App\Models\Program::create(['code' => 'P1', 'name' => 'P', 'type' => 'PREGRADO', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
+        $area = \App\Models\Area::create(['code' => 'A1', 'name' => 'A', 'status' => 'ACTIVO']);
+        $seedbed = \App\Models\Seedbed::create(['name' => 'Semillero X', 'program_id' => $program->id, 'area_id' => $area->id, 'status' => 'ACTIVO']);
+        $seedbed->users()->attach($lider->id, ['role' => 'LIDER']);
+
+        $this->getJson("/api/users/{$lider->id}")
+            ->assertOk()
+            ->assertJsonPath('led_seedbeds.0.name', 'Semillero X');
+    }
+
+    /** Para roles distintos de líder, led_seedbeds es null. */
+    public function test_show_led_seedbeds_null_for_non_lider(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        Sanctum::actingAs($admin);
+        $estudiante = User::factory()->create(['role' => 'ESTUDIANTE']);
+
+        $this->getJson("/api/users/{$estudiante->id}")
+            ->assertOk()
+            ->assertJsonPath('led_seedbeds', null);
+    }
 }

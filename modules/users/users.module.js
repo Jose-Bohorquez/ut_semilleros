@@ -9,6 +9,8 @@ import { createCrudModule } from "../../core/crud.engine.js";
 import { apiFetch }         from "../../services/api.service.js";
 import { escapeHtml }      from "../../core/escape.js";
 
+const fmtDate = d => d ? new Date(d).toLocaleString("es-CO", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
+
 /* ─────────────────────────────────────────────────────────────────
    Importación masiva de usuarios (Jose, 2026-08-31)
    El admin pega/sube una lista de correos (una por línea o CSV con
@@ -333,8 +335,10 @@ toolbarExtraHtml() {
 },
 
 /* CU06-E4: reenviar el correo de activación (nuevo token, invalida el
-   anterior) cuando el primer envío falló o se perdió. */
+   anterior) cuando el primer envío falló o se perdió.
+   CU06-A1: ver detalle (último acceso + semilleros a cargo si es líder). */
 actions: [
+    { label: "Ver", class: "viewUserBtn" },
     { label: "Reenviar activación", class: "resendActivationBtn" },
 ],
 
@@ -342,6 +346,28 @@ afterTableMount() {
     document.getElementById("importUsersBtn")?.addEventListener("click", openImportModal);
 }
 
+});
+
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".viewUserBtn");
+    if (!btn) return;
+    const { user: u, led_seedbeds } = await apiFetch(`/users/${btn.dataset.id}`);
+    const seedbedsHtml = u.role === "LIDER_SEMILLERO"
+        ? `<p><b>Semilleros a cargo:</b> ${led_seedbeds?.length ? led_seedbeds.map(s => `${escapeHtml(s.name)} (${escapeHtml(s.status)})`).join(", ") : "Ninguno"}</p>`
+        : "";
+    Swal.fire({
+        title: escapeHtml(u.name),
+        html: `
+            <div style="text-align:left">
+                <p><b>Correo:</b> ${escapeHtml(u.email)}</p>
+                <p><b>Rol:</b> ${escapeHtml(u.role)}</p>
+                <p><b>Estado:</b> ${escapeHtml(u.status)}</p>
+                <p><b>Último acceso:</b> ${fmtDate(u.last_login_at)}</p>
+                ${seedbedsHtml}
+                <p><b>Registrado:</b> ${fmtDate(u.created_at)}</p>
+            </div>`,
+        confirmButtonText: "Volver",
+    });
 });
 
 document.addEventListener("click", async (e) => {
