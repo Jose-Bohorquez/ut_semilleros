@@ -20430,28 +20430,6 @@
       "source_location": "L5"
     },
     {
-      "id": "modules_cats_cats_module",
-      "label": "cats.module.js",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Motor CRUD frontend",
-      "file_type": "code",
-      "norm_label": "cats.module.js",
-      "source_file": "modules/cats/cats.module.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "modules_cats_cats_module_catsmodule",
-      "label": "catsModule",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Motor CRUD frontend",
-      "file_type": "code",
-      "norm_label": "catsmodule",
-      "source_file": "modules/cats/cats.module.js",
-      "source_location": "L4"
-    },
-    {
       "id": "modules_coordinators_coordinators_module",
       "label": "coordinators.module.js",
       "_origin": "ast",
@@ -20614,6 +20592,26 @@
       "norm_label": "crud.engine.js",
       "source_file": "core/crud.engine.js",
       "source_location": "L1"
+    },
+    {
+      "id": "modules_cats_cats_module",
+      "label": "cats.module.js",
+      "_origin": "ast",
+      "community": 4,
+      "file_type": "code",
+      "norm_label": "cats.module.js",
+      "source_file": "modules/cats/cats.module.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "modules_cats_cats_module_catsmodule",
+      "label": "catsModule",
+      "_origin": "ast",
+      "community": 4,
+      "file_type": "code",
+      "norm_label": "catsmodule",
+      "source_file": "modules/cats/cats.module.js",
+      "source_location": "L4"
     },
     {
       "id": "modules_faculties_faculties_module",
@@ -69162,5 +69160,5 @@
       "source_file": "docs/especificacion/Especificacion_Requerimientos_Casos_de_Uso_SemillerosUT.md"
     }
   ],
-  "built_at_commit": "8db4a9dde95461ac89ea2fda8139b15a17fcdff1"
+  "built_at_commit": "57acfa8729d19e13eb5846d43b8f7ecbfb2907fa"
 }

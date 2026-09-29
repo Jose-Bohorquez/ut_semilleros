@@ -83,9 +83,15 @@ CU08 tampoco liga con RF08/RNF08 — RF08 es objetivos (CU19), RNF08 es disponib
 CU08 + RF03 (programas) ✅ desplegado en producción (acta `docs/validacion/CU08.md`), mismo patrón
 que CU07: filtro por estado + `pageLength:15`.
 
+CU09 tampoco liga con RF09/RNF09 — RF09 es resultados (CU20), RNF09 es usabilidad/accesibilidad
+(transversal). CU09 + RF04 (CAT) ✅ desplegado en producción (acta `docs/validacion/CU09.md`),
+mismo patrón. **Hallazgo sin corregir:** la especificación pide teléfono principal (`phone1`)
+obligatorio; el código solo exige "al menos uno de los 3 teléfonos" — pendiente de decisión de
+Jose antes de tocarlo (podría romper CAT ya registrados con solo `phone2`/`phone3`).
+
 **Nota transversal (2026-09-29):** desde CU06, la red local de Docker (puertos 8080/8000) quedó
 inalcanzable desde el host (contenedores sanos, problema de iptables/docker-proxy que necesita
-`sudo` interactivo, fuera de mi alcance). Las rondas CU07/CU08 se validaron con backend vía
+`sudo` interactivo, fuera de mi alcance). Las rondas CU07-CU09 se validaron con backend vía
 `docker exec` (sin red) + verificación en producción; falta el E2E completo en navegador local
 hasta que Jose resuelva el acceso `sudo` en su máquina.
 
