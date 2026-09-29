@@ -1,17 +1,29 @@
 <?php # archivo: backend/app/Http/Controllers/Api/AreaController.php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Area;
 
+/**
+ * RF05 — Gestión de áreas de conocimiento: código (único, RN08) y nombre.
+ * Sin eliminación (RN01): solo se activan o inactivan.
+ */
 class AreaController extends Controller
 {
+    private const MESSAGES = [
+        'code.required' => 'El código es obligatorio.',
+        'code.unique'    => 'Ya existe un área con ese código.',
+        'name.required'  => 'El nombre es obligatorio.',
+        'status.in'      => 'El estado debe ser ACTIVO o INACTIVO.',
+    ];
 
     public function index()
     {
 
-        $areas = Area::get();
+        $areas = Area::orderBy('name')->get();
 
         return response()->json([
             "areas"=>$areas
@@ -23,13 +35,10 @@ class AreaController extends Controller
     public function store(Request $request)
     {
 
-        $validated = $request->validate([
+        $this->normalizeCode($request);
 
-            "name"=>"required|string|max:255",
-
-            "code"=>"required|string|max:50|unique:areas,code"
-
-        ]);
+        $validated = $request->validate($this->rules(null), self::MESSAGES);
+        $validated['status'] = $validated['status'] ?? 'ACTIVO';
 
         $area = Area::create($validated);
 
@@ -46,13 +55,9 @@ class AreaController extends Controller
 
         $area = Area::findOrFail($id);
 
-        $validated = $request->validate([
+        $this->normalizeCode($request);
 
-            "name"=>"required|string|max:255",
-
-            "code"=>"required|string|max:50|unique:areas,code,".$id
-
-        ]);
+        $validated = $request->validate($this->rules($id), self::MESSAGES);
 
         $area->update($validated);
 
@@ -78,6 +83,23 @@ class AreaController extends Controller
             "area"=>$area
         ]);
 
+    }
+
+    /* RN08: «tic» y «TIC » son el mismo código */
+    private function normalizeCode(Request $request): void
+    {
+        if (is_string($request->input('code'))) {
+            $request->merge(['code' => mb_strtoupper(trim($request->input('code')))]);
+        }
+    }
+
+    private function rules(?int $ignoreId): array
+    {
+        return [
+            'code'   => ['required', 'string', 'max:50', Rule::unique('areas', 'code')->ignore($ignoreId)],
+            'name'   => 'required|string|max:255',
+            'status' => ($ignoreId ? 'required' : 'sometimes') . '|in:ACTIVO,INACTIVO',
+        ];
     }
 
 }

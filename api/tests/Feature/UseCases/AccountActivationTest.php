@@ -36,7 +36,7 @@ class AccountActivationTest extends TestCase
     {
         Notification::fake();
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
-        $this->postJson('/api/users', ['name' => 'Pablo E Cuenca', 'email' => 'nuevo@ut.edu.co', 'role' => 'LIDER_SEMILLERO', 'status' => 'ACTIVO'])->assertSuccessful();
+        $this->postJson('/api/users', ['name' => 'Pablo E Cuenca', 'email' => 'nuevo@ut.edu.co', 'role' => 'LIDER_SEMILLERO', 'status' => 'ACTIVO', 'authorization_reference' => 'Oficio 001 de 2026'])->assertSuccessful();
         Notification::assertSentTo(User::where('email', 'nuevo@ut.edu.co')->first(), AccountActivationNotification::class);
     }
 

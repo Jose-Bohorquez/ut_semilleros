@@ -8,6 +8,7 @@ use App\Models\Faculty;
 use App\Models\Program;
 use App\Models\Seedbed;
 use App\Models\Proposal;
+use App\Models\Area;
 use App\Models\Coordinator;
 use App\Models\MembershipRequest;
 use Laravel\Sanctum\Sanctum;
@@ -81,8 +82,9 @@ class SecurityRegressionTest extends TestCase
         $other   = User::factory()->create(['role' => 'ESTUDIANTE']);
         Sanctum::actingAs($student);
 
+        $area = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
         $this->postJson('/api/proposals', [
-            'user_id' => $other->id, 'title' => 'qa_sec', 'description' => 'd', 'status' => 'APROBADA',
+            'user_id' => $other->id, 'area_id' => $area->id, 'title' => 'qa_sec', 'description' => 'd', 'status' => 'APROBADA',
         ])->assertStatus(201);
 
         $this->assertDatabaseHas('proposals', ['title' => 'qa_sec', 'user_id' => $student->id, 'status' => 'PENDIENTE']);
@@ -92,11 +94,12 @@ class SecurityRegressionTest extends TestCase
     {
         $student  = User::factory()->create(['role' => 'ESTUDIANTE']);
         $other    = User::factory()->create(['role' => 'ESTUDIANTE']);
-        $proposal = Proposal::create(['user_id' => $student->id, 'title' => 't', 'description' => 'd', 'status' => 'PENDIENTE']);
+        $area     = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
+        $proposal = Proposal::create(['user_id' => $student->id, 'area_id' => $area->id, 'title' => 't', 'description' => 'd', 'status' => 'PENDIENTE']);
         Sanctum::actingAs($student);
 
         $this->putJson("/api/proposals/{$proposal->id}", [
-            'user_id' => $other->id, 'title' => 't2', 'description' => 'd2', 'status' => 'APROBADA',
+            'user_id' => $other->id, 'area_id' => $area->id, 'title' => 't2', 'description' => 'd2', 'status' => 'APROBADA',
         ])->assertStatus(200);
 
         $proposal->refresh();

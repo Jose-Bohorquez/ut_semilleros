@@ -61,6 +61,7 @@ class AreaCrudTest extends TestCase
         $response = $this->putJson("/api/areas/{$area->id}", [
             'name' => 'Actualizada',
             'code' => 'A-OR',
+            'status' => 'ACTIVO',
         ]);
         $response->assertStatus(200);
         $this->assertDatabaseHas('areas', ['id' => $area->id, 'name' => 'Actualizada']);

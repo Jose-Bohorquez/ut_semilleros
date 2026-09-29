@@ -15,7 +15,9 @@ class UpdateUserRequest extends FormRequest
 
     public function messages(): array
     {
-        return PasswordPolicy::messages();
+        return PasswordPolicy::messages() + [
+            'authorization_reference.required' => 'La referencia de autorización es obligatoria para usuarios del panel web (RN02).',
+        ];
     }
 
     public function rules(): array
@@ -59,6 +61,16 @@ class UpdateUserRequest extends FormRequest
                RN10, 2026-09-28). Opcional: en blanco, la contraseña actual
                no cambia. */
             'password' => PasswordPolicy::optional(),
+
+            /* RNF05 / RN02 */
+            'authorization_reference' => [
+
+                Rule::requiredIf(fn () => $this->input('role') !== 'ESTUDIANTE'),
+                'nullable',
+                'string',
+                'max:255',
+
+            ],
         ];
     }
 }

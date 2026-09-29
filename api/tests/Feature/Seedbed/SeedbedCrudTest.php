@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Faculty;
 use App\Models\Program;
+use App\Models\Area;
 use App\Models\Seedbed;
 use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,6 +22,11 @@ class SeedbedCrudTest extends TestCase
     {
         $faculty = Faculty::create(['name' => 'Facultad Test', 'status' => 'ACTIVO']);
         return Program::create(['name' => 'Programa Test', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
+    }
+
+    private function area(): Area
+    {
+        return Area::create(['name' => 'Área Test', 'code' => 'AT-' . uniqid(), 'status' => 'ACTIVO']);
     }
 
     public function test_unauthenticated_cannot_access_seedbeds(): void
@@ -43,6 +49,7 @@ class SeedbedCrudTest extends TestCase
         $response = $this->postJson('/api/seedbeds', [
             'name'       => 'Semillero Innovación',
             'program_id' => $program->id,
+            'area_id'    => $this->area()->id,
             'status'     => 'ACTIVO',
         ]);
         $response->assertStatus(201);
@@ -62,6 +69,7 @@ class SeedbedCrudTest extends TestCase
         $response = $this->postJson('/api/seedbeds', [
             'name'       => 'Test',
             'program_id' => 9999,
+            'area_id'    => $this->area()->id,
             'status'     => 'ACTIVO',
         ]);
         $response->assertStatus(422);
@@ -71,10 +79,12 @@ class SeedbedCrudTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
         $program  = $this->program();
-        $seedbed  = Seedbed::create(['name' => 'Original', 'program_id' => $program->id, 'status' => 'ACTIVO']);
+        $area     = $this->area();
+        $seedbed  = Seedbed::create(['name' => 'Original', 'program_id' => $program->id, 'area_id' => $area->id, 'status' => 'ACTIVO']);
         $response = $this->putJson("/api/seedbeds/{$seedbed->id}", [
             'name'       => 'Actualizado',
             'program_id' => $program->id,
+            'area_id'    => $area->id,
             'status'     => 'ACTIVO',
         ]);
         $response->assertStatus(200);
@@ -88,6 +98,7 @@ class SeedbedCrudTest extends TestCase
         $response = $this->putJson('/api/seedbeds/9999', [
             'name'       => 'X',
             'program_id' => $program->id,
+            'area_id'    => $this->area()->id,
             'status'     => 'ACTIVO',
         ]);
         $response->assertStatus(404);
@@ -96,7 +107,7 @@ class SeedbedCrudTest extends TestCase
     public function test_seedbed_status_can_be_toggled_without_deletion(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
-        $seedbed  = Seedbed::create(['name' => 'Test', 'program_id' => $this->program()->id, 'status' => 'ACTIVO']);
+        $seedbed  = Seedbed::create(['name' => 'Test', 'program_id' => $this->program()->id, 'area_id' => $this->area()->id, 'status' => 'ACTIVO']);
         $response = $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status");
         $response->assertStatus(200);
         $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id, 'status' => 'INACTIVO']);

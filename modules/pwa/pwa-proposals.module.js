@@ -21,6 +21,23 @@ const STATUS_MAP = {
 };
 
 let proposalsCache = [];
+let areasCache = null;
+
+/* RF05: solo áreas activas, salvo la que ya tenía asignada la propuesta que se edita */
+async function loadAreaOptions(currentAreaId = null) {
+    if (!areasCache) {
+        try { areasCache = (await apiFetch("/areas")).areas || []; }
+        catch { areasCache = []; }
+    }
+    const select = document.getElementById("prop-area");
+    if (!select) return;
+    const options = areasCache
+        .filter(a => a.status === "ACTIVO" || a.id === currentAreaId)
+        .map(a => `<option value="${a.id}">${escapeHtml(a.name)}${a.status !== "ACTIVO" ? " (inactiva)" : ""}</option>`)
+        .join("");
+    select.innerHTML = '<option value="">Selecciona un área...</option>' + options;
+    select.value = currentAreaId || "";
+}
 
 export const pwaProposalsModule = {
 
@@ -89,6 +106,7 @@ function renderList(proposals) {
                         <div class="card-title">${escapeHtml(p.title)}</div>
                         <div class="card-subtitle">
                             <span class="badge-pwa ${st.cls}">${st.label}</span>
+                            ${p.area ? `<span class="badge-pwa badge-pwa-neutral">${escapeHtml(p.area.name)}</span>` : ""}
                         </div>
                         <div class="card-meta">
                             <i class="fas fa-calendar-alt" style="margin-right:4px"></i>${date}
@@ -152,6 +170,16 @@ function renderList(proposals) {
 
             <form id="proposalForm">
                 <input type="hidden" id="prop-id" name="id" value="">
+
+                <div class="pwa-form-group">
+                    <label class="pwa-label" for="prop-area">
+                        Área de conocimiento <span style="color:var(--color-error)">*</span>
+                    </label>
+                    <select class="pwa-input" id="prop-area" name="area_id" required>
+                        <option value="">Selecciona un área...</option>
+                    </select>
+                    <span class="pwa-field-error" id="err-prop-area"></span>
+                </div>
 
                 <div class="pwa-form-group">
                     <label class="pwa-label" for="prop-title">
@@ -233,16 +261,20 @@ function bindListEvents() {
         e.preventDefault();
 
         const id    = document.getElementById("prop-id").value;
+        const areaId= document.getElementById("prop-area").value;
         const title = document.getElementById("prop-title").value.trim();
         const desc  = document.getElementById("prop-desc").value.trim();
         const btn   = document.getElementById("saveProposalBtn");
         const banner= document.getElementById("sheetBanner");
 
         /* Limpiar errores */
+        document.getElementById("err-prop-area").textContent  = "";
         document.getElementById("err-prop-title").textContent = "";
         document.getElementById("err-prop-desc").textContent  = "";
 
         let hasErr = false;
+        if (!areaId){ document.getElementById("err-prop-area").innerHTML =
+            '<i class="fas fa-exclamation-circle"></i> El área es obligatoria'; hasErr = true; }
         if (!title) { document.getElementById("err-prop-title").innerHTML =
             '<i class="fas fa-exclamation-circle"></i> El título es obligatorio'; hasErr = true; }
         if (!desc)  { document.getElementById("err-prop-desc").innerHTML  =
@@ -255,7 +287,7 @@ function bindListEvents() {
 
         const user    = getUser();
         const isEdit  = !!id;
-        const payload = { user_id: user.id, title, description: desc, status: "PENDIENTE" };
+        const payload = { user_id: user.id, area_id: areaId, title, description: desc, status: "PENDIENTE" };
 
         try {
             if (isEdit) {
@@ -300,6 +332,7 @@ function openSheet(proposal) {
     if (banner) banner.style.display = "none";
     document.getElementById("err-prop-title").textContent = "";
     document.getElementById("err-prop-desc").textContent  = "";
+    document.getElementById("err-prop-area").textContent  = "";
 
     if (proposal) {
         title.innerHTML  = '<i class="fas fa-edit" style="color:var(--color-primary);margin-right:8px"></i>Editar Propuesta';
@@ -314,6 +347,8 @@ function openSheet(proposal) {
         descInp.value= "";
         if (btnTxt) btnTxt.textContent = "Guardar propuesta";
     }
+
+    loadAreaOptions(proposal?.area_id ?? null);
 
     sheet.style.display = "flex";
     setTimeout(() => titInp?.focus(), 100);

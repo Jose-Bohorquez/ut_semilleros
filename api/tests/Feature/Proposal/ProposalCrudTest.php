@@ -5,6 +5,7 @@ namespace Tests\Feature\Proposal;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Proposal;
+use App\Models\Area;
 use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -14,6 +15,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class ProposalCrudTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function area(): Area
+    {
+        return Area::create(['name' => 'Área Test', 'code' => 'AT-' . uniqid(), 'status' => 'ACTIVO']);
+    }
 
     public function test_unauthenticated_cannot_access_proposals(): void
     {
@@ -34,6 +40,7 @@ class ProposalCrudTest extends TestCase
         $user     = User::factory()->create(['role' => 'ESTUDIANTE']);
         $response = $this->postJson('/api/proposals', [
             'user_id'     => $user->id,
+            'area_id'     => $this->area()->id,
             'title'       => 'Investigación sobre IA',
             'description' => 'Propuesta para aplicar IA en educación',
             'status'      => 'PENDIENTE',
@@ -55,6 +62,7 @@ class ProposalCrudTest extends TestCase
         $user     = User::factory()->create(['role' => 'ESTUDIANTE']);
         $response = $this->postJson('/api/proposals', [
             'user_id'     => $user->id,
+            'area_id'     => $this->area()->id,
             'title'       => 'Test',
             'description' => 'Descripción',
             'status'      => 'INVALIDO',
@@ -66,14 +74,17 @@ class ProposalCrudTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
         $user     = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $area     = $this->area();
         $proposal = Proposal::create([
             'user_id'     => $user->id,
+            'area_id'     => $area->id,
             'title'       => 'Original',
             'description' => 'Descripción original',
             'status'      => 'PENDIENTE',
         ]);
         $response = $this->putJson("/api/proposals/{$proposal->id}", [
             'user_id'     => $user->id,
+            'area_id'     => $area->id,
             'title'       => 'Actualizada',
             'description' => 'Nueva descripción',
             'status'      => 'APROBADA',
@@ -88,6 +99,7 @@ class ProposalCrudTest extends TestCase
         $user     = User::factory()->create(['role' => 'ESTUDIANTE']);
         $response = $this->putJson('/api/proposals/9999', [
             'user_id'     => $user->id,
+            'area_id'     => $this->area()->id,
             'title'       => 'X',
             'description' => 'Y',
             'status'      => 'PENDIENTE',
@@ -100,6 +112,7 @@ class ProposalCrudTest extends TestCase
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
         $response = $this->postJson('/api/proposals', [
             'user_id'     => 9999,
+            'area_id'     => $this->area()->id,
             'title'       => 'Test',
             'description' => 'Descripción',
             'status'      => 'PENDIENTE',

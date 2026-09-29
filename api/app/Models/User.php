@@ -46,6 +46,10 @@ class User extends Authenticatable
 
         'status',
 
+        'phone',
+
+        'authorization_reference',
+
         'profile_photo',
 
         /* google_id y data_consent_at NO van aquí: solo se escriben con
@@ -86,6 +90,10 @@ class User extends Authenticatable
             'data_consent_at' => 'datetime',
 
             'password' => 'hashed',
+
+            /* RNF12: dato personal cifrado en reposo con APP_KEY (mismo
+               patrón que Coordinator::phone). */
+            'phone' => 'encrypted',
         ];
     }
 

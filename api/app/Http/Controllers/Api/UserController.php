@@ -37,6 +37,7 @@ class UserController extends Controller
             'email',
             'role',
             'status',
+            'authorization_reference',
             'created_at'
 
         )->get();
@@ -126,6 +127,10 @@ class UserController extends Controller
 
             'password' => Hash::make($passwordPlano),
 
+            /* RNF05 / RN02: obligatoria para todo rol distinto de ESTUDIANTE
+               (la exige StoreUserRequest; el import masivo no crea estos roles). */
+            'authorization_reference' => $validated['authorization_reference'] ?? null,
+
         ]);
 
         $correoEnviado = true;
@@ -172,6 +177,15 @@ class UserController extends Controller
                 'name'  => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email',
                 'role'  => 'required|in:ADMIN_SISTEMA,ESTUDIANTE,LIDER_SEMILLERO,ADMINISTRATIVO',
+                /* RNF05 / RN02: obligatoria en la carga masiva también,
+                   cuando la fila no es un ESTUDIANTE (poco común, pero la
+                   carga admite cualquier rol). */
+                'authorization_reference' => [
+                    \Illuminate\Validation\Rule::requiredIf(($fila['role'] ?? null) !== 'ESTUDIANTE'),
+                    'nullable', 'string', 'max:255',
+                ],
+            ], [
+                'authorization_reference.required' => 'La referencia de autorización es obligatoria para este rol (RN02).',
             ]);
 
             if ($validator->fails()) {
@@ -190,6 +204,7 @@ class UserController extends Controller
                     'email'  => $email,
                     'role'   => $fila['role'],
                     'status' => 'ACTIVO',
+                    'authorization_reference' => $fila['authorization_reference'] ?? null,
                 ]);
 
                 $resultados[] = [
@@ -241,6 +256,8 @@ class UserController extends Controller
         $user->role = $validated['role'];
 
         $user->status = $validated['status'];
+
+        $user->authorization_reference = $validated['authorization_reference'] ?? null;
 
         /**
          * Actualizar password

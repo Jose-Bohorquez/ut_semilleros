@@ -21,6 +21,15 @@ fields:[
   display:"name"
  },
 
+ /* RF05: toda propuesta tiene al menos un área */
+ {
+  name:"area_id",
+  label:"Área",
+  type:"relation",
+  relation:"areas",
+  display:"name"
+ },
+
  {name:"title",label:"Título",type:"text"},
 
  {name:"description",label:"Descripción",type:"text"},

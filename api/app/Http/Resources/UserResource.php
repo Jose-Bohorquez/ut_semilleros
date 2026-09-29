@@ -24,6 +24,12 @@ class UserResource extends JsonResource
 
             'status' => $this->status,
 
+            /* CU05 paso 2: el perfil muestra el teléfono */
+            'phone' => $this->phone,
+
+            /* RNF05 / RN02: referencia del comunicado que autorizó el alta */
+            'authorization_reference' => $this->authorization_reference,
+
             'profile_photo' => $this->profile_photo,
 
             /* RF16: la PWA pide la autorización de datos si viene null */

@@ -58,6 +58,15 @@ fields:[
   display:"name"
  },
 
+ /* RF05: todo semillero tiene al menos un área */
+ {
+  name:"area_id",
+  label:"Área",
+  type:"relation",
+  relation:"areas",
+  display:"name"
+ },
+
  {
   name:"status",
   label:"Estado",

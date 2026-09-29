@@ -333,7 +333,8 @@ class AuthController extends Controller
     }
 
     /**
-     * Actualizar perfil del usuario autenticado.
+     * CU05 — Consultar y actualizar perfil (paso 3-5: nombre, correo y
+     * teléfono; A1: cambiar contraseña).
      */
     public function updateProfile(Request $request)
     {
@@ -342,23 +343,56 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => PasswordPolicy::optional(),   /* RN10 */
-        ], PasswordPolicy::messages());
+
+            /* E1: entre 7 y 15 dígitos (se admite un "+" inicial, no se
+               cuenta en el largo). */
+            'phone' => ['nullable', 'regex:/^\+?[0-9]{7,15}$/'],
+
+            /* A1: cambiar contraseña exige la actual + RN10 en la nueva. */
+            'current_password' => 'required_with:password|string',
+            'password' => PasswordPolicy::optional(),
+
+        ], PasswordPolicy::messages() + [
+            'phone.regex' => 'El teléfono debe tener entre 7 y 15 dígitos.',
+            'current_password.required_with' => 'Escribe tu contraseña actual.',
+        ]);
+
+        /* E2 */
+        if (!empty($validated['password']) && !Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['La contraseña actual no es correcta.'],
+            ]);
+        }
 
         $data = [
             'name'  => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
         ];
 
-        if (!empty($validated['password'])) {
+        $changingPassword = !empty($validated['password']);
+        if ($changingPassword) {
             $data['password'] = Hash::make($validated['password']);
         }
 
-        $user->update($data);
+        DB::transaction(function () use ($user, $data, $changingPassword) {
+
+            /* Auditoría (CU29): $user->update() ya la genera solo (AuditObserver),
+               no hace falta un Audit::create manual aquí. */
+            $user->update($data);
+
+            /* A1: al cambiar la contraseña se cierran las demás sesiones —
+               esta (la que la está cambiando) se conserva, para no botar de
+               inmediato a quien acaba de autenticarse con la anterior. */
+            if ($changingPassword) {
+                $current = $user->currentAccessToken();
+                $user->tokens()->when($current, fn ($q) => $q->where('id', '!=', $current->id))->delete();
+            }
+        });
 
         return response()->json([
             'message' => 'Perfil actualizado correctamente',
-            'user'    => new UserResource($user),
+            'user'    => new UserResource($user->fresh()),
         ]);
     }
 

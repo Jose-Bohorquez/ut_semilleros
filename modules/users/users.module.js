@@ -301,7 +301,13 @@ fields: [
    { value:"ACTIVO", label:"ACTIVO"},
    { value:"INACTIVO", label:"INACTIVO"}
   ]
- }
+ },
+
+ /* RNF05 / RN02: obligatoria para todo rol distinto de Estudiante (el
+    servidor la exige; aquí queda opcional porque el motor CRUD no admite
+    "obligatorio según otro campo"). */
+ { name:"authorization_reference", label:"Referencia de autorización", type:"text", required:false,
+   hint:"Obligatoria salvo para Estudiante. Ej: Oficio 123 de 2026." }
 
 ],
 

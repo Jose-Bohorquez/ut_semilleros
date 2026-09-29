@@ -94,6 +94,12 @@ function renderProfile(user) {
                 ${escapeHtml(roleInfo.label)}
             </span>
 
+            ${user?.created_at ? `
+            <p style="margin:0;font-size:var(--text-xs);color:rgba(255,255,255,0.75)">
+                <i class="fas fa-calendar-alt" style="margin-right:4px"></i>
+                Miembro desde ${new Date(user.created_at).toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" })}
+            </p>` : ""}
+
             <!-- Acciones de foto -->
             <div style="display:flex;gap:var(--space-3);margin-top:var(--space-2)">
                 <button id="changePhotoBtn" class="btn btn-sm"
@@ -150,6 +156,15 @@ function renderProfile(user) {
                     <span class="pwa-field-error" id="err-email"></span>
                 </div>
 
+                <div class="pwa-form-group">
+                    <label class="pwa-label" for="prof-phone">
+                        Teléfono
+                    </label>
+                    <input class="pwa-input" id="prof-phone" name="phone"
+                           type="tel" placeholder="Ej: 3001234567" value="${escapeHtml(user?.phone || "")}">
+                    <span class="pwa-field-error" id="err-phone"></span>
+                </div>
+
                 <div style="border-top:1px solid var(--color-border);
                              padding-top:var(--space-4);margin-top:var(--space-2)">
                     <p style="font-size:var(--text-xs);color:var(--color-text-muted);
@@ -157,6 +172,16 @@ function renderProfile(user) {
                         <i class="fas fa-lock" style="margin-right:4px"></i>
                         Deja en blanco para conservar la contraseña actual
                     </p>
+
+                    <div class="pwa-form-group">
+                        <label class="pwa-label" for="prof-current-pass">
+                            Contraseña actual
+                        </label>
+                        <input class="pwa-input" id="prof-current-pass" name="current_password"
+                               type="password" autocomplete="current-password"
+                               placeholder="Solo si vas a cambiarla">
+                        <span class="pwa-field-error" id="err-current-password"></span>
+                    </div>
 
                     <div class="pwa-form-group">
                         <label class="pwa-label" for="prof-pass">
@@ -316,6 +341,8 @@ function bindEvents() {
         const btn  = document.getElementById("saveProfileBtn");
         const name = document.getElementById("prof-name").value.trim();
         const email= document.getElementById("prof-email").value.trim();
+        const phone= document.getElementById("prof-phone").value.trim();
+        const curPass = document.getElementById("prof-current-pass").value;
         const pass = document.getElementById("prof-pass").value;
         const conf = document.getElementById("prof-pass-confirm").value;
 
@@ -326,20 +353,24 @@ function bindEvents() {
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showError("email", "Ingresa un correo válido"); hasError = true;
         }
+        /* E1: entre 7 y 15 dígitos (opcional: no todos los usuarios lo llenan) */
+        if (phone && !/^\+?[0-9]{7,15}$/.test(phone)) {
+            showError("phone", "El teléfono debe tener entre 7 y 15 dígitos"); hasError = true;
+        }
         if (pass) {
+            /* A1: se exige la contraseña actual para poder cambiarla */
+            if (!curPass) { showError("current-password", "Escribe tu contraseña actual"); hasError = true; }
             const policyErr = passwordPolicyError(pass);
             if (policyErr) { showError("password", policyErr); hasError = true; }
-        }
-        if (pass && pass !== conf) {
-            showError("pass-confirm", "Las contraseñas no coinciden"); hasError = true;
+            if (pass !== conf) { showError("pass-confirm", "Las contraseñas no coinciden"); hasError = true; }
         }
         if (hasError) return;
 
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
-        const payload = { name, email };
-        if (pass) { payload.password = pass; payload.password_confirmation = conf; }
+        const payload = { name, email, phone: phone || null };
+        if (pass) { payload.current_password = curPass; payload.password = pass; payload.password_confirmation = conf; }
 
         try {
             const res = await apiFetch("/profile", {
@@ -351,6 +382,12 @@ function bindEvents() {
                 '<i class="fas fa-check-circle"></i> Información actualizada correctamente');
             setTimeout(() => { renderProfile(res.user); bindEvents(); }, 1200);
         } catch (err) {
+            /* E2: además del banner, resalta el campo si el servidor lo señaló */
+            const fieldErrors = err.payload?.errors || {};
+            Object.entries(fieldErrors).forEach(([field, msgs]) => {
+                const id = field === "current_password" ? "current-password" : field;
+                showError(id, msgs[0]);
+            });
             showBanner("error",
                 `<i class="fas fa-exclamation-circle"></i> ${escapeHtml(err.message)}`);
         } finally {

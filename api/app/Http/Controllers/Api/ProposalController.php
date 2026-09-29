@@ -3,16 +3,22 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Proposal;
 
 class ProposalController extends Controller
 {
+    private const MESSAGES = [
+        'area_id.required' => 'El área es obligatoria.',
+        'area_id.exists'   => 'El área seleccionada no existe o está inactiva.',
+    ];
 
     public function index()
     {
 
         $proposals = Proposal::with([
-            'user:id,name'
+            'user:id,name',
+            'area'
         ])->get();
 
         return response()->json([
@@ -29,13 +35,15 @@ class ProposalController extends Controller
 
             "user_id"=>"required|exists:users,id",
 
+            "area_id"=>["required", Rule::exists('areas', 'id')->where('status', 'ACTIVO')],
+
             "title"=>"required|string|max:255",
 
             "description"=>"required|string",
 
             "status"=>"required|in:PENDIENTE,APROBADA,RECHAZADA"
 
-        ]);
+        ], self::MESSAGES);
 
         /* Seguridad (hallazgo C-02, 2026-09-27): el ESTUDIANTE crea
            propuestas solo a su nombre y siempre PENDIENTE — se ignora lo que
@@ -78,13 +86,20 @@ class ProposalController extends Controller
 
             "user_id"=>"required|exists:users,id",
 
+            "area_id"=>[
+                "required",
+                (int) $request->input("area_id") === (int) $proposal->area_id
+                    ? "exists:areas,id"
+                    : Rule::exists('areas', 'id')->where('status', 'ACTIVO'),
+            ],
+
             "title"=>"required|string|max:255",
 
             "description"=>"required|string",
 
             "status"=>"required|in:PENDIENTE,APROBADA,RECHAZADA"
 
-        ]);
+        ], self::MESSAGES);
 
         /* El estudiante no puede cambiar el estado ni el autor desde este
            endpoint — se conservan los actuales, aunque el frontend ya manda
@@ -131,7 +146,7 @@ class ProposalController extends Controller
     public function myProposals()
     {
         $user = auth()->user();
-        $proposals = Proposal::with(['user:id,name'])
+        $proposals = Proposal::with(['user:id,name', 'area'])
             ->where('user_id', $user->id)
             ->latest()
             ->get();

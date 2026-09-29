@@ -3,6 +3,7 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use App\Support\PasswordPolicy;
 
 class StoreUserRequest extends FormRequest
@@ -14,7 +15,9 @@ class StoreUserRequest extends FormRequest
 
     public function messages(): array
     {
-        return PasswordPolicy::messages();
+        return PasswordPolicy::messages() + [
+            'authorization_reference.required' => 'La referencia de autorización es obligatoria para usuarios del panel web (RN02).',
+        ];
     }
 
     public function rules(): array
@@ -57,7 +60,19 @@ class StoreUserRequest extends FormRequest
                 'required',
                 'in:ACTIVO,INACTIVO'
 
-            ]
+            ],
+
+            /* RNF05 / RN02: todo usuario del panel web (no ESTUDIANTE, que
+               usa la PWA) se crea con la referencia del comunicado que lo
+               autorizó. */
+            'authorization_reference' => [
+
+                Rule::requiredIf(fn () => $this->input('role') !== 'ESTUDIANTE'),
+                'nullable',
+                'string',
+                'max:255',
+
+            ],
         ];
     }
 }
