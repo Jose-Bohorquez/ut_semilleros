@@ -185,10 +185,6 @@ async function openGroup(id) {
     activeGroupId = id;
     dirtyGroupMembers = null;
     dirtyGroupPerms = null;
-    if (!allUsers) {
-        const r = await apiFetch("/rbac/users-lite");
-        allUsers = r.users;
-    }
     groupDetail = await apiFetch(`/rbac/groups/${id}`);
 }
 
@@ -292,11 +288,7 @@ function renderPeopleTab() {
     `;
 }
 
-async function findUserByEmail(email) {
-    if (!allUsers) {
-        const r = await apiFetch("/rbac/users-lite");
-        allUsers = r.users;
-    }
+function findUserByEmail(email) {
     return allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 }
 
@@ -352,13 +344,20 @@ function bindActiveTab() {
 }
 
 async function render() {
-    const [c, rp] = await Promise.all([
+    /* Siempre fresco al entrar a la pantalla — antes se cacheaba en memoria
+       y un usuario creado después de la primera visita no aparecía hasta
+       recargar la página entera (bug reportado por Jose, 2026-09-29). */
+    const [c, rp, ul] = await Promise.all([
         apiFetch("/rbac/catalog"),
         apiFetch("/rbac/roles"),
+        apiFetch("/rbac/users-lite"),
     ]);
     catalog = c;
     roleMatrix = rp;
+    allUsers = ul.users;
     dirtyRolePerms = null;
+    userResult = null;
+    userSearch = "";
     await loadGroups();
 
     const content = `
