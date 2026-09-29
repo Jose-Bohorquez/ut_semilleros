@@ -1620,10 +1620,10 @@
     "semantic_hash": "6625d1c1699dee8355f25092f4e7ffa0"
   },
   "modules/rbac/rbac.module.js": {
-    "mtime": 1790654271.7850924,
-    "seen": 1790654843.8207903,
-    "ast_hash": "271b2d5e50d0a1328ef3f57a76826ad8",
-    "semantic_hash": "271b2d5e50d0a1328ef3f57a76826ad8"
+    "mtime": 1790655166.6607573,
+    "seen": 1790655349.541689,
+    "ast_hash": "c0e6a3accc6852ccfe519dbbe25136ee",
+    "semantic_hash": "c0e6a3accc6852ccfe519dbbe25136ee"
   },
   "api/app/Models/PermissionGroup.php": {
     "mtime": 1790653445.6665978,

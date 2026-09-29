@@ -116,7 +116,7 @@ a las que se les da un conjunto de permisos como grupo, sin tocar el rol de nadi
   modelo Eloquent normales). Si se necesita trazar cada cambio de membresía,
   se debe loguear explícitamente en el controlador — pendiente si Jose lo pide.
 
-## UX/UI del panel (2026-09-29)
+## UX/UI del panel (2026-09-29, dos rondas)
 
 Rediseño en la misma ronda, con foco en usabilidad (17 módulos era demasiado
 para una sola pantalla plana):
@@ -128,6 +128,17 @@ para una sola pantalla plana):
   cuántas acciones tiene activas.
 - El botón de guardar queda flotante (`position: sticky`) al fondo del panel
   para no tener que hacer scroll de vuelta arriba tras marcar algo.
+
+**Segunda pasada (mismo día, reportado por Jose: "se ve como cards muy largos,
+demasiados cards, debe ser responsivo"):** los 17 módulos se agrupan en las
+mismas 3 categorías que ya usa el sidebar (Investigación / Catálogos
+académicos / Sistema — `MODULE_CATEGORY` en `rbac.module.js`), y cada
+categoría es un grid responsivo (`repeat(auto-fill, minmax(230px,1fr))`) en
+vez de una sola columna. En desktop pasó de ~3860px de alto a ~2090px (3
+columnas por categoría); en móvil sigue en una columna pero con las
+categorías como separadores claros en vez de 17 tarjetas sueltas sin
+agrupar. Sin cambios de comportamiento — mismo `accordion()` reutilizado por
+Roles/Grupos/Personas, solo se le agregó la agrupación visual.
 
 ## Pendiente (fuera de esta ronda)
 

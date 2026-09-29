@@ -45,36 +45,61 @@ let userResult = null;    // { user, effective, overrides }
 const toolbarTab = (key, label, icon) =>
     `<button type="button" class="btn btn-sm ${activeTab === key ? "btn-primary" : "btn-secondary"}" data-tab="${key}"><i class="fas ${icon}"></i> ${label}</button>`;
 
-/** Acordeón reutilizable de módulos: cada módulo es un <details>, cerrado si no tiene nada marcado. */
-function accordion(mode, getMarks) {
-    return Object.entries(catalog.modules).map(([mod, def]) => {
-        const marks = getMarks(mod, def);
-        const anyMarked = mode === "checkbox" ? def.actions.some(a => marks.has(a.id)) : def.actions.some(a => marks[a.id]);
-        const count = mode === "checkbox" ? def.actions.filter(a => marks.has(a.id)).length : def.actions.filter(a => marks[a.id]).length;
+/* Mismas 3 categorías que ya usa el sidebar (layout.view.js) — reutilizar el
+   agrupamiento que Jose ya conoce, en vez de inventar uno nuevo solo para
+   este panel (17 módulos sueltos se sentía como "demasiadas tarjetas"). */
+const MODULE_CATEGORY = {
+    seedbeds: "Investigación", objectives: "Investigación", results: "Investigación",
+    projects: "Investigación", products: "Investigación", requests: "Investigación", proposals: "Investigación",
+    faculties: "Catálogos académicos", programs: "Catálogos académicos", cats: "Catálogos académicos",
+    areas: "Catálogos académicos", groups: "Catálogos académicos", coordinators: "Catálogos académicos",
+    users: "Sistema", audits: "Sistema", notifications: "Sistema", sia: "Sistema",
+};
+const CATEGORY_ORDER = ["Investigación", "Catálogos académicos", "Sistema"];
 
-        const rows = def.actions.map(a => {
-            if (mode === "checkbox") {
-                return `<label class="rbac-perm">
-                    <input type="checkbox" data-perm="${a.id}" ${marks.has(a.id) ? "checked" : ""}>
-                    ${escapeHtml(a.label || a.action)}
-                </label>`;
-            }
-            const eff = marks[a.id] || "";
-            return `<div class="rbac-perm rbac-perm-override">
-                <span>${escapeHtml(a.label || a.action)}</span>
-                <select data-override-perm="${a.id}">
-                    <option value="" ${eff === "" ? "selected" : ""}>Según su rol/grupo</option>
-                    <option value="grant" ${eff === "grant" ? "selected" : ""}>Permitir (excepción)</option>
-                    <option value="revoke" ${eff === "revoke" ? "selected" : ""}>Quitar (excepción)</option>
-                </select>
-            </div>`;
-        }).join("");
+/** Una tarjeta de módulo: <details>, cerrado si no tiene nada marcado, con contador. */
+function moduleCard(mod, def, mode, marks) {
+    const anyMarked = mode === "checkbox" ? def.actions.some(a => marks.has(a.id)) : def.actions.some(a => marks[a.id]);
+    const count = mode === "checkbox" ? def.actions.filter(a => marks.has(a.id)).length : def.actions.filter(a => marks[a.id]).length;
 
-        return `<details class="rbac-accordion-item" ${anyMarked ? "open" : ""}>
-            <summary>${escapeHtml(def.label || mod)} ${count ? `<span class="rbac-count-badge">${count}</span>` : ""}</summary>
-            <div class="rbac-perms">${rows}</div>
-        </details>`;
+    const rows = def.actions.map(a => {
+        if (mode === "checkbox") {
+            return `<label class="rbac-perm">
+                <input type="checkbox" data-perm="${a.id}" ${marks.has(a.id) ? "checked" : ""}>
+                ${escapeHtml(a.label || a.action)}
+            </label>`;
+        }
+        const eff = marks[a.id] || "";
+        return `<div class="rbac-perm rbac-perm-override">
+            <span>${escapeHtml(a.label || a.action)}</span>
+            <select data-override-perm="${a.id}">
+                <option value="" ${eff === "" ? "selected" : ""}>Según su rol/grupo</option>
+                <option value="grant" ${eff === "grant" ? "selected" : ""}>Permitir (excepción)</option>
+                <option value="revoke" ${eff === "revoke" ? "selected" : ""}>Quitar (excepción)</option>
+            </select>
+        </div>`;
     }).join("");
+
+    return `<details class="rbac-accordion-item" ${anyMarked ? "open" : ""}>
+        <summary>${escapeHtml(def.label || mod)} ${count ? `<span class="rbac-count-badge">${count}</span>` : ""}</summary>
+        <div class="rbac-perms">${rows}</div>
+    </details>`;
+}
+
+/** Acordeón reutilizable de módulos, agrupado por categoría y en grid responsivo. */
+function accordion(mode, getMarks) {
+    const byCategory = {};
+    Object.entries(catalog.modules).forEach(([mod, def]) => {
+        const cat = MODULE_CATEGORY[mod] || "Otros";
+        (byCategory[cat] ??= []).push(moduleCard(mod, def, mode, getMarks(mod, def)));
+    });
+
+    return [...CATEGORY_ORDER, "Otros"].filter(cat => byCategory[cat]?.length).map(cat => `
+        <div class="rbac-category">
+            <h4 class="rbac-category-label">${escapeHtml(cat)}</h4>
+            <div class="rbac-accordion">${byCategory[cat].join("")}</div>
+        </div>
+    `).join("");
 }
 
 /* =========================================================
