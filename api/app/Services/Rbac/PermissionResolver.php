@@ -8,15 +8,17 @@ use App\Models\UserPermission;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * RBAC granular (permisos por módulo + acción, por rol y por persona).
+ * RBAC granular (permisos por módulo + acción, por rol, por grupo y por persona).
  *
  * Resolución de `can($user, 'modulo', 'accion')`:
  *   1. ADMIN_SISTEMA siempre true — acceso total, no se le puede quitar
  *      (decisión de Jose, 2026-09-29: "yo como admin tendré full access a todo").
  *   2. Si hay una excepción por persona (user_permissions) para ese permiso,
- *      manda ella: 'grant' → true aunque el rol no lo tenga, 'revoke' → false
- *      aunque el rol sí lo tenga.
- *   3. Si no hay excepción, manda lo que tenga asignado el rol (role_permissions).
+ *      manda ella y nada más importa: 'grant' → true, 'revoke' → false. Es la
+ *      capa más específica, así que gana incluso sobre un grupo que lo otorgue.
+ *   3. Si no hay excepción, el permiso está activo si lo da el ROL o algún
+ *      GRUPO al que pertenezca (un grupo solo suma permisos, nunca quita —
+ *      para quitar algo puntual se usa la excepción por persona del punto 2).
  *
  * No reemplaza al `role:` de las rutas todavía (conviven a propósito mientras
  * se prueba el sistema nuevo, CU por CU) — ver CLAUDE.md sección RBAC.
@@ -34,11 +36,17 @@ class PermissionResolver
             $rolePerms = Permission::query()
                 ->join('role_permissions', 'role_permissions.permission_id', '=', 'permissions.id')
                 ->where('role_permissions.role', $user->role)
-                ->get(['permissions.module', 'permissions.action', 'permissions.id']);
+                ->pluck('permissions.id');
+
+            $groupPerms = Permission::query()
+                ->join('permission_group_permissions', 'permission_group_permissions.permission_id', '=', 'permissions.id')
+                ->join('permission_group_user', 'permission_group_user.group_id', '=', 'permission_group_permissions.group_id')
+                ->where('permission_group_user.user_id', $user->id)
+                ->pluck('permissions.id');
 
             $effective = [];
-            foreach ($rolePerms as $p) {
-                $effective[$p->id] = true;
+            foreach ($rolePerms->merge($groupPerms) as $permId) {
+                $effective[$permId] = true;
             }
 
             $overrides = UserPermission::where('user_id', $user->id)->get(['permission_id', 'effect']);
@@ -68,5 +76,10 @@ class PermissionResolver
     public function forgetCache(User $user): void
     {
         Cache::forget("rbac:effective:{$user->id}");
+    }
+
+    public function forgetCacheForGroup(\App\Models\PermissionGroup $group): void
+    {
+        $group->users()->get(['users.id'])->each(fn (User $u) => $this->forgetCache($u));
     }
 }

@@ -73,13 +73,15 @@ operación en `docs/sia/README.md`. La memoria técnica que usa SIA está en
 La key (`GROQ_API_KEY`) vive solo en `.env` o en el override local; nunca en git.
 
 **RBAC granular (2026-09-29, fuera de la especificación oficial, pedido directo de Jose):**
-permisos por módulo+acción, asignables a un rol completo o a una persona como excepción
-(grant/revoke), sin tocar código. Documentado a fondo en `docs/rbac/README.md`. Los 4 roles siguen
-siendo la base (`ADMIN_SISTEMA` con acceso total, inamovible); v1 no incluye grupos de usuarios ni
-roles dinámicos (decisión explícita de Jose, se evalúa después). El `role:` hardcodeado de las 38
-rutas de `api/routes/api.php` sigue mandando — el `permission:` nuevo convive en paralelo mientras
-se prueba y se migra ruta por ruta, no se reemplazó de una vez. Panel en `/admin/rbac`
-(`modules/rbac/rbac.module.js` + `RbacController`), 10 tests nuevos (266 en total) + 5/5 E2E local.
+permisos por módulo+acción, asignables a un rol completo, a un **grupo** de personas de distintos
+roles, o a una persona como excepción (grant/revoke), sin tocar código. Documentado a fondo en
+`docs/rbac/README.md`. Los 4 roles siguen siendo la base (`ADMIN_SISTEMA` con acceso total,
+inamovible); no hay roles dinámicos (decisión explícita de Jose, se evalúa después). El `role:`
+hardcodeado de las 38 rutas de `api/routes/api.php` sigue mandando — el `permission:` nuevo convive
+en paralelo mientras se prueba y se migra ruta por ruta, no se reemplazó de una vez. Panel en
+`/admin/rbac` (`modules/rbac/rbac.module.js` + `RbacController`) con 3 pestañas (Roles/Grupos/
+Personas) y acordeón por módulo para usabilidad; 25 tests nuevos (271 en total) + 8/8 y 5/5 E2E
+local.
 
 Diferencias conocidas a cerrar (2026-09-29): RN06 (líder solo en sus semilleros) no se aplica;
 RN02/RN03 (referencia de autorización escrita) sin campo; RN08 (códigos únicos) en CAT, áreas,

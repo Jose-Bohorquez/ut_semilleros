@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
+use App\Models\PermissionGroup;
 use App\Models\RolePermission;
 use App\Models\User;
 use App\Models\UserPermission;
@@ -133,6 +134,99 @@ class RbacController extends Controller
         $this->resolver->forgetCache($user);
 
         return response()->json(['message' => 'Excepciones de la persona actualizadas', 'user_id' => $user->id]);
+    }
+
+    /** Listado liviano de personas, para el buscador del panel (sistema chico: sin paginar). */
+    public function usersLite()
+    {
+        return response()->json([
+            'users' => User::orderBy('name')->get(['id', 'name', 'email', 'role', 'status']),
+        ]);
+    }
+
+    /* ───────────────────── Grupos de permisos (v2, 2026-09-29) ───────────────────── */
+
+    /** Lista de grupos con su cantidad de integrantes y de permisos, para la vista general. */
+    public function groups()
+    {
+        $groups = PermissionGroup::withCount(['users', 'permissions'])->orderBy('name')->get();
+        return response()->json(['groups' => $groups]);
+    }
+
+    public function storeGroup(Request $request)
+    {
+        $data = $request->validate([
+            'name'        => 'required|string|max:100|unique:permission_groups,name',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $group = PermissionGroup::create($data);
+
+        return response()->json(['message' => 'Grupo creado', 'group' => $group], 201);
+    }
+
+    public function updateGroup(Request $request, PermissionGroup $group)
+    {
+        $data = $request->validate([
+            'name'        => ['required', 'string', 'max:100', Rule::unique('permission_groups', 'name')->ignore($group->id)],
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $group->update($data);
+
+        return response()->json(['message' => 'Grupo actualizado', 'group' => $group]);
+    }
+
+    public function destroyGroup(PermissionGroup $group)
+    {
+        $members = $group->users()->get(['users.id']);
+        $group->delete();
+        $members->each(fn (User $u) => $this->resolver->forgetCache($u));
+
+        return response()->json(['message' => 'Grupo eliminado']);
+    }
+
+    /** Detalle de un grupo: integrantes (con nombre/rol) y los ids de permiso que otorga. */
+    public function showGroup(PermissionGroup $group)
+    {
+        return response()->json([
+            'group'         => $group,
+            'member_ids'    => $group->users()->pluck('users.id'),
+            'members'       => $group->users()->get(['users.id', 'users.name', 'users.email', 'users.role']),
+            'permission_ids' => $group->permissions()->pluck('permissions.id'),
+        ]);
+    }
+
+    /** Reemplaza los integrantes del grupo (personas de cualquier rol). */
+    public function updateGroupMembers(Request $request, PermissionGroup $group)
+    {
+        $data = $request->validate([
+            'user_ids'   => 'present|array',
+            'user_ids.*' => 'integer|exists:users,id',
+        ]);
+
+        $before = $group->users()->pluck('users.id');
+        $group->users()->sync($data['user_ids']);
+
+        $before->merge($data['user_ids'])->unique()->each(
+            fn ($id) => $this->resolver->forgetCache(User::find($id))
+        );
+
+        return response()->json(['message' => 'Integrantes del grupo actualizados']);
+    }
+
+    /** Reemplaza los permisos que otorga el grupo a todos sus integrantes. */
+    public function updateGroupPermissions(Request $request, PermissionGroup $group)
+    {
+        $data = $request->validate([
+            'permission_ids'   => 'present|array',
+            'permission_ids.*' => 'integer|exists:permissions,id',
+        ]);
+
+        $group->permissions()->sync($data['permission_ids']);
+        $this->resolver->forgetCacheForGroup($group);
+
+        return response()->json(['message' => 'Permisos del grupo actualizados']);
     }
 
     private function forgetCacheForRole(string $role): void

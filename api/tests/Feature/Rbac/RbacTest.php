@@ -3,6 +3,7 @@
 namespace Tests\Feature\Rbac;
 
 use App\Models\Permission;
+use App\Models\PermissionGroup;
 use App\Models\User;
 use App\Models\UserPermission;
 use App\Services\Rbac\PermissionResolver;
@@ -135,5 +136,82 @@ class RbacTest extends TestCase
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $response = $this->getJson('/api/rbac/roles')->assertOk();
         $this->assertNotContains('ADMIN_SISTEMA', $response->json('roles'));
+    }
+
+    /* ───── Grupos de permisos (v2) ───── */
+
+    public function test_group_grant_adds_permission_across_different_roles(): void
+    {
+        $resolver = app(PermissionResolver::class);
+        $estudiante = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $lider = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
+        $perm = Permission::where('module', 'sia')->where('action', 'curate')->firstOrFail();
+
+        $group = PermissionGroup::create(['name' => 'Comité editorial']);
+        $group->users()->attach([$estudiante->id, $lider->id]);
+        $group->permissions()->attach($perm->id);
+        $resolver->forgetCacheForGroup($group);
+
+        $this->assertTrue($resolver->can($estudiante, 'sia', 'curate'));
+        $this->assertTrue($resolver->can($lider, 'sia', 'curate'));
+
+        $outsider = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $this->assertFalse($resolver->can($outsider, 'sia', 'curate'));
+    }
+
+    public function test_user_revoke_overrides_group_grant(): void
+    {
+        $resolver = app(PermissionResolver::class);
+        $estudiante = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $perm = Permission::where('module', 'sia')->where('action', 'curate')->firstOrFail();
+
+        $group = PermissionGroup::create(['name' => 'Comité editorial 2']);
+        $group->users()->attach($estudiante->id);
+        $group->permissions()->attach($perm->id);
+        $resolver->forgetCache($estudiante);
+        $this->assertTrue($resolver->can($estudiante, 'sia', 'curate'));
+
+        UserPermission::create(['user_id' => $estudiante->id, 'permission_id' => $perm->id, 'effect' => 'revoke']);
+        $resolver->forgetCache($estudiante);
+        $this->assertFalse($resolver->can($estudiante, 'sia', 'curate'));
+    }
+
+    public function test_admin_can_manage_group_lifecycle_via_api(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $estudiante = User::factory()->create(['role' => 'ESTUDIANTE', 'name' => 'Estudiante Grupo']);
+        $lider = User::factory()->create(['role' => 'LIDER_SEMILLERO', 'name' => 'Lider Grupo']);
+        $perm = Permission::where('module', 'sia')->where('action', 'curate')->firstOrFail();
+
+        $created = $this->postJson('/api/rbac/groups', ['name' => 'Comunicados', 'description' => 'Para avisos institucionales'])
+            ->assertCreated()->json('group');
+
+        $this->putJson("/api/rbac/groups/{$created['id']}/members", ['user_ids' => [$estudiante->id, $lider->id]])->assertOk();
+        $this->putJson("/api/rbac/groups/{$created['id']}/permissions", ['permission_ids' => [$perm->id]])->assertOk();
+
+        $this->getJson("/api/rbac/groups/{$created['id']}")
+            ->assertOk()
+            ->assertJsonFragment(['name' => 'Estudiante Grupo'])
+            ->assertJsonFragment(['name' => 'Lider Grupo']);
+
+        $this->assertTrue(app(PermissionResolver::class)->can($estudiante->fresh(), 'sia', 'curate'));
+
+        $this->getJson('/api/rbac/groups')->assertOk()->assertJsonFragment(['name' => 'Comunicados']);
+
+        $this->deleteJson("/api/rbac/groups/{$created['id']}")->assertOk();
+        $this->assertFalse(app(PermissionResolver::class)->can($estudiante->fresh(), 'sia', 'curate'));
+    }
+
+    public function test_group_name_must_be_unique(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        PermissionGroup::create(['name' => 'Duplicado']);
+        $this->postJson('/api/rbac/groups', ['name' => 'Duplicado'])->assertStatus(422);
+    }
+
+    public function test_only_admin_sistema_can_manage_groups(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        $this->getJson('/api/rbac/groups')->assertStatus(403);
     }
 }

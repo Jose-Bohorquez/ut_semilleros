@@ -312,10 +312,10 @@
     "semantic_hash": "3b44eaa09c5abc8be9ad8293d26bd710"
   },
   "api/app/Providers/AppServiceProvider.php": {
-    "mtime": 1790651382.7283635,
-    "seen": 1790652399.8195403,
-    "ast_hash": "ca2042024b38920e30e18947cd6939d4",
-    "semantic_hash": "ca2042024b38920e30e18947cd6939d4"
+    "mtime": 1790653510.9969378,
+    "seen": 1790653814.141411,
+    "ast_hash": "bb858a807909645f39f888be22025037",
+    "semantic_hash": "bb858a807909645f39f888be22025037"
   },
   "api/artisan": {
     "mtime": 1780193356.0,
@@ -690,10 +690,10 @@
     "semantic_hash": "f9f90b3bab40fd1d366e9b54466deac7"
   },
   "api/routes/api.php": {
-    "mtime": 1790651431.8129148,
-    "seen": 1790652399.8211765,
-    "ast_hash": "12d40af6a81e0a42bc1d511c298bc52a",
-    "semantic_hash": "12d40af6a81e0a42bc1d511c298bc52a"
+    "mtime": 1790653521.967827,
+    "seen": 1790653814.14488,
+    "ast_hash": "72a6c121f01d07856e7204365857ecd2",
+    "semantic_hash": "72a6c121f01d07856e7204365857ecd2"
   },
   "api/routes/console.php": {
     "mtime": 1780193357.0,
@@ -1560,10 +1560,10 @@
     "semantic_hash": "12a9b2644ff217d120975df5bd04929d"
   },
   "api/app/Http/Controllers/Api/RbacController.php": {
-    "mtime": 1790652177.2037802,
-    "seen": 1790652399.8187056,
-    "ast_hash": "6196c37110580fcb5b36e2ba50368e08",
-    "semantic_hash": "6196c37110580fcb5b36e2ba50368e08"
+    "mtime": 1790653504.156007,
+    "seen": 1790653814.1378348,
+    "ast_hash": "abadeecb194a057b4ad0de79adacb756",
+    "semantic_hash": "abadeecb194a057b4ad0de79adacb756"
   },
   "api/app/Http/Middleware/PermissionMiddleware.php": {
     "mtime": 1790651326.2028801,
@@ -1590,10 +1590,10 @@
     "semantic_hash": "66e3b9f53e63a1dd58c980c2f10c6e85"
   },
   "api/app/Services/Rbac/PermissionResolver.php": {
-    "mtime": 1790651312.8080025,
-    "seen": 1790652399.8195825,
-    "ast_hash": "19171886eee3ec36a18846611020c81e",
-    "semantic_hash": "19171886eee3ec36a18846611020c81e"
+    "mtime": 1790653475.0713007,
+    "seen": 1790653814.1415107,
+    "ast_hash": "16a5ca0697f4df9b601e2f5917121a9c",
+    "semantic_hash": "16a5ca0697f4df9b601e2f5917121a9c"
   },
   "api/config/rbac.php": {
     "mtime": 1790651242.962646,
@@ -1614,15 +1614,27 @@
     "semantic_hash": "12fe47aa04a2c327dee40f284f51ddc1"
   },
   "api/tests/Feature/Rbac/RbacTest.php": {
-    "mtime": 1790651499.845293,
-    "seen": 1790652399.8214679,
-    "ast_hash": "12a02ca3a788d7977f9f48a4df2d2383",
-    "semantic_hash": "12a02ca3a788d7977f9f48a4df2d2383"
+    "mtime": 1790653551.4995286,
+    "seen": 1790653814.1455007,
+    "ast_hash": "6625d1c1699dee8355f25092f4e7ffa0",
+    "semantic_hash": "6625d1c1699dee8355f25092f4e7ffa0"
   },
   "modules/rbac/rbac.module.js": {
-    "mtime": 1790651615.1652224,
-    "seen": 1790652399.8225873,
-    "ast_hash": "ea4cf1fd02015aaa4c5f54e219b6844a",
-    "semantic_hash": "ea4cf1fd02015aaa4c5f54e219b6844a"
+    "mtime": 1790653649.253541,
+    "seen": 1790653814.1480205,
+    "ast_hash": "d561247539c1b567e7eff6e729317e56",
+    "semantic_hash": "d561247539c1b567e7eff6e729317e56"
+  },
+  "api/app/Models/PermissionGroup.php": {
+    "mtime": 1790653445.6665978,
+    "seen": 1790653814.1400826,
+    "ast_hash": "0f41e2a88d4c6d2a502ec2c30c6f3b12",
+    "semantic_hash": "0f41e2a88d4c6d2a502ec2c30c6f3b12"
+  },
+  "api/database/migrations/2026_09_29_000005_create_permission_groups.php": {
+    "mtime": 1790653434.8347073,
+    "seen": 1790653814.1439433,
+    "ast_hash": "610c6885a26a04316273a851daba1982",
+    "semantic_hash": "610c6885a26a04316273a851daba1982"
   }
 }

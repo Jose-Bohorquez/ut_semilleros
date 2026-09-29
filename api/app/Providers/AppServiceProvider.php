@@ -137,5 +137,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\RolePermission::observe(AuditObserver::class);
 
         \App\Models\UserPermission::observe(AuditObserver::class);
+
+        \App\Models\PermissionGroup::observe(AuditObserver::class);
     }
 }

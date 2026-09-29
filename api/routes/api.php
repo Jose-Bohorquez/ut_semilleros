@@ -436,8 +436,19 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
         Route::get('/catalog',                    [RbacController::class, 'catalog']);
         Route::get('/roles',                       [RbacController::class, 'rolePermissions']);
         Route::put('/roles/{role}',                [RbacController::class, 'updateRolePermissions']);
+        Route::get('/users-lite',                  [RbacController::class, 'usersLite']);
         Route::get('/users/{user}',                [RbacController::class, 'userPermissions']);
         Route::put('/users/{user}',                 [RbacController::class, 'updateUserPermissions']);
+
+        /* Grupos de permisos (v2, 2026-09-29): personas de distintos roles
+           agrupadas, con permisos que se otorgan al grupo completo. */
+        Route::get('/groups',                      [RbacController::class, 'groups']);
+        Route::post('/groups',                     [RbacController::class, 'storeGroup']);
+        Route::get('/groups/{group}',               [RbacController::class, 'showGroup']);
+        Route::put('/groups/{group}',               [RbacController::class, 'updateGroup']);
+        Route::delete('/groups/{group}',            [RbacController::class, 'destroyGroup']);
+        Route::put('/groups/{group}/members',       [RbacController::class, 'updateGroupMembers']);
+        Route::put('/groups/{group}/permissions',   [RbacController::class, 'updateGroupPermissions']);
     });
 
 });

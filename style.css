@@ -1221,16 +1221,36 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sia-acct { width: 72px !important; font-family: ui-monospace, monospace; font-size: var(--text-xs); }
 .sia-cool { font-size: var(--text-sm); }
 
-/* RBAC granular (permisos por rol / persona) */
+/* RBAC granular (permisos por rol / grupo / persona) */
 .rbac-hint { font-size: var(--text-sm); color: var(--color-text-2); margin: 0; }
-.rbac-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
-.rbac-tabs .btn { min-height: 44px; }
-.rbac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-3); margin: var(--space-3) 0; }
-.rbac-module { padding: var(--space-3); }
-.rbac-module h4 { margin: 0 0 var(--space-2); font-size: var(--text-sm); }
+.rbac-main-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
+.rbac-main-tabs .btn, .rbac-subtabs .btn { min-height: 44px; }
+.rbac-subtabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
 .rbac-perms { display: grid; gap: var(--space-2); }
 .rbac-perm { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); min-height: 32px; }
 .rbac-perm-override { justify-content: space-between; gap: var(--space-3); }
 .rbac-perm-override select { padding: 6px var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-surface); color: var(--color-text); font: inherit; min-height: 40px; }
 .rbac-search { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); }
 .rbac-search input { flex: 1; min-width: 220px; padding: 10px var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-surface); color: var(--color-text); font: inherit; min-height: 44px; }
+
+/* Acordeón de módulos — evita la pared de checkboxes sin fin */
+.rbac-accordion { display: grid; gap: var(--space-2); margin: var(--space-3) 0; }
+.rbac-accordion-item { border: 1px solid var(--color-border); border-radius: var(--radius-btn); background: var(--color-surface); padding: 0; }
+.rbac-accordion-item summary { cursor: pointer; padding: var(--space-3); font-weight: 600; font-size: var(--text-sm); list-style: none; display: flex; align-items: center; gap: var(--space-2); min-height: 44px; }
+.rbac-accordion-item summary::-webkit-details-marker { display: none; }
+.rbac-accordion-item summary::before { content: "▸"; color: var(--color-text-muted); transition: transform .15s; }
+.rbac-accordion-item[open] summary::before { transform: rotate(90deg); }
+.rbac-accordion-item .rbac-perms { padding: 0 var(--space-3) var(--space-3); }
+.rbac-count-badge { background: var(--color-primary, #ef4444); color: #fff; border-radius: var(--radius-full); font-size: 11px; padding: 1px 7px; }
+.rbac-save-sticky { position: sticky; bottom: var(--space-3); z-index: 5; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
+
+/* Grupos */
+.rbac-groups-layout { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: var(--space-3); align-items: start; }
+@media (max-width: 800px) { .rbac-groups-layout { grid-template-columns: 1fr; } }
+.rbac-group-cards { display: grid; gap: var(--space-2); margin-top: var(--space-2); }
+.rbac-group-card { text-align: left; border: 1px solid var(--color-border); border-radius: var(--radius-btn); background: var(--color-surface); padding: var(--space-2) var(--space-3); cursor: pointer; display: grid; gap: 2px; min-height: 44px; }
+.rbac-group-card span { font-size: var(--text-xs); color: var(--color-text-muted); }
+.rbac-group-card.is-active { border-color: var(--color-primary, #ef4444); background: var(--color-surface-2, #fff7ed); }
+.rbac-member-list { max-height: 260px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius-btn); padding: var(--space-2) var(--space-3); }
+.rbac-section-gap { margin-top: var(--space-4); }
+.rbac-empty { color: var(--color-text-muted); font-size: var(--text-sm); }

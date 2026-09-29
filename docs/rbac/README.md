@@ -83,10 +83,45 @@ Idempotente: se puede correr varias veces sin duplicar filas ni tocar
 No hacer esto en bloque para las 38 rutas de una sola vez — decisión de Jose,
 2026-09-29 ("convive primero, luego reemplaza").
 
-## Pendiente (fuera de esta primera versión)
+## v2 — Grupos de permisos (2026-09-29, misma ronda)
 
-- Grupos de usuarios (ej. "Comité editorial") con permisos compartidos —
-  decisión explícita de Jose: no entra en v1, se evalúa después.
+Personas de **distintos roles** agrupadas (ej. "Comité editorial", "Comunicados"),
+a las que se les da un conjunto de permisos como grupo, sin tocar el rol de nadie.
+
+- Tablas: `permission_groups`, `permission_group_user` (integrantes, cualquier
+  rol), `permission_group_permissions` (lo que otorga el grupo).
+- Un grupo **solo otorga** permisos, nunca los quita — para quitarle algo
+  puntual a alguien se sigue usando la excepción por persona.
+- Orden de precedencia final en `PermissionResolver::effective()`:
+  1. `ADMIN_SISTEMA` → siempre total.
+  2. Excepción por persona (`user_permissions`) → gana sobre todo lo demás,
+     `grant` o `revoke`.
+  3. Si no hay excepción: el permiso está activo si lo da el **rol o algún
+     grupo** al que pertenezca (unión, no hace falta que lo den ambos).
+- Endpoints nuevos bajo `/rbac`: `GET|POST /groups`, `GET|PUT|DELETE
+  /groups/{id}`, `PUT /groups/{id}/members`, `PUT /groups/{id}/permissions`,
+  y `GET /users-lite` (listado liviano para el buscador del panel).
+- Limitación conocida: los cambios de integrantes/permisos de un grupo
+  (`sync()` en una relación many-to-many) no generan fila de auditoría
+  automática como sí lo hacen crear/renombrar/borrar el grupo (eventos de
+  modelo Eloquent normales). Si se necesita trazar cada cambio de membresía,
+  se debe loguear explícitamente en el controlador — pendiente si Jose lo pide.
+
+## UX/UI del panel (2026-09-29)
+
+Rediseño en la misma ronda, con foco en usabilidad (17 módulos era demasiado
+para una sola pantalla plana):
+
+- 3 pestañas: **Roles** (permisos por defecto), **Grupos** (esta sección) y
+  **Personas** (excepción puntual) — antes todo estaba junto en una sola vista.
+- Cada módulo es un `<details>` (acordeón nativo, accesible por teclado sin JS
+  extra); se abre solo si ya tiene algo marcado, con una insignia mostrando
+  cuántas acciones tiene activas.
+- El botón de guardar queda flotante (`position: sticky`) al fondo del panel
+  para no tener que hacer scroll de vuelta arriba tras marcar algo.
+
+## Pendiente (fuera de esta ronda)
+
 - Roles completamente dinámicos (crear roles nuevos desde el panel, no solo
   los 4 actuales) — decisión explícita de Jose: no entra en v1.
 - Reemplazar el `role:` hardcodeado de las 38 rutas y los
