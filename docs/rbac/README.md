@@ -4,6 +4,14 @@ Fecha: 2026-09-29. Fuera del alcance de los 30 CU de la especificación oficial 
 es una capacidad nueva que Jose pidió agregar directamente (no reemplaza RN06 ni
 ningún requisito de la especificación; convive con ella).
 
+**Estado: desplegado y validado en producción (2026-09-29).** Migración puramente
+aditiva (3 tablas nuevas, sin tocar tablas existentes), diff 0 entre el commit y
+el servidor, y probado en vivo el caso real que motivó esta ronda: dar a la
+cuenta de prueba `LIDER_SEMILLERO` el permiso `sia.curate` sin tocar su rol
+(confirmado en `effective` antes/después), auditado (`CREATE user_permissions`
+en `/api/audits`), y limpiado al terminar. Se confirmó que ninguna ruta
+existente (`/seedbeds`, `/users`, `/sia/admin/stats`) cambió de comportamiento.
+
 ## Qué resuelve
 
 Antes de esto, el acceso era binario: 4 roles fijos (`ADMIN_SISTEMA`,
