@@ -63,8 +63,8 @@ balanceadas, fix del eje del gráfico "Semilleros por facultad").
 **Aviso de numeración (Jose, 2026-09-29):** CU06 no está ligado a RF06/RNF06 — cada uno pertenece a
 un CU distinto (ver tabla de equivalencias de la especificación §1.4 antes de agrupar un CU con un
 RF/RNF del mismo número; no siempre coinciden, a diferencia de CU01-05 que sí estaban alineados).
-CU06 + RF01 ✅ cumple en local (2026-09-29, 273 tests + 4/4 E2E; acta `docs/validacion/CU06.md`),
-pendiente de desplegar a producción. Paginación (ya existía vía DataTables) + filtros por rol/estado
+CU06 + RF01 ✅ desplegado y validado en producción (2026-09-29, 273 tests + 4/4 E2E local + 1/1
+verificación en vivo; acta `docs/validacion/CU06.md`). Paginación (ya existía vía DataTables) + filtros por rol/estado
 nuevos en el listado de usuarios (`config.filters`, reutilizable por cualquier módulo CRUD). El
 formulario individual de creación ya no acepta `ESTUDIANTE` (CU06-A4); **la carga masiva de
 estudiantes se mantiene sin cambios** — decisión explícita de Jose de priorizar la funcionalidad
