@@ -90,6 +90,7 @@ export function LayoutView(content = "") {
         <a href="/admin/users"      data-link><i class="fas fa-users"></i>          Usuarios</a>
         <a href="/audits"           data-link><i class="fas fa-clipboard-list"></i>  Auditoría</a>
         <a href="/admin/sia"        data-link><i class="fas fa-robot"></i>           SIA · Asistente</a>
+        <a href="/admin/rbac"       data-link><i class="fas fa-user-shield"></i>     Permisos (RBAC)</a>
         `;
     }
 

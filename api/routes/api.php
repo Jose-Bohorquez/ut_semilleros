@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\AuditController;
 use App\Http\Controllers\Api\NotificacionController;
 use App\Http\Controllers\Api\PushSubscriptionController;
+use App\Http\Controllers\Api\RbacController;
 
 /*
 |--------------------------------------------------------------------------
@@ -422,6 +423,21 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
         Route::put('/knowledge/{id}',         [SiaController::class, 'knowledgeUpdate']);
         Route::get('/settings',               [SiaController::class, 'settings']);
         Route::put('/settings',               [SiaController::class, 'settingsUpdate']);
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | RBAC granular (permisos por módulo+acción, por rol y por persona)
+    |   Solo ADMIN_SISTEMA administra permisos — ver config/rbac.php y
+    |   App\Services\Rbac\PermissionResolver.
+    |----------------------------------------------------------------------
+    */
+    Route::middleware('role:ADMIN_SISTEMA')->prefix('rbac')->group(function () {
+        Route::get('/catalog',                    [RbacController::class, 'catalog']);
+        Route::get('/roles',                       [RbacController::class, 'rolePermissions']);
+        Route::put('/roles/{role}',                [RbacController::class, 'updateRolePermissions']);
+        Route::get('/users/{user}',                [RbacController::class, 'userPermissions']);
+        Route::put('/users/{user}',                 [RbacController::class, 'updateUserPermissions']);
     });
 
 });

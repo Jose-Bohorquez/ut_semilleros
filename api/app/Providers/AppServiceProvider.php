@@ -127,5 +127,15 @@ class AppServiceProvider extends ServiceProvider
         MembershipRequest::observe(
             AuditObserver::class
         );
+
+        /*
+        |--------------------------------------------------------------------------
+        | RBAC granular (permisos por rol y por persona)
+        |--------------------------------------------------------------------------
+        */
+
+        \App\Models\RolePermission::observe(AuditObserver::class);
+
+        \App\Models\UserPermission::observe(AuditObserver::class);
     }
 }

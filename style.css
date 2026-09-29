@@ -1220,3 +1220,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sia-meta { display: block; margin-top: 4px; font-size: 11px; color: var(--color-text-muted); }
 .sia-acct { width: 72px !important; font-family: ui-monospace, monospace; font-size: var(--text-xs); }
 .sia-cool { font-size: var(--text-sm); }
+
+/* RBAC granular (permisos por rol / persona) */
+.rbac-hint { font-size: var(--text-sm); color: var(--color-text-2); margin: 0; }
+.rbac-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
+.rbac-tabs .btn { min-height: 44px; }
+.rbac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-3); margin: var(--space-3) 0; }
+.rbac-module { padding: var(--space-3); }
+.rbac-module h4 { margin: 0 0 var(--space-2); font-size: var(--text-sm); }
+.rbac-perms { display: grid; gap: var(--space-2); }
+.rbac-perm { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); min-height: 32px; }
+.rbac-perm-override { justify-content: space-between; gap: var(--space-3); }
+.rbac-perm-override select { padding: 6px var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-surface); color: var(--color-text); font: inherit; min-height: 40px; }
+.rbac-search { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); }
+.rbac-search input { flex: 1; min-width: 220px; padding: 10px var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-surface); color: var(--color-text); font: inherit; min-height: 44px; }

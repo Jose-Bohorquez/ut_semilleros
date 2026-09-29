@@ -32,6 +32,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
             'role' => \App\Http\Middleware\RoleMiddleware::class,
 
+            /* RBAC granular por módulo+acción (2026-09-29). Convive con
+               'role' mientras se prueba ruta por ruta — ver config/rbac.php */
+            'permission' => \App\Http\Middleware\PermissionMiddleware::class,
+
             /* Usuario INACTIVO no puede usar su token (C-04, 2026-09-27) */
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
 

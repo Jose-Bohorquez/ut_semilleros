@@ -343,6 +343,14 @@ export const routes = {
         await module.siaAdminModule.init();
     },
 
+    /* RBAC granular — panel del admin para editar permisos por rol/persona */
+    "/admin/rbac": async () => {
+        if (!requireAuth()) return;
+        if (!requireRole(["ADMIN_SISTEMA"])) return;
+        const module = await import("../modules/rbac/rbac.module.js");
+        await module.rbacModule.init();
+    },
+
     "/audits": async () => {
 
         if (!requireAuth()) return;
