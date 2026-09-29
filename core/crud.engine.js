@@ -256,7 +256,7 @@ export function createCrudModule(config) {
                 $(tableId).DataTable().destroy();
             }
             const table = $(tableId).DataTable({
-                pageLength: 10,
+                pageLength: config.pageLength ?? 10,
                 dom: "Bfrtip",
                 buttons: [
                     { extend: "copy",    text: '<i class="fas fa-copy"></i> Copiar'   },

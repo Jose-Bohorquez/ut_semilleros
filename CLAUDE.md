@@ -72,6 +72,15 @@ real ya usada en producción sobre la letra literal de la especificación. Queda
 ronda futura: E3 (no poder auto-inactivarse ni inactivar al último ADMIN_SISTEMA), E4 (reenviar
 correo de activación) y A1 (último acceso y semilleros a cargo del líder en el detalle).
 
+CU07 no está ligado a RF07/RNF07 tampoco — RF07 es coordinadores (CU12), RNF07 es rendimiento
+(transversal). CU07 + RF02 (facultades) ✅ cumple en código (acta `docs/validacion/CU07.md`),
+validado en producción vía API; **verificación visual en navegador local pendiente** por una caída
+de red de Docker en el host durante esta ronda (contenedores sanos, no arreglable sin sudo
+interactivo). Se agregó `config.pageLength` genérico a `crud.engine.js` (15/página en Facultades,
+10 default sin cambio en el resto) y filtro por estado reutilizando `config.filters` de CU06. Se
+descartó a propósito la extensión DataTables Responsive: el sistema ya tiene su propio responsive
+(`mobile-card-table`, `style.css` @768px) y dos mecanismos competirían.
+
 **Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
 (`GOOGLE_ALLOWED_DOMAINS`, por defecto `ut.edu.co`, y claim `hd` igual). Única excepción: un
 ADMIN_SISTEMA ya registrado puede usar cualquier cuenta de Google. **El login con contraseña sigue
