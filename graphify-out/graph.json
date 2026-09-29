@@ -20474,28 +20474,6 @@
       "source_location": "L7"
     },
     {
-      "id": "modules_faculties_faculties_module",
-      "label": "faculties.module.js",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Motor CRUD frontend",
-      "file_type": "code",
-      "norm_label": "faculties.module.js",
-      "source_file": "modules/faculties/faculties.module.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "modules_faculties_faculties_module_facultiesmodule",
-      "label": "facultiesModule",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Motor CRUD frontend",
-      "file_type": "code",
-      "norm_label": "facultiesmodule",
-      "source_file": "modules/faculties/faculties.module.js",
-      "source_location": "L4"
-    },
-    {
       "id": "modules_groups_groups_module",
       "label": "groups.module.js",
       "_origin": "ast",
@@ -20658,6 +20636,26 @@
       "norm_label": "crud.engine.js",
       "source_file": "core/crud.engine.js",
       "source_location": "L1"
+    },
+    {
+      "id": "modules_faculties_faculties_module",
+      "label": "faculties.module.js",
+      "_origin": "ast",
+      "community": 4,
+      "file_type": "code",
+      "norm_label": "faculties.module.js",
+      "source_file": "modules/faculties/faculties.module.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "modules_faculties_faculties_module_facultiesmodule",
+      "label": "facultiesModule",
+      "_origin": "ast",
+      "community": 4,
+      "file_type": "code",
+      "norm_label": "facultiesmodule",
+      "source_file": "modules/faculties/faculties.module.js",
+      "source_location": "L4"
     },
     {
       "id": "manifest",
@@ -69166,5 +69164,5 @@
       "source_file": "docs/especificacion/Especificacion_Requerimientos_Casos_de_Uso_SemillerosUT.md"
     }
   ],
-  "built_at_commit": "74bd0278d28fd6b3a3b9c10d4e6ba803de8877cb"
+  "built_at_commit": "4cccdd35f53f933a26e83d827455537a0ba2b1ca"
 }

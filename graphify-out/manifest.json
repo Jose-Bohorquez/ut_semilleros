@@ -846,10 +846,10 @@
     "semantic_hash": "70087812420b3b0dcb1d1565533bde9b"
   },
   "core/crud.engine.js": {
-    "mtime": 1790657375.653343,
-    "seen": 1790657714.7395983,
-    "ast_hash": "e5edd33df3044cd6f2967627f3423a51",
-    "semantic_hash": "e5edd33df3044cd6f2967627f3423a51"
+    "mtime": 1790697185.641662,
+    "seen": 1790697408.892053,
+    "ast_hash": "bcf50c77fefe0b8531e488b359ed4d2f",
+    "semantic_hash": "bcf50c77fefe0b8531e488b359ed4d2f"
   },
   "core/guards.js": {
     "mtime": 1790605441.3388863,
@@ -954,10 +954,10 @@
     "semantic_hash": "6aec4ee44fa0eea31851ada3b8daac17"
   },
   "modules/faculties/faculties.module.js": {
-    "mtime": 1790605338.459079,
-    "seen": 1790607985.6510022,
-    "ast_hash": "70c05f78992179ea2eab48f5ef246c80",
-    "semantic_hash": "70c05f78992179ea2eab48f5ef246c80"
+    "mtime": 1790697199.0995698,
+    "seen": 1790697408.892944,
+    "ast_hash": "040d4fc003e337e5c7fb7992a8e221e1",
+    "semantic_hash": "040d4fc003e337e5c7fb7992a8e221e1"
   },
   "modules/faculties/faculties.service.js": {
     "mtime": 1780193382.0,
