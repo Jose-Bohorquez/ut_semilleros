@@ -162,10 +162,10 @@
     "semantic_hash": "72091c1e939e58133670b3b4a3a919fe"
   },
   "api/app/Http/Requests/User/StoreUserRequest.php": {
-    "mtime": 1790631574.180514,
-    "seen": 1790648810.88835,
-    "ast_hash": "f86902a209462c34ed41d4e4d19b9288",
-    "semantic_hash": "f86902a209462c34ed41d4e4d19b9288"
+    "mtime": 1790657439.5086563,
+    "seen": 1790657714.7332227,
+    "ast_hash": "3b7c85d108c97582a78f28ff5100347a",
+    "semantic_hash": "3b7c85d108c97582a78f28ff5100347a"
   },
   "api/app/Http/Requests/User/UpdateUserRequest.php": {
     "mtime": 1790631639.122741,
@@ -810,10 +810,10 @@
     "semantic_hash": "6426cd6a9d55fd4c998dc791b26bc52b"
   },
   "api/tests/Feature/User/UserCrudTest.php": {
-    "mtime": 1790625993.955203,
-    "seen": 1790628213.1369634,
-    "ast_hash": "6aecce7d0b6df37b713e00b4c1adb6e5",
-    "semantic_hash": "6aecce7d0b6df37b713e00b4c1adb6e5"
+    "mtime": 1790657511.1728966,
+    "seen": 1790657714.7394278,
+    "ast_hash": "d63dba5f5035dd89035c13202ee21eea",
+    "semantic_hash": "d63dba5f5035dd89035c13202ee21eea"
   },
   "api/tests/Feature/User/UserManagementTest.php": {
     "mtime": 1780193357.0,
@@ -846,10 +846,10 @@
     "semantic_hash": "70087812420b3b0dcb1d1565533bde9b"
   },
   "core/crud.engine.js": {
-    "mtime": 1790625424.6742792,
-    "seen": 1790628213.136964,
-    "ast_hash": "234886ed17b80c958ac5f3c9a41ff479",
-    "semantic_hash": "234886ed17b80c958ac5f3c9a41ff479"
+    "mtime": 1790657375.653343,
+    "seen": 1790657714.7395983,
+    "ast_hash": "e5edd33df3044cd6f2967627f3423a51",
+    "semantic_hash": "e5edd33df3044cd6f2967627f3423a51"
   },
   "core/guards.js": {
     "mtime": 1790605441.3388863,
@@ -1074,10 +1074,10 @@
     "semantic_hash": "6bac3a729b14f31ed2424d3ac0736178"
   },
   "modules/users/users.module.js": {
-    "mtime": 1790631846.7464473,
-    "seen": 1790648810.8883708,
-    "ast_hash": "1b7147ecc4e8f3491064c2ba9952b858",
-    "semantic_hash": "1b7147ecc4e8f3491064c2ba9952b858"
+    "mtime": 1790657409.3799803,
+    "seen": 1790657714.7410872,
+    "ast_hash": "1a7e0ba9f7f5c296f65d8613fd59bc86",
+    "semantic_hash": "1a7e0ba9f7f5c296f65d8613fd59bc86"
   },
   "service-worker.js": {
     "mtime": 1790605706.1948812,
@@ -1554,10 +1554,10 @@
     "semantic_hash": "83b87cd4ca067a54f5534ee2215ed599"
   },
   "api/tests/Feature/UseCases/RNF05AuthorizationReferenceTest.php": {
-    "mtime": 1790631951.0512962,
-    "seen": 1790648810.8883646,
-    "ast_hash": "12a9b2644ff217d120975df5bd04929d",
-    "semantic_hash": "12a9b2644ff217d120975df5bd04929d"
+    "mtime": 1790657561.88136,
+    "seen": 1790657714.7394254,
+    "ast_hash": "67f73014c30ac60bd3eba4c2027389d1",
+    "semantic_hash": "67f73014c30ac60bd3eba4c2027389d1"
   },
   "api/app/Http/Controllers/Api/RbacController.php": {
     "mtime": 1790653504.156007,

@@ -37,9 +37,11 @@ class UserCrudTest extends TestCase
 
             'password_confirmation' => 'Nueva#Clave2026',
 
-            'role' => 'ESTUDIANTE',
+            'role' => 'LIDER_SEMILLERO',
 
             'status' => 'ACTIVO',
+
+            'authorization_reference' => 'Oficio 001 de 2026',
 
         ]);
 
@@ -79,13 +81,51 @@ class UserCrudTest extends TestCase
 
             'password' => '123456',
 
-            'role' => 'ESTUDIANTE',
+            'role' => 'LIDER_SEMILLERO',
 
             'status' => 'ACTIVO',
+
+            'authorization_reference' => 'Oficio 002 de 2026',
 
         ]);
 
         $response->assertStatus(422);
+    }
+
+    /**
+     * CU06-A4: los estudiantes no se crean uno por uno; solo por carga
+     * masiva (import) o por su cuenta institucional de Google (CU02).
+     */
+    public function test_cannot_create_estudiante_individually(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        Sanctum::actingAs($admin);
+
+        $response = $this->postJson('/api/users', [
+            'name' => 'Estudiante Suelto',
+            'email' => 'suelto@test.com',
+            'role' => 'ESTUDIANTE',
+            'status' => 'ACTIVO',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['role']);
+        $this->assertDatabaseMissing('users', ['email' => 'suelto@test.com']);
+    }
+
+    /** La carga masiva sigue permitiendo ESTUDIANTE (Jose, 2026-09-29: no se toca). */
+    public function test_bulk_import_still_allows_estudiante(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        Sanctum::actingAs($admin);
+
+        $response = $this->postJson('/api/users/import', [
+            'users' => [
+                ['name' => 'Estudiante Import', 'email' => 'import@test.com', 'role' => 'ESTUDIANTE'],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', ['email' => 'import@test.com', 'role' => 'ESTUDIANTE']);
     }
 
     /**

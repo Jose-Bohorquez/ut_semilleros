@@ -34,12 +34,16 @@ class RNF05AuthorizationReferenceTest extends TestCase
         ])->assertCreated()->assertJsonPath('user.authorization_reference', 'Oficio 045 de 2026');
     }
 
-    /* ESTUDIANTE usa la PWA, no el panel web: no se le exige */
+    /* ESTUDIANTE usa la PWA, no el panel web: no se le exige la referencia —
+       pero desde CU06-A4 (2026-09-29) tampoco se crea individualmente aquí,
+       así que la petición falla antes, por el rol y no por la referencia. */
     public function test_estudiante_does_not_require_authorization_reference(): void
     {
         Notification::fake();
         $this->postJson('/api/users', ['name' => 'N', 'email' => 'e@ut.edu.co', 'role' => 'ESTUDIANTE', 'status' => 'ACTIVO'])
-            ->assertCreated();
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['role'])
+            ->assertJsonMissingValidationErrors(['authorization_reference']);
     }
 
     public function test_editing_a_panel_user_still_requires_the_reference(): void

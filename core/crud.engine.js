@@ -219,6 +219,18 @@ export function createCrudModule(config) {
             </div>` : ""}
         </div>
 
+        ${config.filters?.length ? `
+        <div class="crud-filters" role="group" aria-label="Filtrar registros">
+            ${config.filters.map(f => `
+                <label class="crud-filter">
+                    ${escapeHtml(f.label)}
+                    <select data-crud-filter="${escapeHtml(f.field)}">
+                        <option value="">Todos</option>
+                        ${f.options.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join("")}
+                    </select>
+                </label>`).join("")}
+        </div>` : ""}
+
         <table id="datatable-${entity}" class="display mobile-card-table" style="width:100%">
             <thead>
                 <tr>
@@ -243,7 +255,7 @@ export function createCrudModule(config) {
             if ($.fn.DataTable.isDataTable(tableId)) {
                 $(tableId).DataTable().destroy();
             }
-            $(tableId).DataTable({
+            const table = $(tableId).DataTable({
                 pageLength: 10,
                 dom: "Bfrtip",
                 buttons: [
@@ -260,6 +272,18 @@ export function createCrudModule(config) {
                     zeroRecords: "No se encontraron resultados",
                     paginate: { next: "Siguiente", previous: "Anterior" }
                 }
+            });
+
+            /* Filtros por columna (config.filters), ej. rol/estado en Usuarios
+               (CU06 / RF01): coincidencia exacta sobre el texto de la celda,
+               no una búsqueda parcial como el buscador general de DataTables. */
+            config.filters?.forEach(f => {
+                const colIndex = tableFields.findIndex(tf => tf.name === f.field);
+                if (colIndex === -1) return;
+                document.querySelector(`[data-crud-filter="${f.field}"]`)?.addEventListener("change", e => {
+                    const val = e.target.value;
+                    table.column(colIndex).search(val ? `^${val}$` : "", true, false).draw();
+                });
             });
         }, 100);
     }

@@ -313,6 +313,17 @@ fields: [
 
 readonlyFor: ['ADMINISTRATIVO', 'LIDER_SEMILLERO'],
 
+/* CU06 / RF01: "listado paginado ... con filtros por rol y estado" — la
+   paginación ya la da DataTables (crud.engine.js); esto agrega los 2
+   filtros que faltaban. */
+filters: [
+    { field: "role", label: "Rol", options: ROLES.map(r => ({ value: r, label: r })) },
+    { field: "status", label: "Estado", options: [
+        { value: "ACTIVO", label: "ACTIVO" },
+        { value: "INACTIVO", label: "INACTIVO" },
+    ] },
+],
+
 toolbarExtraHtml() {
     return `
     <button class="btn btn-secondary" id="importUsersBtn" type="button">

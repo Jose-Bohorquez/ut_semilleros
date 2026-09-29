@@ -60,6 +60,18 @@ de contraseña con verificación; áreas de conocimiento obligatorias en semille
 para roles no-ESTUDIANTE. Incluye el rediseño de UX/UI del dashboard (sidebar agrupado, gráficas
 balanceadas, fix del eje del gráfico "Semilleros por facultad").
 
+**Aviso de numeración (Jose, 2026-09-29):** CU06 no está ligado a RF06/RNF06 — cada uno pertenece a
+un CU distinto (ver tabla de equivalencias de la especificación §1.4 antes de agrupar un CU con un
+RF/RNF del mismo número; no siempre coinciden, a diferencia de CU01-05 que sí estaban alineados).
+CU06 + RF01 ✅ cumple en local (2026-09-29, 273 tests + 4/4 E2E; acta `docs/validacion/CU06.md`),
+pendiente de desplegar a producción. Paginación (ya existía vía DataTables) + filtros por rol/estado
+nuevos en el listado de usuarios (`config.filters`, reutilizable por cualquier módulo CRUD). El
+formulario individual de creación ya no acepta `ESTUDIANTE` (CU06-A4); **la carga masiva de
+estudiantes se mantiene sin cambios** — decisión explícita de Jose de priorizar la funcionalidad
+real ya usada en producción sobre la letra literal de la especificación. Quedan pendientes para una
+ronda futura: E3 (no poder auto-inactivarse ni inactivar al último ADMIN_SISTEMA), E4 (reenviar
+correo de activación) y A1 (último acceso y semilleros a cargo del líder en el detalle).
+
 **Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
 (`GOOGLE_ALLOWED_DOMAINS`, por defecto `ut.edu.co`, y claim `hd` igual). Única excepción: un
 ADMIN_SISTEMA ya registrado puede usar cualquier cuenta de Google. **El login con contraseña sigue

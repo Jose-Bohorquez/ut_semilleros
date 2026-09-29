@@ -17,6 +17,7 @@ class StoreUserRequest extends FormRequest
     {
         return PasswordPolicy::messages() + [
             'authorization_reference.required' => 'La referencia de autorización es obligatoria para usuarios del panel web (RN02).',
+            'role.in' => 'Los estudiantes no se crean uno por uno aquí: usa «Importar usuarios» (carga masiva) o el login con Google institucional (CU02).',
         ];
     }
 
@@ -48,10 +49,16 @@ class StoreUserRequest extends FormRequest
                cuando el admin escribe la contraseña a mano. */
             'password' => PasswordPolicy::optional(),
 
+            /* CU06-A4: los estudiantes no se crean aquí uno por uno — se
+               crean por carga masiva (UserController::import(), que valida
+               aparte y sí permite ESTUDIANTE) o por su cuenta institucional
+               de Google (CU02). Decisión de Jose, 2026-09-29: mantener la
+               carga masiva de estudiantes tal como está, restringir solo
+               este formulario individual a los 3 roles del panel web. */
             'role' => [
 
                 'required',
-                'in:ADMIN_SISTEMA,ESTUDIANTE,LIDER_SEMILLERO,ADMINISTRATIVO'
+                'in:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO'
 
             ],
 
