@@ -46,11 +46,14 @@ export function DashboardView() {
 
     /* Charts solo para roles con acceso a datos globales */
     const showCharts = ["ADMIN_SISTEMA", "ADMINISTRATIVO"].includes(role);
+    const isSystemAdmin = role === "ADMIN_SISTEMA";
+    const today = new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
 
     return `
 
     <!-- ── WELCOME ─────────────────────────────────── -->
     <div class="dashboard-welcome">
+        <p class="dashboard-date">${today.charAt(0).toUpperCase() + today.slice(1)}</p>
         <h1>${greeting}, ${escapeHtml(user?.name?.split(" ")[0] || "usuario")} 👋</h1>
         <p>Sistema de Semilleros de Investigación — Universidad del Tolima, IDEAD</p>
         <div class="accent-divider"></div>
@@ -108,6 +111,48 @@ export function DashboardView() {
         </div>
 
     </div>
+
+    <!-- ── PANEL DEL SISTEMA (solo ADMIN_SISTEMA) ──── -->
+    ${isSystemAdmin ? `
+    <h3 class="section-title">
+        <i class="fas fa-gauge-high" style="color:var(--color-primary);margin-right:6px"></i>
+        Panel del sistema
+    </h3>
+    <div class="sys-overview-grid" id="sysOverviewGrid">
+
+        <a href="/admin/sia" data-link class="sys-card">
+            <div class="sys-card-header">
+                <span class="sys-card-title"><i class="fas fa-robot"></i> SIA hoy</span>
+                <span class="sys-card-badge" id="sys-sia-status">—</span>
+            </div>
+            <div class="sys-card-body" id="sys-sia-body">
+                <div class="skeleton skeleton-row" style="width:100%;height:52px"></div>
+            </div>
+            <span class="sys-card-link">Ver panel de SIA <i class="fas fa-arrow-right"></i></span>
+        </a>
+
+        <a href="/admin/rbac" data-link class="sys-card">
+            <div class="sys-card-header">
+                <span class="sys-card-title"><i class="fas fa-user-shield"></i> Permisos (RBAC)</span>
+            </div>
+            <div class="sys-card-body" id="sys-rbac-body">
+                <div class="skeleton skeleton-row" style="width:100%;height:52px"></div>
+            </div>
+            <span class="sys-card-link">Administrar permisos <i class="fas fa-arrow-right"></i></span>
+        </a>
+
+        <a href="/audits" data-link class="sys-card">
+            <div class="sys-card-header">
+                <span class="sys-card-title"><i class="fas fa-clipboard-list"></i> Auditoría</span>
+            </div>
+            <div class="sys-card-body" id="sys-audits-body">
+                <div class="skeleton skeleton-row" style="width:100%;height:52px"></div>
+            </div>
+            <span class="sys-card-link">Ver registro completo <i class="fas fa-arrow-right"></i></span>
+        </a>
+
+    </div>
+    ` : ""}
 
     <!-- ── CHARTS (solo admin / administrativo) ───── -->
     ${showCharts ? `

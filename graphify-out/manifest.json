@@ -936,16 +936,16 @@
     "semantic_hash": "1d7d97609f03f3379834aa3732c29572"
   },
   "modules/dashboard/dashboard.controller.js": {
-    "mtime": 1790647519.18696,
-    "seen": 1790648810.8883662,
-    "ast_hash": "b9bfcef24a458fdd7c8faba8f980d110",
-    "semantic_hash": "b9bfcef24a458fdd7c8faba8f980d110"
+    "mtime": 1790654680.2588084,
+    "seen": 1790654843.8202431,
+    "ast_hash": "115c82e7ea0e41b904bbd55bd2d7cd8b",
+    "semantic_hash": "115c82e7ea0e41b904bbd55bd2d7cd8b"
   },
   "modules/dashboard/dashboard.view.js": {
-    "mtime": 1790647353.6794984,
-    "seen": 1790648810.8883672,
-    "ast_hash": "2e35294fef80d55d1a655084e6a3fe2d",
-    "semantic_hash": "2e35294fef80d55d1a655084e6a3fe2d"
+    "mtime": 1790654664.487974,
+    "seen": 1790654843.8202465,
+    "ast_hash": "0c05814218fac132b3411e17aa4cb855",
+    "semantic_hash": "0c05814218fac132b3411e17aa4cb855"
   },
   "modules/faculties/faculties.controller.js": {
     "mtime": 1780193382.0,
@@ -1620,10 +1620,10 @@
     "semantic_hash": "6625d1c1699dee8355f25092f4e7ffa0"
   },
   "modules/rbac/rbac.module.js": {
-    "mtime": 1790653649.253541,
-    "seen": 1790653814.1480205,
-    "ast_hash": "d561247539c1b567e7eff6e729317e56",
-    "semantic_hash": "d561247539c1b567e7eff6e729317e56"
+    "mtime": 1790654271.7850924,
+    "seen": 1790654843.8207903,
+    "ast_hash": "271b2d5e50d0a1328ef3f57a76826ad8",
+    "semantic_hash": "271b2d5e50d0a1328ef3f57a76826ad8"
   },
   "api/app/Models/PermissionGroup.php": {
     "mtime": 1790653445.6665978,

@@ -9,6 +9,76 @@ export function initDashboardController() {
     if (["ADMIN_SISTEMA", "ADMINISTRATIVO"].includes(role)) {
         loadCharts();
     }
+    if (role === "ADMIN_SISTEMA") {
+        loadSystemOverview();
+    }
+}
+
+/* ─── Panel del sistema (solo ADMIN_SISTEMA): SIA, RBAC, Auditoría ──── */
+
+async function loadSystemOverview() {
+    const safe = fn => fn.catch(() => null);
+    const [sia, groups, audits] = await Promise.all([
+        safe(apiFetch("/sia/admin/stats")),
+        safe(apiFetch("/rbac/groups")),
+        safe(apiFetch("/audits")),
+    ]);
+
+    renderSiaOverview(sia);
+    renderRbacOverview(groups);
+    renderAuditsOverview(audits);
+}
+
+function pct(a, b) { return b ? Math.min(100, Math.round(a / b * 100)) : 0; }
+
+function renderSiaOverview(sia) {
+    const body = document.getElementById("sys-sia-body");
+    const status = document.getElementById("sys-sia-status");
+    if (!body) return;
+    if (!sia) { body.innerHTML = `<p class="sys-empty">SIA no está disponible.</p>`; return; }
+
+    const t = sia.today, c = sia.conversations;
+    const usagePct = pct(t.requests, t.requests_cap);
+    if (status) {
+        status.textContent = usagePct >= 80 ? "Cerca del tope" : "Activo";
+        status.className = `sys-card-badge ${usagePct >= 80 ? "is-warn" : "is-ok"}`;
+    }
+    body.innerHTML = `
+        <div class="sys-stat-row"><span>Consultas hoy</span><b>${t.requests} / ${t.requests_cap}</b></div>
+        <div class="sia-bar"><span style="width:${usagePct}%" class="${usagePct >= 80 ? "is-hot" : ""}"></span></div>
+        <div class="sys-stat-row"><span>Calificación promedio</span><b>${c.avg_rating ? `${c.avg_rating} / 5` : "—"}</b></div>
+        <div class="sys-stat-row"><span>Por revisar</span><b>${c.unreviewed}</b></div>
+    `;
+}
+
+function renderRbacOverview(groups) {
+    const body = document.getElementById("sys-rbac-body");
+    if (!body) return;
+    if (!groups) { body.innerHTML = `<p class="sys-empty">No se pudo cargar.</p>`; return; }
+
+    const list = groups.groups || [];
+    const totalMembers = list.reduce((sum, g) => sum + (g.users_count || 0), 0);
+    body.innerHTML = `
+        <div class="sys-stat-row"><span>Grupos de permisos</span><b>${list.length}</b></div>
+        <div class="sys-stat-row"><span>Personas en algún grupo</span><b>${totalMembers}</b></div>
+        <div class="sys-stat-row"><span>Roles con permisos propios</span><b>3</b></div>
+    `;
+}
+
+function renderAuditsOverview(audits) {
+    const body = document.getElementById("sys-audits-body");
+    if (!body) return;
+    if (!audits?.audits) { body.innerHTML = `<p class="sys-empty">No se pudo cargar.</p>`; return; }
+
+    const list = audits.audits;
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const lastWeek = list.filter(a => new Date(a.created_at).getTime() >= weekAgo).length;
+    const latest = list[0];
+    body.innerHTML = `
+        <div class="sys-stat-row"><span>Eventos totales</span><b>${list.length}</b></div>
+        <div class="sys-stat-row"><span>Últimos 7 días</span><b>${lastWeek}</b></div>
+        ${latest ? `<p class="sys-latest">Último: ${latest.action} en ${latest.table_name}${latest.user ? " · " + latest.user.name : ""}</p>` : ""}
+    `;
 }
 
 /* ─── KPIs ─────────────────────────────────────────── */
