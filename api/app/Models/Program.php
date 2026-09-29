@@ -24,4 +24,10 @@ class Program extends Model
         return $this->belongsTo(Faculty::class);
     }
 
+    /** CU08-A1: "información relacionada" en el detalle. */
+    public function seedbeds()
+    {
+        return $this->hasMany(Seedbed::class);
+    }
+
 }

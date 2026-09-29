@@ -27,4 +27,10 @@ class Faculty extends Model
         'status'
     ];
 
+    /** CU07-A1: "información relacionada" en el detalle. */
+    public function programs()
+    {
+        return $this->hasMany(Program::class);
+    }
+
 }

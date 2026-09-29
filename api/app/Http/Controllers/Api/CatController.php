@@ -42,6 +42,19 @@ class CatController extends Controller
     }
 
 
+    /**
+     * Detalle de un CAT (CU09-A1): fechas y estado. Sin relaciones en el
+     * esquema (no hay FK de otras tablas hacia cats).
+     */
+    public function show($id)
+    {
+        $cat = Cat::findOrFail($id);
+
+        return response()->json([
+            'cat' => $cat,
+        ]);
+    }
+
     public function store(Request $request)
     {
 

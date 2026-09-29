@@ -1,5 +1,9 @@
 /* archivo: frontend/modules/cats/cats.module.js */
 import { createCrudModule } from "../../core/crud.engine.js";
+import { apiFetch }         from "../../services/api.service.js";
+import { escapeHtml }       from "../../core/escape.js";
+
+const fmtDate = d => d ? new Date(d).toLocaleString("es-CO", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
 
 export const catsModule = createCrudModule({
 
@@ -52,6 +56,32 @@ filters: [
 ],
 
 /* CU09 flujo básico paso 2: "listado paginado (15 por página)" */
-pageLength: 15
+pageLength: 15,
 
+/* CU09-A1: ver detalle (fechas) */
+actions: [
+    { label: "Ver", class: "viewCatBtn" },
+],
+
+});
+
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".viewCatBtn");
+    if (!btn) return;
+    const { cat: c } = await apiFetch(`/cats/${btn.dataset.id}`);
+    Swal.fire({
+        title: escapeHtml(c.name),
+        html: `
+            <div style="text-align:left">
+                <p><b>Código:</b> ${escapeHtml(c.code)}</p>
+                <p><b>Dirección:</b> ${escapeHtml(c.address || "—")}</p>
+                <p><b>Ciudad:</b> ${escapeHtml(c.city || "—")}</p>
+                <p><b>Correo:</b> ${escapeHtml(c.email || "—")}</p>
+                <p><b>Teléfonos:</b> ${[c.phone1, c.phone2, c.phone3].filter(Boolean).map(escapeHtml).join(" · ") || "—"}</p>
+                <p><b>Estado:</b> ${escapeHtml(c.status)}</p>
+                <p><b>Creado:</b> ${fmtDate(c.created_at)}</p>
+                <p><b>Última modificación:</b> ${fmtDate(c.updated_at)}</p>
+            </div>`,
+        confirmButtonText: "Volver",
+    });
 });

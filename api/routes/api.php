@@ -104,6 +104,7 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
         Route::post('/users/import',                 [UserController::class, 'import']);
         Route::put('/users/{id}',                    [UserController::class, 'update']);
         Route::put('/users/{id}/toggle-status',      [UserController::class, 'toggleStatus']);
+        Route::post('/users/{id}/resend-activation', [UserController::class, 'resendActivation']);
     });
 
     /*
@@ -114,8 +115,10 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
-         ->get('/faculties', [FacultyController::class, 'index']);
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+        Route::get('/faculties',      [FacultyController::class, 'index']);
+        Route::get('/faculties/{id}', [FacultyController::class, 'show']);
+    });
 
     Route::middleware('role:ADMIN_SISTEMA')->group(function () {
         Route::post('/faculties',                    [FacultyController::class, 'store']);
@@ -131,8 +134,10 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
-         ->get('/programs', [ProgramController::class, 'index']);
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+        Route::get('/programs',      [ProgramController::class, 'index']);
+        Route::get('/programs/{id}', [ProgramController::class, 'show']);
+    });
 
     Route::middleware('role:ADMIN_SISTEMA')->group(function () {
         Route::post('/programs',                     [ProgramController::class, 'store']);
@@ -148,8 +153,10 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
-         ->get('/cats', [CatController::class, 'index']);
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+        Route::get('/cats',      [CatController::class, 'index']);
+        Route::get('/cats/{id}', [CatController::class, 'show']);
+    });
 
     Route::middleware('role:ADMIN_SISTEMA')->group(function () {
         Route::post('/cats',                         [CatController::class, 'store']);

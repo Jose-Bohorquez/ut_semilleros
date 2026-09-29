@@ -249,6 +249,12 @@ class UserController extends Controller
 
         $validated = $request->validated();
 
+        /* CU06-E3: no permitir auto-inactivarse ni inactivar al último
+           ADMIN_SISTEMA activo (dejaría el sistema sin nadie que administre). */
+        if ($validated['status'] === 'INACTIVO' && $user->status === 'ACTIVO') {
+            $this->guardAgainstLockout($user);
+        }
+
         $user->name = $validated['name'];
 
         $user->email = $validated['email'];
@@ -297,6 +303,11 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        /* CU06-E3: solo aplica al pasar de ACTIVO a INACTIVO. */
+        if ($user->status === 'ACTIVO') {
+            $this->guardAgainstLockout($user);
+        }
+
         $user->status =
 
             $user->status === 'ACTIVO'
@@ -319,6 +330,48 @@ class UserController extends Controller
 
             'user' => new UserResource($user)
 
+        ]);
+    }
+
+    /**
+     * CU06-E3: impide inactivar al propio admin autenticado o al último
+     * ADMIN_SISTEMA activo del sistema.
+     */
+    private function guardAgainstLockout(User $user): void
+    {
+        if ($user->id === auth()->id()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'status' => ['No es posible inactivar este usuario.'],
+            ]);
+        }
+
+        if ($user->role === 'ADMIN_SISTEMA') {
+            $otrosAdminsActivos = User::where('role', 'ADMIN_SISTEMA')
+                ->where('status', 'ACTIVO')
+                ->where('id', '!=', $user->id)
+                ->exists();
+
+            if (!$otrosAdminsActivos) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'status' => ['No es posible inactivar este usuario.'],
+                ]);
+            }
+        }
+    }
+
+    /**
+     * CU06-E4: reenvía el correo de activación (nuevo token, invalida el
+     * anterior) — para cuando el primer envío falló o el correo se perdió.
+     */
+    public function resendActivation($id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        $token = Password::broker('activations')->createToken($user);
+        $user->notify(new AccountActivationNotification($token));
+
+        return response()->json([
+            'message' => 'Correo de activación reenviado.',
         ]);
     }
 }

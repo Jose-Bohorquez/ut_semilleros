@@ -89,6 +89,14 @@ mismo patrón. **Hallazgo sin corregir:** la especificación pide teléfono prin
 obligatorio; el código solo exige "al menos uno de los 3 teléfonos" — pendiente de decisión de
 Jose antes de tocarlo (podría romper CAT ya registrados con solo `phone2`/`phone3`).
 
+**Ronda 2 de pendientes (2026-09-29)**, antes de seguir con CU10: CU06-E3 (bloquear
+auto-inactivarse / inactivar al último `ADMIN_SISTEMA` activo — `guardAgainstLockout()` en
+`UserController`), CU06-E4 (`POST /users/{id}/resend-activation`, botón "Reenviar activación"),
+y A1 (endpoint `show()` + botón "Ver" con `Swal`) en Facultades/Programas/CAT. `phone1` de CAT
+se mantiene como "al menos uno de 3" (decisión de Jose, no se fuerza estricto). 281 tests en
+total. Sigue pendiente CU06-A1 (último acceso / semilleros del líder — necesita migración
+`last_login_at`) y E4 (mensaje genérico de fallo de conexión) en CU07/08/09.
+
 **Nota transversal (2026-09-29):** desde CU06, la red local de Docker (puertos 8080/8000) quedó
 inalcanzable desde el host (contenedores sanos, problema de iptables/docker-proxy que necesita
 `sudo` interactivo, fuera de mi alcance). Las rondas CU07-CU09 se validaron con backend vía

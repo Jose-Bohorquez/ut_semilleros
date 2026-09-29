@@ -332,8 +332,34 @@ toolbarExtraHtml() {
     </button>`;
 },
 
+/* CU06-E4: reenviar el correo de activación (nuevo token, invalida el
+   anterior) cuando el primer envío falló o se perdió. */
+actions: [
+    { label: "Reenviar activación", class: "resendActivationBtn" },
+],
+
 afterTableMount() {
     document.getElementById("importUsersBtn")?.addEventListener("click", openImportModal);
 }
 
+});
+
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".resendActivationBtn");
+    if (!btn) return;
+    const r = await Swal.fire({
+        icon: "question",
+        title: "¿Reenviar correo de activación?",
+        text: "Se genera un enlace nuevo; el anterior deja de funcionar.",
+        showCancelButton: true,
+        confirmButtonText: "Sí, reenviar",
+        cancelButtonText: "Cancelar",
+    });
+    if (!r.isConfirmed) return;
+    try {
+        await apiFetch(`/users/${btn.dataset.id}/resend-activation`, { method: "POST" });
+        Swal.fire({ toast: true, position: "top-end", icon: "success", title: "Correo reenviado", timer: 1800, showConfirmButton: false });
+    } catch (err) {
+        Swal.fire({ icon: "error", title: "No se pudo reenviar", text: err.message });
+    }
 });

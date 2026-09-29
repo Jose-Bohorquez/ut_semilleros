@@ -37,6 +37,18 @@ class FacultyController extends Controller
     }
 
     /**
+     * Detalle de una facultad (CU07-A1): fechas, estado y programas asociados.
+     */
+    public function show($id)
+    {
+        $faculty = Faculty::withCount('programs')->findOrFail($id);
+
+        return response()->json([
+            'faculty' => $faculty,
+        ]);
+    }
+
+    /**
      * Crear facultad (se registra activa, RF02 «Procesamiento»)
      */
     public function store(Request $request)

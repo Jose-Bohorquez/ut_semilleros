@@ -154,5 +154,68 @@ class UserManagementTest extends TestCase
             ]);
     }
 
+    /* ───── CU06-E3: no auto-inactivarse ni inactivar al último admin activo ───── */
+
+    public function test_admin_cannot_inactivate_self_via_toggle(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        Sanctum::actingAs($admin);
+
+        $this->putJson("/api/users/{$admin->id}/toggle-status")
+            ->assertStatus(422)->assertJsonValidationErrors(['status']);
+        $this->assertDatabaseHas('users', ['id' => $admin->id, 'status' => 'ACTIVO']);
+    }
+
+    /* El actor siempre es un ADMIN_SISTEMA activo (auth:sanctum + 'active' lo
+       exigen), así que al inactivar a OTRO admin siempre queda al menos el
+       actor activo — la rama "último admin" del guard es inalcanzable por
+       este flujo con un solo actor; solo el auto-caso (arriba) es real. Este
+       test confirma el camino positivo: inactivar a otro admin sí funciona
+       mientras alguien más quede activo. */
+    public function test_can_inactivate_admin_when_another_stays_active(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        $otherAdmin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        Sanctum::actingAs($admin);
+
+        $this->putJson("/api/users/{$otherAdmin->id}/toggle-status")->assertOk();
+        $this->assertDatabaseHas('users', ['id' => $otherAdmin->id, 'status' => 'INACTIVO']);
+    }
+
+    public function test_update_can_inactivate_other_admin_when_actor_stays_active(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        Sanctum::actingAs($admin);
+        $other = User::factory()->create(['role' => 'ADMIN_SISTEMA', 'authorization_reference' => 'Oficio 1']);
+
+        $this->putJson("/api/users/{$other->id}", [
+            'name' => $other->name, 'email' => $other->email,
+            'role' => 'ADMIN_SISTEMA', 'status' => 'INACTIVO',
+            'authorization_reference' => 'Oficio 1',
+        ])->assertOk();
+        $this->assertDatabaseHas('users', ['id' => $other->id, 'status' => 'INACTIVO']);
+    }
+
+    /* ───── CU06-E4: reenviar correo de activación ───── */
+
+    public function test_admin_can_resend_activation_email(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+        $admin = User::factory()->create(['role' => 'ADMIN_SISTEMA']);
+        $target = User::factory()->create(['role' => 'ESTUDIANTE']);
+        Sanctum::actingAs($admin);
+
+        $this->postJson("/api/users/{$target->id}/resend-activation")->assertOk();
+        \Illuminate\Support\Facades\Notification::assertSentTo($target, \App\Notifications\AccountActivationNotification::class);
+    }
+
+    public function test_non_admin_cannot_resend_activation(): void
+    {
+        $lider = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
+        $target = User::factory()->create(['role' => 'ESTUDIANTE']);
+        Sanctum::actingAs($lider);
+
+        $this->postJson("/api/users/{$target->id}/resend-activation")->assertStatus(403);
+    }
 
 }

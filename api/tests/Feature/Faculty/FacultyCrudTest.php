@@ -91,4 +91,17 @@ class FacultyCrudTest extends TestCase
         $response = $this->putJson('/api/faculties/9999/toggle-status');
         $response->assertStatus(404);
     }
+
+    /** CU07-A1 */
+    public function test_show_returns_detail_with_programs_count(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $faculty = Faculty::create(['code' => 'F1', 'name' => 'Test', 'status' => 'ACTIVO']);
+        \App\Models\Program::create(['code' => 'P1', 'name' => 'P', 'type' => 'PREGRADO', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
+
+        $this->getJson("/api/faculties/{$faculty->id}")
+            ->assertOk()
+            ->assertJsonPath('faculty.programs_count', 1)
+            ->assertJsonStructure(['faculty' => ['created_at', 'updated_at']]);
+    }
 }

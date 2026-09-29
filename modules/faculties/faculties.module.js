@@ -1,5 +1,9 @@
 /* archivo: forntend/modules/faculties/faculties.module.js */
 import { createCrudModule } from "../../core/crud.engine.js";
+import { apiFetch }         from "../../services/api.service.js";
+import { escapeHtml }       from "../../core/escape.js";
+
+const fmtDate = d => d ? new Date(d).toLocaleString("es-CO", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
 
 export const facultiesModule = createCrudModule({
 
@@ -46,6 +50,29 @@ filters: [
 ],
 
 /* CU07 flujo básico paso 2: "listado paginado (15 por página)" */
-pageLength: 15
+pageLength: 15,
 
+/* CU07-A1: ver detalle (fechas + programas asociados) */
+actions: [
+    { label: "Ver", class: "viewFacultyBtn" },
+],
+
+});
+
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".viewFacultyBtn");
+    if (!btn) return;
+    const { faculty: f } = await apiFetch(`/faculties/${btn.dataset.id}`);
+    Swal.fire({
+        title: escapeHtml(f.name),
+        html: `
+            <div style="text-align:left">
+                <p><b>Código:</b> ${escapeHtml(f.code)}</p>
+                <p><b>Estado:</b> ${escapeHtml(f.status)}</p>
+                <p><b>Programas asociados:</b> ${escapeHtml(f.programs_count)}</p>
+                <p><b>Creada:</b> ${fmtDate(f.created_at)}</p>
+                <p><b>Última modificación:</b> ${fmtDate(f.updated_at)}</p>
+            </div>`,
+        confirmButtonText: "Volver",
+    });
 });

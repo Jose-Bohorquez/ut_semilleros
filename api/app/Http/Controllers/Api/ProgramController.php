@@ -48,6 +48,18 @@ class ProgramController extends Controller
 
 
     /**
+     * Detalle de un programa (CU08-A1): fechas, facultad y semilleros asociados.
+     */
+    public function show($id)
+    {
+        $program = Program::with('faculty')->withCount('seedbeds')->findOrFail($id);
+
+        return response()->json([
+            'program' => $program,
+        ]);
+    }
+
+    /**
      * Crear programa (se registra activo si no se indica el estado)
      */
     public function store(Request $request)

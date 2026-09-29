@@ -85,4 +85,16 @@ class CatCrudTest extends TestCase
         $this->assertDatabaseHas('cats', ['id' => $cat->id, 'status' => 'INACTIVO']);
         $this->assertDatabaseHas('cats', ['id' => $cat->id]);
     }
+
+    /** CU09-A1 */
+    public function test_show_returns_detail(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $cat = Cat::create(['name' => 'Test', 'code' => 'CAT-DET', 'phone1' => '3001234567', 'status' => 'ACTIVO']);
+
+        $this->getJson("/api/cats/{$cat->id}")
+            ->assertOk()
+            ->assertJsonPath('cat.code', 'CAT-DET')
+            ->assertJsonStructure(['cat' => ['created_at', 'updated_at']]);
+    }
 }

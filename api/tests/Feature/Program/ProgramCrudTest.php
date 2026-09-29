@@ -111,4 +111,16 @@ class ProgramCrudTest extends TestCase
         $this->assertDatabaseHas('programs', ['id' => $program->id]);
         $this->assertDatabaseMissing('programs', ['id' => $program->id, 'status' => 'ACTIVO']);
     }
+
+    /** CU08-A1 */
+    public function test_show_returns_detail_with_faculty_and_seedbeds_count(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $program = Program::create(['code' => 'P1', 'name' => 'Test', 'faculty_id' => $this->faculty()->id, 'status' => 'ACTIVO']);
+
+        $this->getJson("/api/programs/{$program->id}")
+            ->assertOk()
+            ->assertJsonPath('program.seedbeds_count', 0)
+            ->assertJsonPath('program.faculty.id', $program->faculty_id);
+    }
 }
