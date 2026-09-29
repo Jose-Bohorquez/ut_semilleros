@@ -4,13 +4,22 @@ Fecha: 2026-09-29. Fuera del alcance de los 30 CU de la especificación oficial 
 es una capacidad nueva que Jose pidió agregar directamente (no reemplaza RN06 ni
 ningún requisito de la especificación; convive con ella).
 
-**Estado: desplegado y validado en producción (2026-09-29).** Migración puramente
-aditiva (3 tablas nuevas, sin tocar tablas existentes), diff 0 entre el commit y
-el servidor, y probado en vivo el caso real que motivó esta ronda: dar a la
-cuenta de prueba `LIDER_SEMILLERO` el permiso `sia.curate` sin tocar su rol
-(confirmado en `effective` antes/después), auditado (`CREATE user_permissions`
-en `/api/audits`), y limpiado al terminar. Se confirmó que ninguna ruta
-existente (`/seedbeds`, `/users`, `/sia/admin/stats`) cambió de comportamiento.
+**Estado: desplegado y validado en producción (2026-09-29, dos rondas el mismo día).**
+Ronda 1 (excepción por persona): migración puramente aditiva (3 tablas nuevas,
+sin tocar tablas existentes), diff 0 entre el commit y el servidor, y probado en
+vivo el caso real que motivó esta ronda: dar a la cuenta de prueba
+`LIDER_SEMILLERO` el permiso `sia.curate` sin tocar su rol (confirmado en
+`effective` antes/después), auditado (`CREATE user_permissions` en
+`/api/audits`), y limpiado al terminar. Se confirmó que ninguna ruta existente
+(`/seedbeds`, `/users`, `/sia/admin/stats`) cambió de comportamiento.
+
+Ronda 2 (grupos + rediseño UX/UI): otras 3 tablas nuevas, también aditivas, diff
+0 entre commit y servidor. Validado en vivo el ciclo completo de un grupo
+`qa_temp_*`: crear grupo → agregar a la cuenta de prueba `LIDER_SEMILLERO` como
+integrante → otorgarle `sia.curate` al grupo → confirmar que el líder lo recibió
+(`effective` incluye `sia.curate` sin haber tocado su rol ni una excepción
+individual) → eliminar el grupo → confirmar que el permiso desaparece y que el
+conteo de grupos vuelve a 0.
 
 ## Qué resuelve
 
