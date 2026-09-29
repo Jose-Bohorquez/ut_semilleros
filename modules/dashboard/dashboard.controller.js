@@ -233,8 +233,15 @@ async function loadCharts() {
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: border } },
+                    /* Bug real (revisión de diseño, 2026-09-29): con indexAxis:"y" Chart.js
+                       manda al callback el ÍNDICE numérico del tick, no el nombre — por eso
+                       el eje mostraba 0,1,2… en vez de la facultad. this.getLabelForValue()
+                       resuelve el índice al texto real (necesita function, no arrow, por el "this"). */
                     y: { grid: { display: false }, ticks: {
-                        callback: v => v.length > 20 ? v.substring(0, 18) + "…" : v,
+                        callback: function (val) {
+                            const label = this.getLabelForValue(val);
+                            return label.length > 20 ? label.substring(0, 18) + "…" : label;
+                        },
                     }},
                 },
             },

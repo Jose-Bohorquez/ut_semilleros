@@ -10,36 +10,38 @@ export function DashboardView() {
     const hour = new Date().getHours();
     const greeting = hour < 12 ? "Buenos días" : hour < 19 ? "Buenas tardes" : "Buenas noches";
 
-    /* Quick-access links por rol */
+    /* Quick-access links por rol — mismos íconos FontAwesome que el sidebar,
+       para que un usuario reconozca la sección al primer vistazo en vez de
+       aprenderse un segundo set de símbolos (antes usaban emoji). */
     const links = {
         ADMIN_SISTEMA: [
-            { href: "/admin/users",     icon: "👤", label: "Usuarios"      },
-            { href: "/admin/faculties", icon: "🏛️", label: "Facultades"    },
-            { href: "/admin/programs",  icon: "🎓", label: "Programas"     },
-            { href: "/admin/seedbeds",  icon: "🌱", label: "Semilleros"    },
-            { href: "/coordinators",    icon: "👔", label: "Coordinadores" },
-            { href: "/audits",          icon: "📋", label: "Auditoría"     },
+            { href: "/admin/users",     icon: "fa-users",          label: "Usuarios"      },
+            { href: "/admin/faculties", icon: "fa-university",     label: "Facultades"    },
+            { href: "/admin/programs",  icon: "fa-graduation-cap", label: "Programas"     },
+            { href: "/admin/seedbeds",  icon: "fa-seedling",       label: "Semilleros"    },
+            { href: "/coordinators",    icon: "fa-user-tie",       label: "Coordinadores" },
+            { href: "/audits",          icon: "fa-clipboard-list", label: "Auditoría"     },
         ],
         ADMINISTRATIVO: [
-            { href: "/admin/seedbeds", icon: "🌱", label: "Semilleros"  },
-            { href: "/projects",       icon: "📁", label: "Proyectos"   },
-            { href: "/products",       icon: "🔬", label: "Productos"   },
-            { href: "/results",        icon: "📊", label: "Resultados"  },
+            { href: "/admin/seedbeds", icon: "fa-seedling",        label: "Semilleros"  },
+            { href: "/projects",       icon: "fa-project-diagram", label: "Proyectos"   },
+            { href: "/products",       icon: "fa-flask",           label: "Productos"   },
+            { href: "/results",        icon: "fa-chart-bar",       label: "Resultados"  },
         ],
         LIDER_SEMILLERO: [
-            { href: "/admin/seedbeds", icon: "🌱", label: "Mi Semillero" },
-            { href: "/objectives",     icon: "🎯", label: "Objetivos"    },
-            { href: "/results",        icon: "📊", label: "Resultados"   },
-            { href: "/projects",       icon: "📁", label: "Proyectos"    },
+            { href: "/admin/seedbeds", icon: "fa-seedling",        label: "Mi Semillero" },
+            { href: "/objectives",     icon: "fa-bullseye",        label: "Objetivos"    },
+            { href: "/results",        icon: "fa-chart-bar",       label: "Resultados"   },
+            { href: "/projects",       icon: "fa-project-diagram", label: "Proyectos"    },
         ],
         ESTUDIANTE: [
-            { href: "/requests",  icon: "📨", label: "Solicitudes" },
-            { href: "/proposals", icon: "💡", label: "Propuestas"  },
+            { href: "/requests",  icon: "fa-paper-plane", label: "Solicitudes" },
+            { href: "/proposals", icon: "fa-lightbulb",   label: "Propuestas"  },
         ],
     };
 
     const quickLinks = (links[role] || links.ESTUDIANTE)
-        .map(l => `<a href="${l.href}" data-link class="quick-link-card"><span class="ql-icon">${l.icon}</span>${l.label}</a>`)
+        .map(l => `<a href="${l.href}" data-link class="quick-link-card"><span class="ql-icon"><i class="fas ${l.icon}" aria-hidden="true"></i></span>${l.label}</a>`)
         .join("");
 
     /* Charts solo para roles con acceso a datos globales */

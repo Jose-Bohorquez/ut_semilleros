@@ -206,6 +206,19 @@ body {
 
 .sidebar .menu { display: flex; flex-direction: column; gap: var(--space-1); }
 
+/* Encabezado de sección del menú (agrupa enlaces relacionados en un menú largo) */
+.sidebar-section-label {
+  display: block;
+  padding: var(--space-4) var(--space-3) var(--space-1);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-sidebar-text);
+  opacity: 0.55;
+}
+.sidebar-section-label:first-of-type { padding-top: var(--space-2); }
+
 .sidebar a,
 .sidebar button.nav-link {
   display: flex;
@@ -764,14 +777,28 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: var(--shadow-md);
 }
 
-.quick-link-card .ql-icon { font-size: 24px; }
+.quick-link-card .ql-icon {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 18px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.quick-link-card:hover .ql-icon { background: #fff; color: var(--color-primary-text); }
 
-/* Chart containers */
+/* Chart containers — 2 columnas fijas: con 4 gráficas quedan 2 filas
+   parejas; antes (auto-fit) la 4ª quedaba sola en una fila, con medio
+   contenedor vacío al lado (encontrado al revisar el diseño, 2026-09-29). */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-6);
   margin-bottom: var(--space-8);
+}
+@media (max-width: 1100px) {
+  .charts-grid { grid-template-columns: 1fr; }
 }
 
 .chart-card {
