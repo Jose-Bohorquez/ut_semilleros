@@ -61,6 +61,7 @@ class GroupCrudTest extends TestCase
         $response = $this->putJson("/api/groups/{$group->id}", [
             'name' => 'Actualizado',
             'code' => 'G-OR',
+            'status' => 'ACTIVO',
         ]);
         $response->assertStatus(200);
         $this->assertDatabaseHas('groups', ['id' => $group->id, 'name' => 'Actualizado']);
@@ -81,5 +82,54 @@ class GroupCrudTest extends TestCase
         $response->assertStatus(200);
         $this->assertDatabaseHas('groups', ['id' => $group->id, 'status' => 'INACTIVO']);
         $this->assertDatabaseHas('groups', ['id' => $group->id]);
+    }
+
+    /* ───── CU11: actor principal es LIDER_SEMILLERO ───── */
+
+    public function test_lider_can_create_group(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        $response = $this->postJson('/api/groups', ['name' => 'Grupo Líder', 'code' => 'GL-1']);
+        $response->assertStatus(201);
+    }
+
+    public function test_administrativo_cannot_create_group(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMINISTRATIVO']));
+        $response = $this->postJson('/api/groups', ['name' => 'X', 'code' => 'ADM-1']);
+        $response->assertStatus(403);
+    }
+
+    public function test_administrativo_can_read_groups(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMINISTRATIVO']));
+        $this->getJson('/api/groups')->assertStatus(200);
+    }
+
+    /* RN08: el código se normaliza a mayúsculas */
+    public function test_code_is_normalized_to_uppercase(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $this->postJson('/api/groups', ['name' => 'Normalizado', 'code' => ' gie-01 '])
+            ->assertCreated()->assertJsonPath('group.code', 'GIE-01');
+    }
+
+    /* CU11-A1 */
+    public function test_show_returns_detail(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $group = Group::create(['name' => 'Test', 'code' => 'G-DET', 'status' => 'ACTIVO']);
+
+        $this->getJson("/api/groups/{$group->id}")
+            ->assertOk()
+            ->assertJsonPath('group.code', 'G-DET')
+            ->assertJsonStructure(['group' => ['created_at', 'updated_at']]);
+    }
+
+    public function test_status_field_rejects_invalid_value(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $this->postJson('/api/groups', ['name' => 'X', 'code' => 'BAD-1', 'status' => 'BORRADO'])
+            ->assertStatus(422)->assertJsonValidationErrors(['status']);
     }
 }

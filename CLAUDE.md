@@ -102,8 +102,16 @@ solo para rol `LIDER_SEMILLERO`). **CU06 queda completo.**
 
 CU10 tampoco liga con RF10/RNF10 — RF10 es solicitudes (CU22/23/24), RNF10 es compatibilidad
 (transversal). CU10 + RF05 (áreas) ✅ desplegado en producción (acta `docs/validacion/CU10.md`),
-mismo patrón que CU07/08/09 (filtro + `pageLength:15` + `show()`). 285 tests en total. Sigue
-pendiente E4 (mensaje genérico de fallo de conexión, transversal CU07-CU10).
+mismo patrón que CU07/08/09 (filtro + `pageLength:15` + `show()`).
+
+CU11 tampoco liga con RF11/RNF11 — RF11 es propuestas (CU25-27), RNF11 es mantenibilidad
+(transversal). CU11 + RF06 (grupos) ✅ desplegado en producción (acta `docs/validacion/CU11.md`).
+**Hallazgo real corregido**: el actor principal de CU11 es el Líder de semillero (no el Admin,
+a diferencia de CU07-10) — el código se lo impedía en 3 capas (backend `role:`, router, sidebar
+sin enlace). Ya corregido: escriben `ADMIN_SISTEMA` y `LIDER_SEMILLERO`, `ADMINISTRATIVO` solo
+consulta. También se corrigió que el código de grupo no se normalizaba a mayúsculas (RN08) y que
+`status` no se validaba. 291 tests en total. Sigue pendiente E4 (mensaje genérico de fallo de
+conexión, transversal CU07-CU11).
 
 **Nota transversal (2026-09-29):** desde CU06, la red local de Docker (puertos 8080/8000) quedó
 inalcanzable desde el host (contenedores sanos, problema de iptables/docker-proxy que necesita

@@ -231,7 +231,7 @@ export const routes = {
 
         if (!requireAuth()) return;
 
-        if (!requireRole(["ADMIN_SISTEMA"])) return;
+        if (!requireRole(["ADMIN_SISTEMA", "LIDER_SEMILLERO", "ADMINISTRATIVO"])) return;
 
         const module = await import("../modules/groups/groups.module.js");
 

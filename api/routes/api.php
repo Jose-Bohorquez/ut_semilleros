@@ -189,16 +189,19 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | GRUPOS (RF06 / CU06)
+    | GRUPOS (RF06 / CU11)
     |   GET  → A, L, ADM
-    |   WRITE → A
+    |   WRITE → L (actor principal de CU11; A también, por consistencia
+    |     administrativa con el resto de catálogos — ADM solo consulta, A5)
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
-         ->get('/groups', [GroupController::class, 'index']);
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+        Route::get('/groups',      [GroupController::class, 'index']);
+        Route::get('/groups/{id}', [GroupController::class, 'show']);
+    });
 
-    Route::middleware('role:ADMIN_SISTEMA')->group(function () {
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO')->group(function () {
         Route::post('/groups',                       [GroupController::class, 'store']);
         Route::put('/groups/{id}',                   [GroupController::class, 'update']);
         Route::put('/groups/{id}/toggle-status',     [GroupController::class, 'toggleStatus']);

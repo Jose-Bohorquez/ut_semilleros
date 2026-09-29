@@ -4,15 +4,27 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Group;
 
+/**
+ * RF06 — Gestión de grupos de investigación (CU11, actor: Líder de
+ * semillero): código (único, RN08) y nombre. Sin eliminación (RN01): solo
+ * se activan o inactivan.
+ */
 class GroupController extends Controller
 {
+    private const MESSAGES = [
+        'code.required' => 'El código es obligatorio.',
+        'code.unique'   => 'Ya existe un grupo con ese código.',
+        'name.required' => 'El nombre es obligatorio.',
+        'status.in'     => 'El estado debe ser ACTIVO o INACTIVO.',
+    ];
 
     public function index()
     {
 
-        $groups = Group::get();
+        $groups = Group::orderBy('name')->get();
 
         return response()->json([
             "groups"=>$groups
@@ -20,17 +32,27 @@ class GroupController extends Controller
 
     }
 
+    /**
+     * Detalle de un grupo (CU11-A1): fechas y estado. Sin relaciones en el
+     * esquema (no hay FK de otras tablas hacia groups).
+     */
+    public function show($id)
+    {
+        $group = Group::findOrFail($id);
+
+        return response()->json([
+            'group' => $group,
+        ]);
+    }
+
 
     public function store(Request $request)
     {
 
-        $validated = $request->validate([
+        $this->normalizeCode($request);
 
-            "name"=>"required|string|max:255",
-
-            "code"=>"required|string|max:50|unique:groups,code"
-
-        ]);
+        $validated = $request->validate($this->rules(null), self::MESSAGES);
+        $validated['status'] = $validated['status'] ?? 'ACTIVO';
 
         $group = Group::create($validated);
 
@@ -47,13 +69,9 @@ class GroupController extends Controller
 
         $group = Group::findOrFail($id);
 
-        $validated = $request->validate([
+        $this->normalizeCode($request);
 
-            "name"=>"required|string|max:255",
-
-            "code"=>"required|string|max:50|unique:groups,code,".$id
-
-        ]);
+        $validated = $request->validate($this->rules($id), self::MESSAGES);
 
         $group->update($validated);
 
@@ -79,6 +97,23 @@ class GroupController extends Controller
             "group"=>$group
         ]);
 
+    }
+
+    /* RN08: «gie» y «GIE » son el mismo código */
+    private function normalizeCode(Request $request): void
+    {
+        if (is_string($request->input('code'))) {
+            $request->merge(['code' => mb_strtoupper(trim($request->input('code')))]);
+        }
+    }
+
+    private function rules(?int $ignoreId): array
+    {
+        return [
+            'code'   => ['required', 'string', 'max:50', Rule::unique('groups', 'code')->ignore($ignoreId)],
+            'name'   => 'required|string|max:255',
+            'status' => ($ignoreId ? 'required' : 'sometimes') . '|in:ACTIVO,INACTIVO',
+        ];
     }
 
 }
