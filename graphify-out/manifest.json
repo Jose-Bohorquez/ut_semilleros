@@ -1362,10 +1362,10 @@
     "semantic_hash": "41b958821a4ad3c8325c6344bd51ece6"
   },
   "modules/sia-admin/sia-admin.module.js": {
-    "mtime": 1790601220.1469252,
-    "seen": 1790601998.2202444,
-    "ast_hash": "77f48e704f9c7acc03387e03fbf95d3b",
-    "semantic_hash": "77f48e704f9c7acc03387e03fbf95d3b"
+    "mtime": 1790656008.808041,
+    "seen": 1790656291.4684768,
+    "ast_hash": "45f2045a344121aebf5ce131b9072b65",
+    "semantic_hash": "45f2045a344121aebf5ce131b9072b65"
   },
   "api/app/Http/Middleware/EnsureDataConsent.php": {
     "mtime": 1790605191.3107686,

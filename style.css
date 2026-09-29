@@ -1216,6 +1216,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sia-kpi-v { margin: var(--space-1) 0; font-size: var(--text-2xl); font-weight: var(--weight-bold); }
 .sia-kpi-s { margin: 0; font-size: var(--text-xs); color: var(--color-text-muted); }
 .sia-bar { height: 8px; border-radius: var(--radius-full); background: var(--color-surface-3); overflow: hidden; margin-top: var(--space-2); flex: 1; }
+/* Dentro de una tarjeta KPI (columna flex) el `flex:1` de arriba la estira
+   verticalmente hasta llenar la tarjeta — bug real encontrado al rediseñar
+   el panel de SIA (2026-09-29): se veía como un bloque gris/rojo enorme en
+   vez de una barra delgada. Aquí sí debe tener alto fijo, sin crecer. */
+.kpi-card .sia-bar { flex: none; height: 8px; width: 100%; }
 .sia-bar span { display: block; height: 100%; background: var(--color-gradient-cta); }
 .sia-bar span.is-hot { background: #b91c1c; }
 .sia-dist { padding: var(--space-4); margin-bottom: var(--space-4); }
@@ -1230,8 +1235,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sia-kn-form, .sia-cfg-form { display: grid; gap: var(--space-2); margin-bottom: var(--space-4); }
 .sia-cfg-form { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); align-items: end; }
 .sia-cfg-form label { display: grid; gap: 4px; font-size: var(--text-sm); }
-.sia-kn-form input, .sia-kn-form textarea, .sia-cfg-form input[type=number], .sia-admin-detail textarea { padding: 10px var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-surface); color: var(--color-text); font: inherit; min-height: 44px; }
+.sia-kn-form input, .sia-kn-form textarea, .sia-cfg-form input[type=number], .sia-cfg-form-v2 input[type=number], .sia-admin-detail textarea { padding: 10px var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-surface); color: var(--color-text); font: inherit; min-height: 44px; }
 .sia-switch { display: flex !important; align-items: center; gap: var(--space-2); min-height: 44px; }
+
+/* Rediseño SIA (2026-09-29): secciones tituladas, KPIs con el mismo lenguaje
+   visual del dashboard, dos columnas donde el ancho lo permite. */
+.sia-kpi .sia-kpi-s { font-size: var(--text-xs); color: var(--color-text-muted); }
+.sia-two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
+.sia-two-col .card { margin-bottom: 0; }
+.sia-hint-block { font-size: var(--text-sm); color: var(--color-text-muted); margin: 0 0 var(--space-3); }
+.sia-knowledge-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-5); }
+.sia-knowledge-layout h3 { margin: 0 0 var(--space-2); font-size: var(--text-base); display: flex; align-items: center; gap: var(--space-2); }
+.sia-cfg-form-v2 { display: grid; gap: var(--space-5); }
+.sia-cfg-group h4 { margin: 0 0 var(--space-2); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--color-text-muted); font-weight: var(--weight-semibold); }
+.sia-cfg-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); }
+.sia-cfg-fields label { display: grid; gap: 4px; font-size: var(--text-sm); }
+.sia-cfg-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-border); }
 .sia-kn-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
 .sia-kn-list li { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-btn); }
 .sia-kn-list li p { margin: 4px 0 0; font-size: var(--text-sm); color: var(--color-text-2); }
@@ -1242,6 +1261,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sia-meta { display: block; margin-top: 4px; font-size: 11px; color: var(--color-text-muted); }
 .sia-acct { width: 72px !important; font-family: ui-monospace, monospace; font-size: var(--text-xs); }
 .sia-cool { font-size: var(--text-sm); }
+
+/* Contenedor de tarjeta genérico — usado por SIA, RBAC y otros paneles de
+   administración. No tenía definición propia (bug real encontrado en la
+   revisión de diseño de SIA, 2026-09-29): esas pantallas se veían "planas",
+   sin borde ni sombra, porque `class="card"` no existía en ningún CSS. */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-4);
+}
 
 /* RBAC granular (permisos por rol / grupo / persona) */
 .rbac-hint { font-size: var(--text-sm); color: var(--color-text-2); margin: 0; }

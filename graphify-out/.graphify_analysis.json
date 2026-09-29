@@ -1,89 +1,6 @@
 {
   "communities": {
     "0": [
-      "api_app_models_user",
-      "api_app_models_user_user",
-      "api_app_models_user_user_casts",
-      "api_app_models_user_user_hasrole",
-      "api_app_models_user_user_isactive",
-      "api_app_models_user_user_seedbeds",
-      "api_app_models_user_user_sendpasswordresetnotification",
-      "api_app_policies_userpolicy",
-      "api_app_policies_userpolicy_userpolicy",
-      "api_app_policies_userpolicy_userpolicy_manage",
-      "api_tests_feature_area_areacrudtest_areacrudtest",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_code_must_be_unique",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_create_requires_name_and_code",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_status_can_be_toggled_without_deletion",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_update_returns_404_for_missing",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_authenticated_user_can_create_area",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_authenticated_user_can_list_areas",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_authenticated_user_can_update_area",
-      "api_tests_feature_area_areacrudtest_areacrudtest_test_unauthenticated_cannot_access_areas",
-      "api_tests_feature_audit_audittest_audittest",
-      "api_tests_feature_audit_audittest_audittest_test_audit_endpoint_returns_correct_structure",
-      "api_tests_feature_audit_audittest_audittest_test_audit_records_contain_all_registered_actions",
-      "api_tests_feature_audit_audittest_audittest_test_authenticated_user_can_list_audits",
-      "api_tests_feature_audit_audittest_audittest_test_creating_a_faculty_generates_audit_record",
-      "api_tests_feature_audit_audittest_audittest_test_unauthenticated_cannot_access_audits",
-      "api_tests_feature_audit_audittest_audittest_test_updating_a_faculty_generates_audit_record",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_authenticated_user_can_create_faculty",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_authenticated_user_can_list_faculties",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_authenticated_user_can_update_faculty",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_create_requires_name",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_create_without_status_registers_active",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_status_can_be_toggled_without_deletion",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_toggle_status_returns_404_for_missing",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_update_returns_404_for_missing",
-      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_unauthenticated_cannot_access_faculties",
-      "api_tests_feature_group_groupcrudtest",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_authenticated_user_can_create_group",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_authenticated_user_can_list_groups",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_authenticated_user_can_update_group",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_code_must_be_unique",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_create_requires_name_and_code",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_status_can_be_toggled_without_deletion",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_update_returns_404_for_missing",
-      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_unauthenticated_cannot_access_groups",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_seedbed",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_admin_can_still_change_coordinator_status_via_update",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_inactivating_user_revokes_all_tokens",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_inactivating_user_via_update_form_revokes_tokens",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_inactive_user_existing_token_is_rejected",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_leader_cannot_change_coordinator_status_via_update",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_leader_creates_coordinators_always_active",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_staff_can_still_create_request_for_a_student",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_cannot_bypass_single_active_request_by_spoofing_user_id",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_cannot_reassign_own_proposal_to_another_user",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_proposal_is_forced_to_self_and_pending",
-      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_request_is_forced_to_self_and_pending",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_login",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_a1_change_password_requires_current_password_and_rn10",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_a1_closes_other_sessions_but_keeps_the_current_one",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_current_password_is_required_to_change_password",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_e1_invalid_phone",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_e2_wrong_current_password",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_profile_shows_basic_data_including_phone_and_registration_date",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_update_phone_is_saved_encrypted_and_audited",
-      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_updating_name_only_does_not_revoke_other_sessions",
-      "api_tests_feature_user_usermanagementtest",
-      "api_tests_feature_user_usermanagementtest_usermanagementtest",
-      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_admin_can_access_users_endpoint",
-      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_administrative_can_read_users_list",
-      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_leader_can_read_users_list",
-      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_non_admin_cannot_access_users_endpoint",
-      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_user_status_can_be_toggled_without_deleting_user",
-      "app_notifications_customresetpasswordnotification",
-      "illuminate_database_eloquent_factories_hasfactory",
-      "illuminate_foundation_auth_user",
-      "illuminate_notifications_notifiable",
-      "laravel_sanctum_hasapitokens"
-    ],
-    "1": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_smtp",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu04_e4",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu06",
@@ -146,64 +63,7 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rnf05",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_soft_delete"
     ],
-    "2": [
-      "api_app_http_controllers_api_seedbedcontroller",
-      "api_app_services_auth_googleidtokenverifier",
-      "api_config_sanctum",
-      "api_tests_feature_area_areacrudtest",
-      "api_tests_feature_audit_audittest",
-      "api_tests_feature_auth_authtest",
-      "api_tests_feature_auth_passwordresetendtoendtest",
-      "api_tests_feature_auth_passwordresetendtoendtest_passwordresetendtoendtest",
-      "api_tests_feature_cat_catcrudtest",
-      "api_tests_feature_faculty_facultycrudtest",
-      "api_tests_feature_program_programcrudtest",
-      "api_tests_feature_proposal_proposalcrudtest",
-      "api_tests_feature_rbac_rbactest",
-      "api_tests_feature_security_rnf03securitytest",
-      "api_tests_feature_security_securityregressiontest",
-      "api_tests_feature_seedbed_seedbedcrudtest",
-      "api_tests_feature_sia_siapoolandlocaltest",
-      "api_tests_feature_sia_siatest",
-      "api_tests_feature_usecases_accountactivationtest",
-      "api_tests_feature_usecases_cu01logintest",
-      "api_tests_feature_usecases_cu02googlelogintest",
-      "api_tests_feature_usecases_cu03logouttest",
-      "api_tests_feature_usecases_cu03logouttest_cu03logouttest",
-      "api_tests_feature_usecases_cu03logouttest_cu03logouttest_test_logout_revokes_this_token_and_audits",
-      "api_tests_feature_usecases_cu03logouttest_cu03logouttest_test_revoking_an_expired_or_revoked_token_answers_401",
-      "api_tests_feature_usecases_cu03logouttest_cu03logouttest_test_student_without_consent_can_logout",
-      "api_tests_feature_usecases_cu04forgotpasswordtest",
-      "api_tests_feature_usecases_cu05profiletest",
-      "api_tests_feature_usecases_rf02facultytest",
-      "api_tests_feature_usecases_rf03programtest",
-      "api_tests_feature_usecases_rf04cattest",
-      "api_tests_feature_usecases_rf05areatest",
-      "api_tests_feature_usecases_rf16consenttest",
-      "api_tests_feature_usecases_rnf05authorizationreferencetest",
-      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest",
-      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_setup",
-      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_bulk_import_requires_authorization_reference_for_non_student_roles",
-      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_editing_a_panel_user_still_requires_the_reference",
-      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_estudiante_does_not_require_authorization_reference",
-      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_panel_role_requires_authorization_reference",
-      "api_tests_feature_user_usercrudtest",
-      "app_models_area",
-      "app_models_faculty",
-      "app_models_program",
-      "app_models_user",
-      "database_seeders_rbacseeder",
-      "illuminate_foundation_testing_refreshdatabase",
-      "illuminate_http_client_connectionexception",
-      "illuminate_support_facades_hash",
-      "illuminate_support_facades_http",
-      "illuminate_support_facades_notification",
-      "illuminate_support_facades_password",
-      "illuminate_support_facades_ratelimiter",
-      "laravel_sanctum_sanctum",
-      "tests_testcase"
-    ],
-    "3": [
+    "1": [
       "claude_agentes_equipo",
       "claude_cdn_cache_5min",
       "claude_cu02_google_oauth",
@@ -254,7 +114,57 @@
       "readme_stack_tecnologico",
       "readme_ut_semilleros_plataforma"
     ],
-    "4": [
+    "2": [
+      "app",
+      "app_public_paths",
+      "core_guards",
+      "core_guards_requireauth",
+      "core_guards_requirerole",
+      "core_router",
+      "core_router_navigateto",
+      "core_router_renderroute",
+      "core_router_routes",
+      "modules_auth_auth_controller",
+      "modules_auth_auth_controller_initgooglelogin",
+      "modules_auth_auth_controller_loadgis",
+      "modules_auth_auth_controller_startsession",
+      "modules_auth_auth_service",
+      "modules_auth_auth_service_login",
+      "modules_auth_auth_view",
+      "modules_auth_auth_view_loginview",
+      "modules_auth_consent_module",
+      "modules_auth_consent_module_consentmodule",
+      "modules_auth_consent_module_endlocalsession",
+      "modules_auth_consent_module_view",
+      "modules_dashboard_dashboard_view",
+      "modules_dashboard_dashboard_view_dashboardview",
+      "services_api_service_login",
+      "services_api_service_logout",
+      "services_push_service",
+      "services_push_service_initpushonlogin",
+      "services_push_service_ispushsupported",
+      "services_push_service_subscribetopush",
+      "services_push_service_unsubscribefrompush",
+      "services_push_service_urlbase64touint8array",
+      "services_storage_service",
+      "services_storage_service_clearlocalsession",
+      "services_storage_service_clearofflinecache",
+      "services_storage_service_consumeintendedroute",
+      "services_storage_service_gettoken",
+      "services_storage_service_getuser",
+      "services_storage_service_hasvalidsession",
+      "services_storage_service_needsdataconsent",
+      "services_storage_service_public_routes",
+      "services_storage_service_rememberintendedroute",
+      "services_storage_service_removetoken",
+      "services_storage_service_removeuser",
+      "services_storage_service_setloginflash",
+      "services_storage_service_settoken",
+      "services_storage_service_settokenexpiry",
+      "services_storage_service_setuser",
+      "services_storage_service_sia_keys"
+    ],
+    "3": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_lider",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu14",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu14_a1",
@@ -301,101 +211,22 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rn12",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rnf09"
     ],
-    "5": [
-      "core_guards",
-      "core_guards_requireauth",
-      "core_guards_requirerole",
-      "core_router",
-      "core_router_navigateto",
-      "core_router_renderroute",
-      "core_router_routes",
-      "modules_auth_auth_controller",
-      "modules_auth_auth_controller_initgooglelogin",
-      "modules_auth_auth_controller_loadgis",
-      "modules_auth_auth_controller_startsession",
-      "modules_auth_auth_service",
-      "modules_auth_auth_service_login",
-      "modules_auth_auth_view",
-      "modules_auth_auth_view_loginview",
-      "modules_auth_consent_module",
-      "modules_auth_consent_module_consentmodule",
-      "modules_auth_consent_module_endlocalsession",
-      "modules_auth_consent_module_view",
-      "modules_dashboard_dashboard_view",
-      "modules_dashboard_dashboard_view_dashboardview",
-      "services_push_service",
-      "services_push_service_initpushonlogin",
-      "services_push_service_ispushsupported",
-      "services_push_service_subscribetopush",
-      "services_push_service_unsubscribefrompush",
-      "services_push_service_urlbase64touint8array",
-      "services_storage_service",
-      "services_storage_service_clearlocalsession",
-      "services_storage_service_clearofflinecache",
-      "services_storage_service_consumeintendedroute",
-      "services_storage_service_gettoken",
-      "services_storage_service_getuser",
-      "services_storage_service_hasvalidsession",
-      "services_storage_service_needsdataconsent",
-      "services_storage_service_public_routes",
-      "services_storage_service_rememberintendedroute",
-      "services_storage_service_removetoken",
-      "services_storage_service_removeuser",
-      "services_storage_service_settoken",
-      "services_storage_service_settokenexpiry",
-      "services_storage_service_setuser",
-      "services_storage_service_sia_keys"
-    ],
-    "6": [
-      "api_app_http_controllers_api_rbaccontroller",
-      "api_app_http_controllers_api_rbaccontroller_php_user",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_catalog",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_construct",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_destroygroup",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_forgetcacheforrole",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_groups",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_showgroup",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_storegroup",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updategroup",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updategroupmembers",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updategrouppermissions",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updaterolepermissions",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updateuserpermissions",
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_userslite",
-      "api_app_http_middleware_permissionmiddleware_permissionmiddleware_construct",
-      "api_app_models_permissiongroup",
-      "api_app_models_permissiongroup_permissiongroup",
-      "api_app_models_permissiongroup_permissiongroup_permissions",
-      "api_app_models_permissiongroup_permissiongroup_users",
-      "api_app_services_rbac_permissionresolver",
-      "api_app_services_rbac_permissionresolver_permissionresolver",
-      "api_app_services_rbac_permissionresolver_permissionresolver_forgetcache",
-      "api_app_services_rbac_permissionresolver_permissionresolver_forgetcacheforgroup",
-      "api_app_support_passwordpolicy",
-      "api_app_support_passwordpolicy_passwordpolicy",
-      "api_app_support_passwordpolicy_passwordpolicy_messages",
-      "api_app_support_passwordpolicy_passwordpolicy_optional",
-      "api_app_support_passwordpolicy_passwordpolicy_required",
-      "api_app_support_passwordpolicy_passwordpolicy_rule",
-      "api_tests_feature_auth_passwordresetendtoendtest_passwordresetendtoendtest_test_user_can_reset_password_end_to_end",
-      "api_tests_feature_rbac_rbactest_rbactest_test_group_name_must_be_unique",
-      "app_models_permission",
-      "app_models_rolepermission",
-      "app_models_userpermission",
-      "illuminate_validation_rules_password",
-      "password"
-    ],
-    "7": [
+    "4": [
       "core_crud_engine",
       "core_escape",
       "core_escape_escapehtml",
       "core_escape_escapes",
       "core_escape_safeimagesrc",
-      "core_escape_safeurl",
       "layout_layout_view",
       "layout_layout_view_bottom_nav",
       "layout_layout_view_layoutview",
+      "modules_faculties_faculties_controller",
+      "modules_faculties_faculties_controller_initfacultiescontroller",
+      "modules_faculties_faculties_service",
+      "modules_faculties_faculties_service_getfaculties",
+      "modules_faculties_faculties_view",
+      "modules_faculties_faculties_view_facultiesview",
+      "modules_notifications_notifications_module_renderskeleton",
       "modules_project_members_project_members_module",
       "modules_project_members_project_members_module_projectmembersmodule",
       "modules_project_members_project_members_module_rendermembers",
@@ -426,46 +257,52 @@
       "modules_seedbeds_seedbeds_module_objectiverowhtml",
       "modules_seedbeds_seedbeds_module_seedbedsmodule"
     ],
-    "8": [
-      "api_app_models_program_program",
-      "api_app_models_program_program_faculty",
-      "api_database_seeders_programseeder",
-      "api_database_seeders_programseeder_programseeder",
-      "api_database_seeders_programseeder_programseeder_run",
-      "api_tests_feature_auth_passwordresettest",
-      "api_tests_feature_auth_passwordresettest_passwordresettest",
-      "api_tests_feature_auth_passwordresettest_passwordresettest_test_password_reset_requires_valid_token",
+    "5": [
+      "api_app_models_user",
+      "api_app_models_user_user",
+      "api_app_models_user_user_casts",
+      "api_app_models_user_user_hasrole",
+      "api_app_models_user_user_isactive",
+      "api_app_models_user_user_seedbeds",
+      "api_app_models_user_user_sendpasswordresetnotification",
+      "api_app_policies_userpolicy",
+      "api_app_policies_userpolicy_userpolicy",
+      "api_app_policies_userpolicy_userpolicy_manage",
       "api_tests_feature_auth_passwordresettest_passwordresettest_test_user_can_request_password_reset",
-      "api_tests_feature_exampletest",
-      "api_tests_feature_exampletest_exampletest",
-      "api_tests_feature_exampletest_exampletest_test_the_application_returns_a_successful_response",
-      "api_tests_feature_objective_objectivecrudtest",
-      "api_tests_feature_result_resultcrudtest",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_seedbed",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_authenticated_user_can_create_result",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_authenticated_user_can_list_results",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_authenticated_user_can_update_result",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_create_rejects_nonexistent_seedbed",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_create_requires_seedbed_and_content",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_status_can_be_toggled_without_deletion",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_update_returns_404_for_missing",
-      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_unauthenticated_cannot_access_results",
-      "api_tests_feature_seedbedmember_seedbedmembertest",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_seedbed",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_add_member_rejects_invalid_role",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_add_member_requires_user_id_and_role",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_authenticated_user_can_add_member",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_authenticated_user_can_list_members",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_authenticated_user_can_remove_member",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_list_members_returns_404_for_missing_seedbed",
-      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_unauthenticated_cannot_list_members",
-      "api_tests_testcase",
-      "api_tests_testcase_testcase",
-      "illuminate_foundation_testing_testcase"
+      "api_tests_feature_group_groupcrudtest_groupcrudtest",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_authenticated_user_can_create_group",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_authenticated_user_can_list_groups",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_authenticated_user_can_update_group",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_code_must_be_unique",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_create_requires_name_and_code",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_status_can_be_toggled_without_deletion",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_group_update_returns_404_for_missing",
+      "api_tests_feature_group_groupcrudtest_groupcrudtest_test_unauthenticated_cannot_access_groups",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_seedbed",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_admin_can_still_change_coordinator_status_via_update",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_inactivating_user_revokes_all_tokens",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_inactivating_user_via_update_form_revokes_tokens",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_inactive_user_existing_token_is_rejected",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_leader_cannot_change_coordinator_status_via_update",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_leader_creates_coordinators_always_active",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_staff_can_still_create_request_for_a_student",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_cannot_bypass_single_active_request_by_spoofing_user_id",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_proposal_is_forced_to_self_and_pending",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_request_is_forced_to_self_and_pending",
+      "api_tests_feature_user_usermanagementtest_usermanagementtest",
+      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_admin_can_access_users_endpoint",
+      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_administrative_can_read_users_list",
+      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_leader_can_read_users_list",
+      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_non_admin_cannot_access_users_endpoint",
+      "api_tests_feature_user_usermanagementtest_usermanagementtest_test_user_status_can_be_toggled_without_deleting_user",
+      "app_notifications_customresetpasswordnotification",
+      "illuminate_database_eloquent_factories_hasfactory",
+      "illuminate_foundation_auth_user",
+      "illuminate_notifications_notifiable",
+      "laravel_sanctum_hasapitokens"
     ],
-    "9": [
+    "6": [
       "core_crud_engine_createcrudmodule",
       "core_crud_engine_createcrudmodule_bindevents",
       "core_crud_engine_createcrudmodule_clearfielderror",
@@ -504,7 +341,82 @@
       "modules_results_results_module",
       "modules_results_results_module_resultsmodule"
     ],
-    "10": [
+    "7": [
+      "api_config_sanctum",
+      "api_tests_feature_area_areacrudtest",
+      "api_tests_feature_audit_audittest",
+      "api_tests_feature_auth_authtest",
+      "api_tests_feature_auth_passwordresetendtoendtest",
+      "api_tests_feature_auth_passwordresetendtoendtest_passwordresetendtoendtest",
+      "api_tests_feature_cat_catcrudtest",
+      "api_tests_feature_coordinator_coordinatorcrudtest",
+      "api_tests_feature_faculty_facultycrudtest",
+      "api_tests_feature_group_groupcrudtest",
+      "api_tests_feature_program_programcrudtest",
+      "api_tests_feature_proposal_proposalcrudtest",
+      "api_tests_feature_rbac_rbactest",
+      "api_tests_feature_security_rnf03securitytest",
+      "api_tests_feature_sia_siapoolandlocaltest",
+      "api_tests_feature_sia_siatest",
+      "api_tests_feature_usecases_accountactivationtest",
+      "api_tests_feature_usecases_cu01logintest",
+      "api_tests_feature_usecases_cu03logouttest",
+      "api_tests_feature_usecases_cu04forgotpasswordtest",
+      "api_tests_feature_usecases_cu05profiletest",
+      "api_tests_feature_usecases_rf03programtest",
+      "api_tests_feature_usecases_rf04cattest",
+      "api_tests_feature_usecases_rf16consenttest",
+      "api_tests_feature_usecases_rnf05authorizationreferencetest",
+      "api_tests_feature_user_usercrudtest",
+      "api_tests_feature_user_usermanagementtest",
+      "app_models_user",
+      "database_seeders_rbacseeder",
+      "illuminate_foundation_testing_refreshdatabase",
+      "illuminate_support_facades_hash",
+      "illuminate_support_facades_notification",
+      "illuminate_support_facades_password",
+      "illuminate_support_facades_ratelimiter",
+      "laravel_sanctum_sanctum",
+      "tests_testcase"
+    ],
+    "8": [
+      "api_app_http_controllers_api_seedbedcontroller",
+      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller",
+      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_activeprogramrule",
+      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_index",
+      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_store",
+      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_togglestatus",
+      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_update",
+      "api_app_http_controllers_api_seedbedmembercontroller",
+      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller",
+      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller_destroy",
+      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller_index",
+      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller_store",
+      "api_app_models_seedbed_seedbed",
+      "api_app_models_seedbed_seedbed_area",
+      "api_app_models_seedbed_seedbed_program",
+      "api_app_models_seedbed_seedbed_projects",
+      "api_app_models_seedbed_seedbed_users",
+      "api_app_providers_appserviceprovider",
+      "api_tests_feature_security_securityregressiontest",
+      "api_tests_feature_seedbed_seedbedcrudtest",
+      "api_tests_feature_usecases_rf02facultytest",
+      "api_tests_feature_usecases_rf05areatest",
+      "app_models_area",
+      "app_models_cat",
+      "app_models_faculty",
+      "app_models_group",
+      "app_models_membershiprequest",
+      "app_models_objective",
+      "app_models_product",
+      "app_models_program",
+      "app_models_project",
+      "app_models_proposal",
+      "app_models_result",
+      "app_models_seedbed",
+      "app_observers_auditobserver"
+    ],
+    "9": [
       "docs_changelog_env_example_gitignore",
       "docs_changelog_sesion_2026_09_28",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_usuario",
@@ -541,7 +453,7 @@
       "docs_validacion_cu01_rnf01_instalacion",
       "docs_validacion_cu01_rnf03_tokens"
     ],
-    "11": [
+    "10": [
       "docs_especificacion_documentacion_tecnica_semillerosut_aggregations",
       "docs_especificacion_documentacion_tecnica_semillerosut_api_rest_sanctum",
       "docs_especificacion_documentacion_tecnica_semillerosut_auditoria_observer",
@@ -576,7 +488,7 @@
       "docs_especificacion_documentacion_tecnica_semillerosut_trimestres_sena",
       "docs_especificacion_documentacion_tecnica_semillerosut_user_model"
     ],
-    "12": [
+    "11": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu07",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu07_a1",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu07_a2",
@@ -610,102 +522,7 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rn07",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_trazabilidad"
     ],
-    "13": [
-      "app",
-      "app_public_paths",
-      "core_offline_banner",
-      "core_offline_banner_fmt",
-      "core_offline_banner_showofflinebanner",
-      "modules_auth_forgot_password_module",
-      "modules_auth_forgot_password_module_bindevents",
-      "modules_auth_forgot_password_module_forgotpasswordmodule",
-      "modules_auth_forgot_password_module_render",
-      "services_api_service",
-      "services_api_service_apifetch",
-      "services_api_service_buildurl",
-      "services_api_service_createuserapi",
-      "services_api_service_flushpendingrevokes",
-      "services_api_service_getme",
-      "services_api_service_getusers",
-      "services_api_service_islan",
-      "services_api_service_isofflinecacheable",
-      "services_api_service_login",
-      "services_api_service_logout",
-      "services_api_service_offline_endpoints",
-      "services_api_service_offlinekey",
-      "services_api_service_readoffline",
-      "services_api_service_saveoffline",
-      "services_api_service_toggleuserstatus",
-      "services_api_service_updateuser",
-      "services_storage_service_getpendingrevokes",
-      "services_storage_service_queuerevoke",
-      "services_storage_service_session_expired_msg",
-      "services_storage_service_setloginflash",
-      "services_storage_service_setpendingrevokes"
-    ],
-    "14": [
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_userpermissions",
-      "api_app_models_permission",
-      "api_app_models_permission_permission",
-      "api_app_models_permission_permission_key",
-      "api_app_models_permission_permission_rolepermissions",
-      "api_app_models_permission_permission_userpermissions",
-      "api_app_models_userpermission",
-      "api_app_models_userpermission_userpermission",
-      "api_app_models_userpermission_userpermission_grantedby",
-      "api_app_models_userpermission_userpermission_permission",
-      "api_app_models_userpermission_userpermission_user",
-      "api_app_services_rbac_permissionresolver_permissionresolver_can",
-      "api_app_services_rbac_permissionresolver_permissionresolver_effective",
-      "api_tests_feature_rbac_rbactest_rbactest",
-      "api_tests_feature_rbac_rbactest_rbactest_setup",
-      "api_tests_feature_rbac_rbactest_rbactest_test_admin_can_manage_group_lifecycle_via_api",
-      "api_tests_feature_rbac_rbactest_rbactest_test_admin_can_replace_role_permissions",
-      "api_tests_feature_rbac_rbactest_rbactest_test_admin_can_set_and_read_user_overrides",
-      "api_tests_feature_rbac_rbactest_rbactest_test_admin_sistema_always_has_full_access_even_for_unknown_permission",
-      "api_tests_feature_rbac_rbactest_rbactest_test_cannot_edit_admin_sistema_permissions",
-      "api_tests_feature_rbac_rbactest_rbactest_test_catalog_lists_modules_and_actions",
-      "api_tests_feature_rbac_rbactest_rbactest_test_group_grant_adds_permission_across_different_roles",
-      "api_tests_feature_rbac_rbactest_rbactest_test_only_admin_sistema_can_manage_groups",
-      "api_tests_feature_rbac_rbactest_rbactest_test_only_admin_sistema_can_reach_rbac_panel",
-      "api_tests_feature_rbac_rbactest_rbactest_test_role_default_grants_seeded_from_config",
-      "api_tests_feature_rbac_rbactest_rbactest_test_role_permissions_endpoint_never_includes_admin_sistema",
-      "api_tests_feature_rbac_rbactest_rbactest_test_user_override_grant_adds_permission_role_does_not_have",
-      "api_tests_feature_rbac_rbactest_rbactest_test_user_override_revoke_removes_permission_role_has_by_default",
-      "api_tests_feature_rbac_rbactest_rbactest_test_user_revoke_overrides_group_grant"
-    ],
-    "15": [
-      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller",
-      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_activeprogramrule",
-      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_index",
-      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_store",
-      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_togglestatus",
-      "api_app_http_controllers_api_seedbedcontroller_seedbedcontroller_update",
-      "api_app_http_controllers_api_seedbedmembercontroller",
-      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller",
-      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller_destroy",
-      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller_index",
-      "api_app_http_controllers_api_seedbedmembercontroller_seedbedmembercontroller_store",
-      "api_app_models_seedbed_seedbed",
-      "api_app_models_seedbed_seedbed_area",
-      "api_app_models_seedbed_seedbed_program",
-      "api_app_models_seedbed_seedbed_projects",
-      "api_app_models_seedbed_seedbed_users",
-      "api_database_seeders_seedbedseeder",
-      "api_database_seeders_seedbedseeder_seedbedseeder",
-      "api_database_seeders_seedbedseeder_seedbedseeder_run",
-      "api_tests_feature_request_requestcrudtest",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_seedbed",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_authenticated_user_can_create_request",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_authenticated_user_can_list_requests",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_authenticated_user_can_update_request",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_request_create_requires_user_seedbed_and_status",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_request_status_must_be_valid_value",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_request_update_returns_404_for_missing",
-      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_unauthenticated_cannot_access_requests"
-    ],
-    "16": [
+    "12": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_acuerdo_0033",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu13",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu13_a1",
@@ -735,63 +552,63 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rnf06",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rnf07"
     ],
-    "17": [
-      "api_app_http_controllers_api_authcontroller",
-      "api_app_http_controllers_api_authcontroller_authcontroller",
-      "api_app_http_controllers_api_authcontroller_authcontroller_consent",
-      "api_app_http_controllers_api_authcontroller_authcontroller_deletephoto",
-      "api_app_http_controllers_api_authcontroller_authcontroller_forgotpassword",
-      "api_app_http_controllers_api_authcontroller_authcontroller_google",
-      "api_app_http_controllers_api_authcontroller_authcontroller_issuesession",
-      "api_app_http_controllers_api_authcontroller_authcontroller_login",
-      "api_app_http_controllers_api_authcontroller_authcontroller_logout",
-      "api_app_http_controllers_api_authcontroller_authcontroller_me",
-      "api_app_http_controllers_api_authcontroller_authcontroller_resetpassword",
-      "api_app_http_controllers_api_authcontroller_authcontroller_updatephoto",
-      "api_app_http_controllers_api_authcontroller_authcontroller_updateprofile",
-      "api_app_http_middleware_authenticate",
-      "api_app_http_middleware_authenticate_authenticate",
-      "api_app_http_middleware_authenticate_authenticate_redirectto",
-      "api_app_http_middleware_authenticate_authenticate_unauthenticated",
-      "api_app_http_resources_userresource",
-      "api_app_http_resources_userresource_userresource",
-      "api_app_http_resources_userresource_userresource_toarray",
-      "app_models_audit",
-      "app_services_auth_googleauthexception",
-      "app_services_auth_googleidtokenverifier",
-      "datetimeinterface",
-      "illuminate_auth_middleware_authenticate",
-      "illuminate_http_request",
-      "illuminate_http_resources_json_jsonresource"
+    "13": [
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_userpermissions",
+      "api_app_models_permission",
+      "api_app_models_permission_permission",
+      "api_app_models_permission_permission_key",
+      "api_app_models_permission_permission_rolepermissions",
+      "api_app_models_permission_permission_userpermissions",
+      "api_app_models_userpermission",
+      "api_app_models_userpermission_userpermission",
+      "api_app_models_userpermission_userpermission_grantedby",
+      "api_app_models_userpermission_userpermission_permission",
+      "api_app_models_userpermission_userpermission_user",
+      "api_tests_feature_rbac_rbactest_rbactest",
+      "api_tests_feature_rbac_rbactest_rbactest_setup",
+      "api_tests_feature_rbac_rbactest_rbactest_test_admin_can_manage_group_lifecycle_via_api",
+      "api_tests_feature_rbac_rbactest_rbactest_test_admin_can_replace_role_permissions",
+      "api_tests_feature_rbac_rbactest_rbactest_test_admin_can_set_and_read_user_overrides",
+      "api_tests_feature_rbac_rbactest_rbactest_test_admin_sistema_always_has_full_access_even_for_unknown_permission",
+      "api_tests_feature_rbac_rbactest_rbactest_test_cannot_edit_admin_sistema_permissions",
+      "api_tests_feature_rbac_rbactest_rbactest_test_catalog_lists_modules_and_actions",
+      "api_tests_feature_rbac_rbactest_rbactest_test_only_admin_sistema_can_manage_groups",
+      "api_tests_feature_rbac_rbactest_rbactest_test_only_admin_sistema_can_reach_rbac_panel",
+      "api_tests_feature_rbac_rbactest_rbactest_test_role_default_grants_seeded_from_config",
+      "api_tests_feature_rbac_rbactest_rbactest_test_role_permissions_endpoint_never_includes_admin_sistema",
+      "api_tests_feature_rbac_rbactest_rbactest_test_user_override_grant_adds_permission_role_does_not_have",
+      "api_tests_feature_rbac_rbactest_rbactest_test_user_override_revoke_removes_permission_role_has_by_default",
+      "api_tests_feature_rbac_rbactest_rbactest_test_user_revoke_overrides_group_grant"
     ],
-    "18": [
-      "api_app_http_controllers_api_coordinatorcontroller",
-      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller",
-      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_index",
-      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_store",
-      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_togglestatus",
-      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_update",
-      "api_app_http_controllers_api_programcontroller",
-      "api_app_http_controllers_api_programcontroller_programcontroller",
-      "api_app_http_controllers_api_programcontroller_programcontroller_index",
-      "api_app_http_controllers_api_programcontroller_programcontroller_normalize",
-      "api_app_http_controllers_api_programcontroller_programcontroller_rules",
-      "api_app_http_controllers_api_programcontroller_programcontroller_store",
-      "api_app_http_controllers_api_programcontroller_programcontroller_togglestatus",
-      "api_app_http_controllers_api_programcontroller_programcontroller_update",
-      "api_app_http_controllers_api_requestcontroller",
-      "api_app_http_controllers_api_requestcontroller_requestcontroller",
-      "api_app_http_controllers_api_requestcontroller_requestcontroller_destroy",
-      "api_app_http_controllers_api_requestcontroller_requestcontroller_index",
-      "api_app_http_controllers_api_requestcontroller_requestcontroller_myrequests",
-      "api_app_http_controllers_api_requestcontroller_requestcontroller_store",
-      "api_app_http_controllers_api_requestcontroller_requestcontroller_update",
-      "api_app_http_controllers_api_requestcontroller_requestcontroller_updatestatus",
-      "api_app_models_membershiprequest",
-      "app_http_controllers_controller",
-      "app_models_coordinator"
+    "14": [
+      "core_offline_banner",
+      "core_offline_banner_fmt",
+      "core_offline_banner_showofflinebanner",
+      "modules_auth_forgot_password_module",
+      "modules_auth_forgot_password_module_bindevents",
+      "modules_auth_forgot_password_module_forgotpasswordmodule",
+      "modules_auth_forgot_password_module_render",
+      "services_api_service",
+      "services_api_service_apifetch",
+      "services_api_service_buildurl",
+      "services_api_service_createuserapi",
+      "services_api_service_flushpendingrevokes",
+      "services_api_service_getme",
+      "services_api_service_getusers",
+      "services_api_service_islan",
+      "services_api_service_isofflinecacheable",
+      "services_api_service_offline_endpoints",
+      "services_api_service_offlinekey",
+      "services_api_service_readoffline",
+      "services_api_service_saveoffline",
+      "services_api_service_toggleuserstatus",
+      "services_api_service_updateuser",
+      "services_storage_service_getpendingrevokes",
+      "services_storage_service_queuerevoke",
+      "services_storage_service_session_expired_msg",
+      "services_storage_service_setpendingrevokes"
     ],
-    "19": [
+    "15": [
       "api_app_http_controllers_api_authcontroller_authcontroller_authconfig",
       "api_app_notifications_accountactivationnotification",
       "api_app_notifications_accountactivationnotification_accountactivationnotification",
@@ -817,7 +634,33 @@
       "illuminate_notifications_notification",
       "mailmessage"
     ],
-    "20": [
+    "16": [
+      "api_app_http_controllers_api_usercontroller",
+      "api_app_http_controllers_api_usercontroller_usercontroller",
+      "api_app_http_controllers_api_usercontroller_usercontroller_createuserrecord",
+      "api_app_http_controllers_api_usercontroller_usercontroller_import",
+      "api_app_http_controllers_api_usercontroller_usercontroller_index",
+      "api_app_http_controllers_api_usercontroller_usercontroller_show",
+      "api_app_http_controllers_api_usercontroller_usercontroller_store",
+      "api_app_http_controllers_api_usercontroller_usercontroller_togglestatus",
+      "api_app_http_controllers_api_usercontroller_usercontroller_update",
+      "api_app_http_requests_user_storeuserrequest_storeuserrequest",
+      "api_app_http_requests_user_storeuserrequest_storeuserrequest_authorize",
+      "api_app_http_requests_user_storeuserrequest_storeuserrequest_messages",
+      "api_app_http_requests_user_storeuserrequest_storeuserrequest_rules",
+      "api_app_http_requests_user_updateuserrequest_updateuserrequest",
+      "api_app_http_requests_user_updateuserrequest_updateuserrequest_authorize",
+      "api_app_http_requests_user_updateuserrequest_updateuserrequest_messages",
+      "api_app_http_requests_user_updateuserrequest_updateuserrequest_rules",
+      "api_app_http_resources_userresource",
+      "api_app_http_resources_userresource_userresource",
+      "api_app_http_resources_userresource_userresource_toarray",
+      "app_notifications_accountactivationnotification",
+      "illuminate_http_jsonresponse",
+      "illuminate_http_resources_json_jsonresource",
+      "illuminate_support_facades_validator"
+    ],
+    "17": [
       "api_routes_api",
       "api_routes_web",
       "app_http_controllers_api_areacontroller",
@@ -843,7 +686,7 @@
       "app_http_controllers_api_usercontroller",
       "illuminate_support_facades_route"
     ],
-    "21": [
+    "18": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_estudiante",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu02_a2",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu17",
@@ -869,57 +712,32 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rn15",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rnf02"
     ],
-    "22": [
-      "api_app_http_controllers_api_areacontroller",
-      "api_app_http_requests_auth_forgotpasswordrequest",
-      "api_app_http_requests_auth_forgotpasswordrequest_forgotpasswordrequest",
-      "api_app_http_requests_auth_forgotpasswordrequest_forgotpasswordrequest_authorize",
-      "api_app_http_requests_auth_forgotpasswordrequest_forgotpasswordrequest_rules",
-      "api_app_http_requests_auth_loginrequest",
-      "api_app_http_requests_auth_loginrequest_loginrequest",
-      "api_app_http_requests_auth_loginrequest_loginrequest_authorize",
-      "api_app_http_requests_auth_loginrequest_loginrequest_messages",
-      "api_app_http_requests_auth_loginrequest_loginrequest_rules",
-      "api_app_http_requests_auth_resetpasswordrequest",
-      "api_app_http_requests_auth_resetpasswordrequest_resetpasswordrequest",
-      "api_app_http_requests_auth_resetpasswordrequest_resetpasswordrequest_authorize",
-      "api_app_http_requests_auth_resetpasswordrequest_resetpasswordrequest_rules",
-      "api_app_http_requests_user_storeuserrequest",
-      "api_app_http_requests_user_storeuserrequest_storeuserrequest",
-      "api_app_http_requests_user_storeuserrequest_storeuserrequest_authorize",
-      "api_app_http_requests_user_storeuserrequest_storeuserrequest_messages",
-      "api_app_http_requests_user_storeuserrequest_storeuserrequest_rules",
-      "api_app_http_requests_user_updateuserrequest",
-      "app_support_passwordpolicy",
-      "illuminate_foundation_http_formrequest",
-      "illuminate_validation_rule"
+    "19": [
+      "api_app_http_controllers_api_areacontroller_areacontroller_normalizecode",
+      "api_app_http_controllers_api_areacontroller_areacontroller_rules",
+      "api_app_http_controllers_api_areacontroller_areacontroller_store",
+      "api_app_http_controllers_api_areacontroller_areacontroller_update",
+      "api_app_http_controllers_api_authcontroller_authcontroller",
+      "api_app_http_controllers_api_authcontroller_authcontroller_consent",
+      "api_app_http_controllers_api_authcontroller_authcontroller_deletephoto",
+      "api_app_http_controllers_api_authcontroller_authcontroller_forgotpassword",
+      "api_app_http_controllers_api_authcontroller_authcontroller_google",
+      "api_app_http_controllers_api_authcontroller_authcontroller_issuesession",
+      "api_app_http_controllers_api_authcontroller_authcontroller_login",
+      "api_app_http_controllers_api_authcontroller_authcontroller_logout",
+      "api_app_http_controllers_api_authcontroller_authcontroller_me",
+      "api_app_http_controllers_api_authcontroller_authcontroller_resetpassword",
+      "api_app_http_controllers_api_authcontroller_authcontroller_updatephoto",
+      "api_app_http_controllers_api_authcontroller_authcontroller_updateprofile",
+      "api_app_http_middleware_authenticate",
+      "api_app_http_middleware_authenticate_authenticate",
+      "api_app_http_middleware_authenticate_authenticate_redirectto",
+      "api_app_http_middleware_authenticate_authenticate_unauthenticated",
+      "datetimeinterface",
+      "illuminate_auth_middleware_authenticate",
+      "illuminate_http_request"
     ],
-    "23": [
-      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_rolepermissions",
-      "api_app_models_rolepermission",
-      "api_app_models_rolepermission_rolepermission",
-      "api_app_models_rolepermission_rolepermission_permission",
-      "api_database_seeders_catseeder",
-      "api_database_seeders_catseeder_catseeder",
-      "api_database_seeders_catseeder_catseeder_run",
-      "api_database_seeders_coordinatorseeder",
-      "api_database_seeders_coordinatorseeder_coordinatorseeder",
-      "api_database_seeders_coordinatorseeder_coordinatorseeder_run",
-      "api_database_seeders_databaseseeder",
-      "api_database_seeders_databaseseeder_databaseseeder",
-      "api_database_seeders_databaseseeder_databaseseeder_run",
-      "api_database_seeders_proposalseeder",
-      "api_database_seeders_proposalseeder_proposalseeder",
-      "api_database_seeders_proposalseeder_proposalseeder_run",
-      "api_database_seeders_rbacseeder",
-      "api_database_seeders_rbacseeder_rbacseeder",
-      "api_database_seeders_rbacseeder_rbacseeder_run",
-      "api_database_seeders_userseeder",
-      "api_database_seeders_userseeder_userseeder",
-      "api_database_seeders_userseeder_userseeder_run",
-      "illuminate_database_seeder"
-    ],
-    "24": [
+    "20": [
       "api_package",
       "api_package_devdependencies",
       "api_package_devdependencies_axios",
@@ -944,7 +762,7 @@
       "ref_tailwindcss_vite",
       "ref_vite"
     ],
-    "25": [
+    "21": [
       "arquitectura_derivada_auditoria",
       "arquitectura_derivada_catalogos",
       "arquitectura_derivada_modules",
@@ -969,7 +787,7 @@
       "roles_usuarios_rule_edit_proposal_pending_only",
       "roles_usuarios_rule_single_active_solicitud"
     ],
-    "26": [
+    "22": [
       "modules_rbac_rbac_module",
       "modules_rbac_rbac_module_accordion",
       "modules_rbac_rbac_module_bindactivetab",
@@ -994,30 +812,31 @@
       "modules_rbac_rbac_module_role_labels",
       "modules_rbac_rbac_module_toolbartab"
     ],
-    "27": [
-      "api_app_http_controllers_api_catcontroller",
-      "api_app_http_controllers_api_catcontroller_catcontroller",
-      "api_app_http_controllers_api_catcontroller_catcontroller_index",
-      "api_app_http_controllers_api_catcontroller_catcontroller_normalizecode",
-      "api_app_http_controllers_api_catcontroller_catcontroller_requireatleastonephone",
-      "api_app_http_controllers_api_catcontroller_catcontroller_rules",
-      "api_app_http_controllers_api_catcontroller_catcontroller_store",
-      "api_app_http_controllers_api_catcontroller_catcontroller_togglestatus",
-      "api_app_http_controllers_api_catcontroller_catcontroller_update",
-      "api_app_models_cat",
-      "api_app_models_cat_cat",
-      "api_tests_feature_cat_catcrudtest_catcrudtest",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_authenticated_user_can_create_cat",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_authenticated_user_can_list_cats",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_authenticated_user_can_update_cat",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_code_must_be_unique",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_create_requires_name_and_code",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_status_can_be_toggled_without_deletion",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_update_returns_404_for_missing",
-      "api_tests_feature_cat_catcrudtest_catcrudtest_test_unauthenticated_cannot_access_cats",
-      "illuminate_validation_validationexception"
+    "23": [
+      "layout_layout_controller",
+      "layout_layout_controller_applytheme",
+      "layout_layout_controller_closesidebar",
+      "layout_layout_controller_initlayoutcontroller",
+      "layout_layout_controller_opensidebar",
+      "layout_layout_controller_page_titles",
+      "layout_layout_controller_registernavlistener",
+      "layout_layout_controller_syncthemeicon",
+      "modules_auth_auth_service_logout",
+      "modules_sia_admin_sia_admin_module",
+      "modules_sia_admin_sia_admin_module_bind",
+      "modules_sia_admin_sia_admin_module_face",
+      "modules_sia_admin_sia_admin_module_fmtdate",
+      "modules_sia_admin_sia_admin_module_kpi",
+      "modules_sia_admin_sia_admin_module_limit_groups",
+      "modules_sia_admin_sia_admin_module_limit_labels",
+      "modules_sia_admin_sia_admin_module_md",
+      "modules_sia_admin_sia_admin_module_openconversation",
+      "modules_sia_admin_sia_admin_module_pct",
+      "modules_sia_admin_sia_admin_module_render",
+      "modules_sia_admin_sia_admin_module_sectiontitle",
+      "modules_sia_admin_sia_admin_module_siaadminmodule"
     ],
-    "28": [
+    "24": [
       "api_app_http_controllers_api_siacontroller_siacontroller",
       "api_app_http_controllers_api_siacontroller_siacontroller_chat",
       "api_app_http_controllers_api_siacontroller_siacontroller_close",
@@ -1040,30 +859,75 @@
       "api_app_models_siasetting_siasetting_all_values",
       "siaconversation"
     ],
-    "29": [
-      "api_app_models_coordinator",
-      "api_app_models_coordinator_coordinator",
-      "api_app_models_coordinator_coordinator_casts",
-      "api_tests_feature_coordinator_coordinatorcrudtest",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_authenticated_user_can_create_coordinator",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_authenticated_user_can_list_coordinators",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_authenticated_user_can_update_coordinator",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_create_requires_name_and_email",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_email_must_be_unique",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_status_can_be_toggled_without_deletion",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_update_returns_404_for_missing",
-      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_unauthenticated_cannot_access_coordinators",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_api_rate_limit_is_applied",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_coordinator_phone_is_encrypted_at_rest",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_every_non_public_api_route_requires_a_token",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_passwords_are_bcrypt_and_production_cost_is_12",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_rate_limit_is_keyed_by_user_not_ip",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_security_headers_also_on_non_api_responses",
-      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_security_headers_and_no_php_version"
+    "25": [
+      "api_app_models_area",
+      "api_app_models_area_area",
+      "api_database_seeders_areaseeder",
+      "api_database_seeders_areaseeder_areaseeder",
+      "api_database_seeders_areaseeder_areaseeder_run",
+      "api_database_seeders_catseeder",
+      "api_database_seeders_catseeder_catseeder",
+      "api_database_seeders_catseeder_catseeder_run",
+      "api_database_seeders_coordinatorseeder",
+      "api_database_seeders_coordinatorseeder_coordinatorseeder",
+      "api_database_seeders_coordinatorseeder_coordinatorseeder_run",
+      "api_database_seeders_databaseseeder",
+      "api_database_seeders_databaseseeder_databaseseeder",
+      "api_database_seeders_databaseseeder_databaseseeder_run",
+      "api_database_seeders_facultyseeder",
+      "api_database_seeders_facultyseeder_facultyseeder",
+      "api_database_seeders_facultyseeder_facultyseeder_run",
+      "api_database_seeders_userseeder",
+      "api_database_seeders_userseeder_userseeder",
+      "api_database_seeders_userseeder_userseeder_run",
+      "illuminate_database_seeder"
     ],
-    "30": [
+    "26": [
+      "api_app_models_program_program",
+      "api_app_models_program_program_faculty",
+      "api_database_seeders_programseeder",
+      "api_database_seeders_programseeder_programseeder",
+      "api_database_seeders_programseeder_programseeder_run",
+      "api_database_seeders_seedbedseeder",
+      "api_database_seeders_seedbedseeder_seedbedseeder",
+      "api_database_seeders_seedbedseeder_seedbedseeder_run",
+      "api_tests_feature_auth_passwordresettest",
+      "api_tests_feature_auth_passwordresettest_passwordresettest",
+      "api_tests_feature_auth_passwordresettest_passwordresettest_test_password_reset_requires_valid_token",
+      "api_tests_feature_exampletest",
+      "api_tests_feature_exampletest_exampletest",
+      "api_tests_feature_exampletest_exampletest_test_the_application_returns_a_successful_response",
+      "api_tests_feature_objective_objectivecrudtest",
+      "api_tests_feature_request_requestcrudtest",
+      "api_tests_feature_result_resultcrudtest",
+      "api_tests_feature_seedbedmember_seedbedmembertest",
+      "api_tests_testcase",
+      "api_tests_testcase_testcase",
+      "illuminate_foundation_testing_testcase"
+    ],
+    "27": [
+      "api_app_http_controllers_api_catcontroller_catcontroller",
+      "api_app_http_controllers_api_catcontroller_catcontroller_index",
+      "api_app_http_controllers_api_catcontroller_catcontroller_normalizecode",
+      "api_app_http_controllers_api_catcontroller_catcontroller_requireatleastonephone",
+      "api_app_http_controllers_api_catcontroller_catcontroller_rules",
+      "api_app_http_controllers_api_catcontroller_catcontroller_store",
+      "api_app_http_controllers_api_catcontroller_catcontroller_togglestatus",
+      "api_app_http_controllers_api_catcontroller_catcontroller_update",
+      "api_app_models_cat",
+      "api_app_models_cat_cat",
+      "api_tests_feature_cat_catcrudtest_catcrudtest",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_authenticated_user_can_create_cat",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_authenticated_user_can_list_cats",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_authenticated_user_can_update_cat",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_code_must_be_unique",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_create_requires_name_and_code",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_status_can_be_toggled_without_deletion",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_cat_update_returns_404_for_missing",
+      "api_tests_feature_cat_catcrudtest_catcrudtest_test_unauthenticated_cannot_access_cats",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_update_keeps_own_code_and_enforces_phone_rule"
+    ],
+    "28": [
       "api_app_http_controllers_api_siacontroller",
       "api_app_http_controllers_api_siacontroller_siacontroller_construct",
       "api_app_services_sia_siaassistant",
@@ -1085,7 +949,7 @@
       "illuminate_support_facades_log",
       "illuminate_support_str"
     ],
-    "31": [
+    "29": [
       "api_app_models_siaconversation",
       "api_app_models_siaconversation_siaconversation",
       "api_app_models_siaconversation_siaconversation_messages",
@@ -1107,7 +971,7 @@
       "api_tests_feature_sia_siatest_siatest_test_logged_user_is_traced",
       "api_tests_feature_sia_siatest_siatest_test_question_length_is_limited"
     ],
-    "32": [
+    "30": [
       "api_tests_feature_auth_authtest_authtest",
       "api_tests_feature_auth_authtest_authtest_test_inactive_user_cannot_login",
       "api_tests_feature_auth_authtest_authtest_test_login_fails_with_invalid_credentials",
@@ -1129,7 +993,8 @@
       "api_tests_feature_usecases_cu01logintest_cu01logintest_user",
       "user"
     ],
-    "33": [
+    "31": [
+      "core_escape_safeurl",
       "modules_notifications_notifications_badge",
       "modules_notifications_notifications_badge_refreshbadge",
       "modules_notifications_notifications_badge_startbadgepolling",
@@ -1143,7 +1008,6 @@
       "modules_notifications_notifications_module_rendercard",
       "modules_notifications_notifications_module_rendercomposer",
       "modules_notifications_notifications_module_renderpage",
-      "modules_notifications_notifications_module_renderskeleton",
       "modules_notifications_notifications_module_role_can_send",
       "modules_notifications_notifications_module_setuptargetdynamic",
       "modules_notifications_notifications_module_showcomposerbanner",
@@ -1151,7 +1015,7 @@
       "modules_notifications_notifications_module_targetlabel",
       "modules_notifications_notifications_module_type_map"
     ],
-    "34": [
+    "32": [
       "api_app_http_controllers_api_auditcontroller",
       "api_app_http_controllers_api_auditcontroller_auditcontroller",
       "api_app_http_controllers_api_projectcontroller",
@@ -1171,7 +1035,7 @@
       "api_app_models_project_project_seedbed",
       "api_app_models_project_project_users"
     ],
-    "35": [
+    "33": [
       "api_app_http_controllers_api_notificacioncontroller",
       "api_app_http_controllers_api_notificacioncontroller_notificacioncontroller",
       "api_app_http_controllers_api_notificacioncontroller_notificacioncontroller_dispatchpush",
@@ -1191,7 +1055,7 @@
       "minishlink_webpush_subscription",
       "minishlink_webpush_webpush"
     ],
-    "36": [
+    "34": [
       "api_tests_feature_usecases_cu02googlelogintest_cu02googlelogintest",
       "api_tests_feature_usecases_cu02googlelogintest_cu02googlelogintest_fakegoogle",
       "api_tests_feature_usecases_cu02googlelogintest_cu02googlelogintest_google",
@@ -1211,7 +1075,7 @@
       "api_tests_feature_usecases_cu02googlelogintest_cu02googlelogintest_test_external_account_of_non_admin_is_rejected",
       "api_tests_feature_usecases_cu02googlelogintest_cu02googlelogintest_test_google_id_is_not_exposed"
     ],
-    "37": [
+    "35": [
       "core_password_policy",
       "core_password_policy_password_hint",
       "core_password_policy_passwordpolicyerror",
@@ -1231,26 +1095,26 @@
       "modules_pwa_pwa_profile_module_showerror",
       "modules_pwa_pwa_profile_module_updateavatarpreview"
     ],
-    "38": [
-      "api_app_http_middleware_ensuredataconsent",
-      "api_app_http_middleware_ensuredataconsent_ensuredataconsent",
-      "api_app_http_middleware_ensuredataconsent_ensuredataconsent_handle",
-      "api_app_http_middleware_ensureuserisactive",
-      "api_app_http_middleware_ensureuserisactive_ensureuserisactive",
-      "api_app_http_middleware_ensureuserisactive_ensureuserisactive_handle",
-      "api_app_http_middleware_permissionmiddleware",
-      "api_app_http_middleware_permissionmiddleware_permissionmiddleware",
-      "api_app_http_middleware_permissionmiddleware_permissionmiddleware_handle",
-      "api_app_http_middleware_rolemiddleware",
-      "api_app_http_middleware_rolemiddleware_rolemiddleware",
-      "api_app_http_middleware_rolemiddleware_rolemiddleware_handle",
-      "api_app_http_middleware_securityheaders",
-      "api_app_http_middleware_securityheaders_securityheaders",
-      "api_app_http_middleware_securityheaders_securityheaders_handle",
-      "closure",
-      "symfony_component_httpfoundation_response"
+    "36": [
+      "api_app_http_controllers_api_rbaccontroller_php_user",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_catalog",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_destroygroup",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_forgetcacheforrole",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_groups",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_showgroup",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_storegroup",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updategroupmembers",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updategrouppermissions",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_userslite",
+      "api_app_models_permissiongroup",
+      "api_app_models_permissiongroup_permissiongroup",
+      "api_app_models_permissiongroup_permissiongroup_permissions",
+      "api_app_models_permissiongroup_permissiongroup_users",
+      "api_tests_feature_rbac_rbactest_rbactest_test_group_grant_adds_permission_across_different_roles",
+      "api_tests_feature_rbac_rbactest_rbactest_test_group_name_must_be_unique"
     ],
-    "39": [
+    "37": [
       "api_tests_feature_usecases_cu04forgotpasswordtest_cu04forgotpasswordtest",
       "api_tests_feature_usecases_cu04forgotpasswordtest_cu04forgotpasswordtest_reset",
       "api_tests_feature_usecases_cu04forgotpasswordtest_cu04forgotpasswordtest_setup",
@@ -1269,43 +1133,25 @@
       "api_tests_feature_usecases_cu04forgotpasswordtest_cu04forgotpasswordtest_user",
       "api_tests_feature_usecases_cu04forgotpasswordtest_php_user"
     ],
-    "40": [
-      "api_app_http_controllers_api_usercontroller",
-      "api_app_http_controllers_api_usercontroller_usercontroller",
-      "api_app_http_controllers_api_usercontroller_usercontroller_createuserrecord",
-      "api_app_http_controllers_api_usercontroller_usercontroller_import",
-      "api_app_http_controllers_api_usercontroller_usercontroller_index",
-      "api_app_http_controllers_api_usercontroller_usercontroller_show",
-      "api_app_http_controllers_api_usercontroller_usercontroller_store",
-      "api_app_http_controllers_api_usercontroller_usercontroller_togglestatus",
-      "api_app_http_controllers_api_usercontroller_usercontroller_update",
-      "api_app_http_requests_user_updateuserrequest_updateuserrequest",
-      "api_app_http_requests_user_updateuserrequest_updateuserrequest_authorize",
-      "api_app_http_requests_user_updateuserrequest_updateuserrequest_messages",
-      "api_app_http_requests_user_updateuserrequest_updateuserrequest_rules",
-      "app_notifications_accountactivationnotification",
-      "illuminate_http_jsonresponse",
-      "illuminate_support_facades_validator"
+    "38": [
+      "api_app_http_controllers_api_areacontroller",
+      "api_app_http_controllers_api_areacontroller_areacontroller",
+      "api_app_http_controllers_api_areacontroller_areacontroller_index",
+      "api_app_http_controllers_api_areacontroller_areacontroller_togglestatus",
+      "api_app_http_controllers_api_authcontroller",
+      "api_app_http_controllers_api_catcontroller",
+      "api_app_http_controllers_api_proposalcontroller",
+      "api_app_http_requests_user_storeuserrequest",
+      "api_app_http_requests_user_updateuserrequest",
+      "app_http_controllers_controller",
+      "app_models_audit",
+      "app_services_auth_googleauthexception",
+      "app_services_auth_googleidtokenverifier",
+      "app_support_passwordpolicy",
+      "illuminate_validation_rule",
+      "illuminate_validation_validationexception"
     ],
-    "41": [
-      "api_app_models_area",
-      "api_app_models_area_area",
-      "api_app_models_membershiprequest_membershiprequest",
-      "api_app_models_membershiprequest_membershiprequest_seedbed",
-      "api_app_models_membershiprequest_membershiprequest_user",
-      "api_app_providers_appserviceprovider_appserviceprovider",
-      "api_app_providers_appserviceprovider_appserviceprovider_boot",
-      "api_app_providers_appserviceprovider_appserviceprovider_register",
-      "api_app_providers_appserviceprovider_appserviceprovider_registerauditobservers",
-      "api_database_seeders_areaseeder",
-      "api_database_seeders_areaseeder_areaseeder",
-      "api_database_seeders_areaseeder_areaseeder_run",
-      "api_database_seeders_requestseeder",
-      "api_database_seeders_requestseeder_requestseeder",
-      "api_database_seeders_requestseeder_requestseeder_run",
-      "illuminate_support_serviceprovider"
-    ],
-    "42": [
+    "39": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_api_rest",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_iso_25010",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_laravel_sanctum",
@@ -1323,7 +1169,7 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rnf16",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_sistema_semillerosut"
     ],
-    "43": [
+    "40": [
       "manifest",
       "manifest_background_color",
       "manifest_categories",
@@ -1341,7 +1187,7 @@
       "manifest_start_url",
       "manifest_theme_color"
     ],
-    "44": [
+    "41": [
       "api_app_http_controllers_api_auditcontroller_auditcontroller_index",
       "api_app_models_audit",
       "api_app_models_audit_audit",
@@ -1358,7 +1204,41 @@
       "illuminate_database_eloquent_model",
       "illuminate_support_facades_auth"
     ],
-    "45": [
+    "42": [
+      "api_app_http_controllers_api_proposalcontroller_proposalcontroller",
+      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_destroy",
+      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_index",
+      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_myproposals",
+      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_store",
+      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_update",
+      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_updatestatus",
+      "api_app_models_proposal",
+      "api_app_models_proposal_proposal",
+      "api_app_models_proposal_proposal_area",
+      "api_app_models_proposal_proposal_user",
+      "api_database_seeders_proposalseeder",
+      "api_database_seeders_proposalseeder_proposalseeder",
+      "api_database_seeders_proposalseeder_proposalseeder_run",
+      "api_tests_feature_security_securityregressiontest_securityregressiontest_test_student_cannot_reassign_own_proposal_to_another_user"
+    ],
+    "43": [
+      "api_app_http_middleware_ensuredataconsent",
+      "api_app_http_middleware_ensuredataconsent_ensuredataconsent",
+      "api_app_http_middleware_ensuredataconsent_ensuredataconsent_handle",
+      "api_app_http_middleware_ensureuserisactive",
+      "api_app_http_middleware_ensureuserisactive_ensureuserisactive",
+      "api_app_http_middleware_ensureuserisactive_ensureuserisactive_handle",
+      "api_app_http_middleware_permissionmiddleware_permissionmiddleware_handle",
+      "api_app_http_middleware_rolemiddleware",
+      "api_app_http_middleware_rolemiddleware_rolemiddleware",
+      "api_app_http_middleware_rolemiddleware_rolemiddleware_handle",
+      "api_app_http_middleware_securityheaders",
+      "api_app_http_middleware_securityheaders_securityheaders",
+      "api_app_http_middleware_securityheaders_securityheaders_handle",
+      "closure",
+      "symfony_component_httpfoundation_response"
+    ],
+    "44": [
       "docs_changelog",
       "docs_changelog_bugs_reales_encontrados",
       "docs_changelog_changelog_sesi\u00f3n_de_validaci\u00f3n_2026_07_28",
@@ -1375,40 +1255,39 @@
       "docs_changelog_solicitudes_postulaci\u00f3n_a_semillero",
       "docs_changelog_verificaci\u00f3n_end_to_end_2026_08_31_contra_producci\u00f3n_real"
     ],
+    "45": [
+      "api_app_http_controllers_api_rbaccontroller",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_construct",
+      "api_app_http_middleware_permissionmiddleware",
+      "api_app_http_middleware_permissionmiddleware_permissionmiddleware",
+      "api_app_http_middleware_permissionmiddleware_permissionmiddleware_construct",
+      "api_app_services_rbac_permissionresolver",
+      "api_app_services_rbac_permissionresolver_permissionresolver",
+      "api_app_services_rbac_permissionresolver_permissionresolver_can",
+      "api_app_services_rbac_permissionresolver_permissionresolver_effective",
+      "api_app_services_rbac_permissionresolver_permissionresolver_forgetcache",
+      "api_app_services_rbac_permissionresolver_permissionresolver_forgetcacheforgroup",
+      "app_models_permission",
+      "app_models_rolepermission",
+      "app_models_userpermission"
+    ],
     "46": [
-      "layout_layout_controller",
-      "layout_layout_controller_applytheme",
-      "layout_layout_controller_closesidebar",
-      "layout_layout_controller_initlayoutcontroller",
-      "layout_layout_controller_opensidebar",
-      "layout_layout_controller_page_titles",
-      "layout_layout_controller_registernavlistener",
-      "layout_layout_controller_syncthemeicon",
-      "modules_auth_auth_service_logout",
-      "modules_faculties_faculties_controller",
-      "modules_faculties_faculties_controller_initfacultiescontroller",
-      "modules_faculties_faculties_service",
-      "modules_faculties_faculties_service_getfaculties",
-      "modules_faculties_faculties_view",
-      "modules_faculties_faculties_view_facultiesview"
+      "api_app_http_requests_auth_forgotpasswordrequest",
+      "api_app_http_requests_auth_forgotpasswordrequest_forgotpasswordrequest",
+      "api_app_http_requests_auth_forgotpasswordrequest_forgotpasswordrequest_authorize",
+      "api_app_http_requests_auth_forgotpasswordrequest_forgotpasswordrequest_rules",
+      "api_app_http_requests_auth_loginrequest",
+      "api_app_http_requests_auth_loginrequest_loginrequest",
+      "api_app_http_requests_auth_loginrequest_loginrequest_authorize",
+      "api_app_http_requests_auth_loginrequest_loginrequest_messages",
+      "api_app_http_requests_auth_loginrequest_loginrequest_rules",
+      "api_app_http_requests_auth_resetpasswordrequest",
+      "api_app_http_requests_auth_resetpasswordrequest_resetpasswordrequest",
+      "api_app_http_requests_auth_resetpasswordrequest_resetpasswordrequest_authorize",
+      "api_app_http_requests_auth_resetpasswordrequest_resetpasswordrequest_rules",
+      "illuminate_foundation_http_formrequest"
     ],
     "47": [
-      "api_app_http_controllers_api_facultycontroller",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller_index",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller_messages",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller_normalizecode",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller_rules",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller_store",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller_togglestatus",
-      "api_app_http_controllers_api_facultycontroller_facultycontroller_update",
-      "api_app_models_faculty",
-      "api_app_models_faculty_faculty",
-      "api_database_seeders_facultyseeder",
-      "api_database_seeders_facultyseeder_facultyseeder",
-      "api_database_seeders_facultyseeder_facultyseeder_run"
-    ],
-    "48": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_google",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu02",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu02_a1",
@@ -1424,7 +1303,7 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rn09",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rnf12"
     ],
-    "49": [
+    "48": [
       "api_app_http_controllers_api_objectivecontroller",
       "api_app_http_controllers_api_objectivecontroller_objectivecontroller",
       "api_app_http_controllers_api_objectivecontroller_objectivecontroller_destroy",
@@ -1439,7 +1318,7 @@
       "api_database_seeders_objectiveseeder_objectiveseeder",
       "api_database_seeders_objectiveseeder_objectiveseeder_run"
     ],
-    "50": [
+    "49": [
       "api_tests_feature_seedbed_seedbedcrudtest_php_area",
       "api_tests_feature_seedbed_seedbedcrudtest_php_program",
       "api_tests_feature_seedbed_seedbedcrudtest_seedbedcrudtest",
@@ -1454,7 +1333,7 @@
       "api_tests_feature_seedbed_seedbedcrudtest_seedbedcrudtest_test_seedbed_update_returns_404_for_missing",
       "api_tests_feature_seedbed_seedbedcrudtest_seedbedcrudtest_test_unauthenticated_cannot_access_seedbeds"
     ],
-    "51": [
+    "50": [
       "api_tests_feature_usecases_rf05areatest_php_program",
       "api_tests_feature_usecases_rf05areatest_rf05areatest",
       "api_tests_feature_usecases_rf05areatest_rf05areatest_program",
@@ -1469,7 +1348,7 @@
       "api_tests_feature_usecases_rf05areatest_rf05areatest_test_seedbed_keeps_its_area_after_it_is_inactivated",
       "api_tests_feature_usecases_rf05areatest_rf05areatest_test_seedbed_requires_an_active_area"
     ],
-    "52": [
+    "51": [
       "core_sia_widget",
       "core_sia_widget_faces",
       "core_sia_widget_format",
@@ -1484,7 +1363,7 @@
       "core_sia_widget_store",
       "core_sia_widget_whatsappurl"
     ],
-    "53": [
+    "52": [
       "modules_dashboard_dashboard_controller",
       "modules_dashboard_dashboard_controller_buildseedbedsbyfaculty",
       "modules_dashboard_dashboard_controller_emptychart",
@@ -1499,21 +1378,7 @@
       "modules_dashboard_dashboard_controller_rendersiaoverview",
       "modules_dashboard_dashboard_controller_setkpi"
     ],
-    "54": [
-      "api_app_http_controllers_api_proposalcontroller",
-      "api_app_http_controllers_api_proposalcontroller_proposalcontroller",
-      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_destroy",
-      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_index",
-      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_myproposals",
-      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_store",
-      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_update",
-      "api_app_http_controllers_api_proposalcontroller_proposalcontroller_updatestatus",
-      "api_app_models_proposal",
-      "api_app_models_proposal_proposal",
-      "api_app_models_proposal_proposal_area",
-      "api_app_models_proposal_proposal_user"
-    ],
-    "55": [
+    "53": [
       "api_app_http_controllers_api_resultcontroller",
       "api_app_http_controllers_api_resultcontroller_resultcontroller",
       "api_app_http_controllers_api_resultcontroller_resultcontroller_index",
@@ -1527,7 +1392,21 @@
       "api_database_seeders_resultseeder_resultseeder",
       "api_database_seeders_resultseeder_resultseeder_run"
     ],
-    "56": [
+    "54": [
+      "api_app_models_coordinator",
+      "api_app_models_coordinator_coordinator",
+      "api_app_models_coordinator_coordinator_casts",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_authenticated_user_can_create_coordinator",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_authenticated_user_can_list_coordinators",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_authenticated_user_can_update_coordinator",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_create_requires_name_and_email",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_email_must_be_unique",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_status_can_be_toggled_without_deletion",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_coordinator_update_returns_404_for_missing",
+      "api_tests_feature_coordinator_coordinatorcrudtest_coordinatorcrudtest_test_unauthenticated_cannot_access_coordinators"
+    ],
+    "55": [
       "api_tests_feature_sia_siapoolandlocaltest_siapoolandlocaltest",
       "api_tests_feature_sia_siapoolandlocaltest_siapoolandlocaltest_ok",
       "api_tests_feature_sia_siapoolandlocaltest_siapoolandlocaltest_setup",
@@ -1541,7 +1420,7 @@
       "api_tests_feature_sia_siapoolandlocaltest_siapoolandlocaltest_test_rotates_to_next_account_on_429_and_records_label",
       "api_tests_feature_sia_siapoolandlocaltest_siapoolandlocaltest_test_simple_intents_answer_locally_without_api"
     ],
-    "57": [
+    "56": [
       "api_tests_feature_usecases_rf02facultytest_rf02facultytest",
       "api_tests_feature_usecases_rf02facultytest_rf02facultytest_setup",
       "api_tests_feature_usecases_rf02facultytest_rf02facultytest_test_changes_are_audited",
@@ -1555,7 +1434,7 @@
       "api_tests_feature_usecases_rf02facultytest_rf02facultytest_test_seedbed_keeps_its_program_on_edit",
       "api_tests_feature_usecases_rf02facultytest_rf02facultytest_test_update_keeps_own_code_and_rejects_duplicates"
     ],
-    "58": [
+    "57": [
       "modules_pwa_pwa_proposals_module",
       "modules_pwa_pwa_proposals_module_bindlistevents",
       "modules_pwa_pwa_proposals_module_closesheet",
@@ -1568,6 +1447,19 @@
       "modules_pwa_pwa_proposals_module_renderlist",
       "modules_pwa_pwa_proposals_module_renderskeleton",
       "modules_pwa_pwa_proposals_module_status_map"
+    ],
+    "58": [
+      "api_app_http_controllers_api_facultycontroller",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller_index",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller_messages",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller_normalizecode",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller_rules",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller_store",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller_togglestatus",
+      "api_app_http_controllers_api_facultycontroller_facultycontroller_update",
+      "api_app_models_faculty",
+      "api_app_models_faculty_faculty"
     ],
     "59": [
       "api_app_http_controllers_api_groupcontroller",
@@ -1583,6 +1475,32 @@
       "api_database_seeders_groupseeder_groupseeder_run"
     ],
     "60": [
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updategroup",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updateuserpermissions",
+      "api_app_support_passwordpolicy",
+      "api_app_support_passwordpolicy_passwordpolicy",
+      "api_app_support_passwordpolicy_passwordpolicy_messages",
+      "api_app_support_passwordpolicy_passwordpolicy_optional",
+      "api_app_support_passwordpolicy_passwordpolicy_required",
+      "api_app_support_passwordpolicy_passwordpolicy_rule",
+      "api_tests_feature_auth_passwordresetendtoendtest_passwordresetendtoendtest_test_user_can_reset_password_end_to_end",
+      "illuminate_validation_rules_password",
+      "password"
+    ],
+    "61": [
+      "api_app_models_membershiprequest_membershiprequest",
+      "api_app_models_membershiprequest_membershiprequest_seedbed",
+      "api_app_models_membershiprequest_membershiprequest_user",
+      "api_app_providers_appserviceprovider_appserviceprovider",
+      "api_app_providers_appserviceprovider_appserviceprovider_boot",
+      "api_app_providers_appserviceprovider_appserviceprovider_register",
+      "api_app_providers_appserviceprovider_appserviceprovider_registerauditobservers",
+      "api_database_seeders_requestseeder",
+      "api_database_seeders_requestseeder_requestseeder",
+      "api_database_seeders_requestseeder_requestseeder_run",
+      "illuminate_support_serviceprovider"
+    ],
+    "62": [
       "api_app_models_siamessage",
       "api_app_models_siamessage_siamessage",
       "api_app_models_siamessage_siamessage_conversation",
@@ -1595,20 +1513,7 @@
       "api_app_services_sia_groqkeypool_groqkeypool_usagetoday",
       "illuminate_support_facades_cache"
     ],
-    "61": [
-      "api_app_providers_appserviceprovider",
-      "app_models_cat",
-      "app_models_group",
-      "app_models_membershiprequest",
-      "app_models_objective",
-      "app_models_product",
-      "app_models_project",
-      "app_models_proposal",
-      "app_models_result",
-      "app_models_seedbed",
-      "app_observers_auditobserver"
-    ],
-    "62": [
+    "63": [
       "api_tests_feature_program_programcrudtest_php_faculty",
       "api_tests_feature_program_programcrudtest_programcrudtest",
       "api_tests_feature_program_programcrudtest_programcrudtest_faculty",
@@ -1621,7 +1526,7 @@
       "api_tests_feature_program_programcrudtest_programcrudtest_test_program_update_returns_404_for_missing",
       "api_tests_feature_program_programcrudtest_programcrudtest_test_unauthenticated_cannot_access_programs"
     ],
-    "63": [
+    "64": [
       "api_tests_feature_proposal_proposalcrudtest_php_area",
       "api_tests_feature_proposal_proposalcrudtest_proposalcrudtest",
       "api_tests_feature_proposal_proposalcrudtest_proposalcrudtest_area",
@@ -1634,7 +1539,7 @@
       "api_tests_feature_proposal_proposalcrudtest_proposalcrudtest_test_proposal_update_returns_404_for_missing",
       "api_tests_feature_proposal_proposalcrudtest_proposalcrudtest_test_unauthenticated_cannot_access_proposals"
     ],
-    "64": [
+    "65": [
       "api_tests_feature_usecases_rf03programtest_php_faculty",
       "api_tests_feature_usecases_rf03programtest_rf03programtest",
       "api_tests_feature_usecases_rf03programtest_rf03programtest_payload",
@@ -1646,19 +1551,6 @@
       "api_tests_feature_usecases_rf03programtest_rf03programtest_test_programs_cannot_be_deleted_and_changes_are_audited",
       "api_tests_feature_usecases_rf03programtest_rf03programtest_test_read_roles_and_write_only_admin",
       "api_tests_feature_usecases_rf03programtest_rf03programtest_test_type_only_accepts_pregrado_or_posgrado"
-    ],
-    "65": [
-      "modules_sia_admin_sia_admin_module",
-      "modules_sia_admin_sia_admin_module_bind",
-      "modules_sia_admin_sia_admin_module_face",
-      "modules_sia_admin_sia_admin_module_fmtdate",
-      "modules_sia_admin_sia_admin_module_kpi",
-      "modules_sia_admin_sia_admin_module_limit_labels",
-      "modules_sia_admin_sia_admin_module_md",
-      "modules_sia_admin_sia_admin_module_openconversation",
-      "modules_sia_admin_sia_admin_module_pct",
-      "modules_sia_admin_sia_admin_module_render",
-      "modules_sia_admin_sia_admin_module_siaadminmodule"
     ],
     "66": [
       "api_app_services_auth_googleauthexception",
@@ -1709,6 +1601,18 @@
       "illuminate_support_facades_schema"
     ],
     "70": [
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_authenticated_user_can_create_faculty",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_authenticated_user_can_list_faculties",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_authenticated_user_can_update_faculty",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_create_requires_name",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_create_without_status_registers_active",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_status_can_be_toggled_without_deletion",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_toggle_status_returns_404_for_missing",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_faculty_update_returns_404_for_missing",
+      "api_tests_feature_faculty_facultycrudtest_facultycrudtest_test_unauthenticated_cannot_access_faculties"
+    ],
+    "71": [
       "api_tests_feature_objective_objectivecrudtest_objectivecrudtest",
       "api_tests_feature_objective_objectivecrudtest_objectivecrudtest_seedbed",
       "api_tests_feature_objective_objectivecrudtest_objectivecrudtest_test_authenticated_user_can_create_objective",
@@ -1720,19 +1624,31 @@
       "api_tests_feature_objective_objectivecrudtest_objectivecrudtest_test_objective_update_returns_404_for_missing",
       "api_tests_feature_objective_objectivecrudtest_objectivecrudtest_test_unauthenticated_cannot_access_objectives"
     ],
-    "71": [
-      "api_tests_feature_usecases_rf04cattest_rf04cattest",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_payload",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_setup",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_at_least_one_phone_is_required",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_cats_cannot_be_deleted_and_changes_are_audited",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_code_is_unique_case_insensitive",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_create_requires_code_and_name_and_registers_active",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_email_and_phone_format_are_validated",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_read_roles_and_write_only_admin",
-      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_update_keeps_own_code_and_enforces_phone_rule"
-    ],
     "72": [
+      "api_tests_feature_result_resultcrudtest_resultcrudtest",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_seedbed",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_authenticated_user_can_create_result",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_authenticated_user_can_list_results",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_authenticated_user_can_update_result",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_create_rejects_nonexistent_seedbed",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_create_requires_seedbed_and_content",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_status_can_be_toggled_without_deletion",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_result_update_returns_404_for_missing",
+      "api_tests_feature_result_resultcrudtest_resultcrudtest_test_unauthenticated_cannot_access_results"
+    ],
+    "73": [
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_login",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_a1_change_password_requires_current_password_and_rn10",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_a1_closes_other_sessions_but_keeps_the_current_one",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_current_password_is_required_to_change_password",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_e1_invalid_phone",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_e2_wrong_current_password",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_profile_shows_basic_data_including_phone_and_registration_date",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_update_phone_is_saved_encrypted_and_audited",
+      "api_tests_feature_usecases_cu05profiletest_cu05profiletest_test_updating_name_only_does_not_revoke_other_sessions"
+    ],
+    "74": [
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_admin",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_administrativo",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_act_usuario_web",
@@ -1744,7 +1660,18 @@
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_cu28",
       "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rf15"
     ],
-    "73": [
+    "75": [
+      "api_app_http_controllers_api_requestcontroller",
+      "api_app_http_controllers_api_requestcontroller_requestcontroller",
+      "api_app_http_controllers_api_requestcontroller_requestcontroller_destroy",
+      "api_app_http_controllers_api_requestcontroller_requestcontroller_index",
+      "api_app_http_controllers_api_requestcontroller_requestcontroller_myrequests",
+      "api_app_http_controllers_api_requestcontroller_requestcontroller_store",
+      "api_app_http_controllers_api_requestcontroller_requestcontroller_update",
+      "api_app_http_controllers_api_requestcontroller_requestcontroller_updatestatus",
+      "api_app_models_membershiprequest"
+    ],
+    "76": [
       "api_composer",
       "api_composer_description",
       "api_composer_keywords",
@@ -1755,7 +1682,7 @@
       "api_composer_schema",
       "api_composer_type"
     ],
-    "74": [
+    "77": [
       "api_composer_scripts",
       "api_composer_scripts_dev",
       "api_composer_scripts_post_autoload_dump",
@@ -1766,7 +1693,40 @@
       "api_composer_scripts_setup",
       "api_composer_scripts_test"
     ],
-    "75": [
+    "78": [
+      "api_tests_feature_area_areacrudtest_areacrudtest",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_code_must_be_unique",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_create_requires_name_and_code",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_status_can_be_toggled_without_deletion",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_area_update_returns_404_for_missing",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_authenticated_user_can_create_area",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_authenticated_user_can_list_areas",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_authenticated_user_can_update_area",
+      "api_tests_feature_area_areacrudtest_areacrudtest_test_unauthenticated_cannot_access_areas"
+    ],
+    "79": [
+      "api_tests_feature_request_requestcrudtest_requestcrudtest",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_seedbed",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_authenticated_user_can_create_request",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_authenticated_user_can_list_requests",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_authenticated_user_can_update_request",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_request_create_requires_user_seedbed_and_status",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_request_status_must_be_valid_value",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_request_update_returns_404_for_missing",
+      "api_tests_feature_request_requestcrudtest_requestcrudtest_test_unauthenticated_cannot_access_requests"
+    ],
+    "80": [
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_seedbed",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_add_member_rejects_invalid_role",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_add_member_requires_user_id_and_role",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_authenticated_user_can_add_member",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_authenticated_user_can_list_members",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_authenticated_user_can_remove_member",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_list_members_returns_404_for_missing_seedbed",
+      "api_tests_feature_seedbedmember_seedbedmembertest_seedbedmembertest_test_unauthenticated_cannot_list_members"
+    ],
+    "81": [
       "api_tests_feature_usecases_accountactivationtest_accountactivationtest",
       "api_tests_feature_usecases_accountactivationtest_accountactivationtest_pending",
       "api_tests_feature_usecases_accountactivationtest_accountactivationtest_reset",
@@ -1777,7 +1737,18 @@
       "api_tests_feature_usecases_accountactivationtest_accountactivationtest_test_mails_use_semilleros_ut_brand_and_whatsapp",
       "api_tests_feature_usecases_accountactivationtest_accountactivationtest_test_template_renders_role_and_link"
     ],
-    "76": [
+    "82": [
+      "api_tests_feature_usecases_rf04cattest_rf04cattest",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_payload",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_setup",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_at_least_one_phone_is_required",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_cats_cannot_be_deleted_and_changes_are_audited",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_code_is_unique_case_insensitive",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_create_requires_code_and_name_and_registers_active",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_email_and_phone_format_are_validated",
+      "api_tests_feature_usecases_rf04cattest_rf04cattest_test_read_roles_and_write_only_admin"
+    ],
+    "83": [
       "modules_auth_auth_controller_initlogincontroller",
       "modules_auth_auth_controller_initlogincontroller_clearerror",
       "modules_auth_auth_controller_initlogincontroller_hidealert",
@@ -1788,7 +1759,7 @@
       "modules_auth_auth_controller_initlogincontroller_validateemail",
       "modules_auth_auth_controller_initlogincontroller_validatepassword"
     ],
-    "77": [
+    "84": [
       "modules_users_users_module",
       "modules_users_users_module_bindimportmodalevents",
       "modules_users_users_module_bindimportmodalevents_renderrows",
@@ -1799,7 +1770,7 @@
       "modules_users_users_module_suggestnamefromemail",
       "modules_users_users_module_usersmodule"
     ],
-    "78": [
+    "85": [
       "api_app_http_controllers_api_productcontroller",
       "api_app_http_controllers_api_productcontroller_productcontroller",
       "api_app_http_controllers_api_productcontroller_productcontroller_index",
@@ -1809,7 +1780,27 @@
       "api_app_models_product_product",
       "api_app_models_product_product_project"
     ],
-    "79": [
+    "86": [
+      "api_app_http_controllers_api_programcontroller",
+      "api_app_http_controllers_api_programcontroller_programcontroller",
+      "api_app_http_controllers_api_programcontroller_programcontroller_index",
+      "api_app_http_controllers_api_programcontroller_programcontroller_normalize",
+      "api_app_http_controllers_api_programcontroller_programcontroller_rules",
+      "api_app_http_controllers_api_programcontroller_programcontroller_store",
+      "api_app_http_controllers_api_programcontroller_programcontroller_togglestatus",
+      "api_app_http_controllers_api_programcontroller_programcontroller_update"
+    ],
+    "87": [
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_rolepermissions",
+      "api_app_http_controllers_api_rbaccontroller_rbaccontroller_updaterolepermissions",
+      "api_app_models_rolepermission",
+      "api_app_models_rolepermission_rolepermission",
+      "api_app_models_rolepermission_rolepermission_permission",
+      "api_database_seeders_rbacseeder",
+      "api_database_seeders_rbacseeder_rbacseeder",
+      "api_database_seeders_rbacseeder_rbacseeder_run"
+    ],
+    "88": [
       "api_composer_require_dev",
       "api_composer_require_dev_fakerphp_faker",
       "api_composer_require_dev_laravel_pail",
@@ -1819,7 +1810,17 @@
       "api_composer_require_dev_nunomaduro_collision",
       "api_composer_require_dev_phpunit_phpunit"
     ],
-    "80": [
+    "89": [
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest",
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_api_rate_limit_is_applied",
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_coordinator_phone_is_encrypted_at_rest",
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_every_non_public_api_route_requires_a_token",
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_passwords_are_bcrypt_and_production_cost_is_12",
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_rate_limit_is_keyed_by_user_not_ip",
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_security_headers_also_on_non_api_responses",
+      "api_tests_feature_security_rnf03securitytest_rnf03securitytest_test_security_headers_and_no_php_version"
+    ],
+    "90": [
       "api_tests_feature_usecases_rf16consenttest_rf16consenttest",
       "api_tests_feature_usecases_rf16consenttest_rf16consenttest_student",
       "api_tests_feature_usecases_rf16consenttest_rf16consenttest_test_accept_stores_date_audits_and_unblocks",
@@ -1829,16 +1830,16 @@
       "api_tests_feature_usecases_rf16consenttest_rf16consenttest_test_reject_revokes_the_token",
       "api_tests_feature_usecases_rf16consenttest_rf16consenttest_test_student_without_consent_is_blocked_by_the_api"
     ],
-    "81": [
-      "api_app_http_controllers_api_areacontroller_areacontroller",
-      "api_app_http_controllers_api_areacontroller_areacontroller_index",
-      "api_app_http_controllers_api_areacontroller_areacontroller_normalizecode",
-      "api_app_http_controllers_api_areacontroller_areacontroller_rules",
-      "api_app_http_controllers_api_areacontroller_areacontroller_store",
-      "api_app_http_controllers_api_areacontroller_areacontroller_togglestatus",
-      "api_app_http_controllers_api_areacontroller_areacontroller_update"
+    "91": [
+      "api_app_http_controllers_api_coordinatorcontroller",
+      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller",
+      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_index",
+      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_store",
+      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_togglestatus",
+      "api_app_http_controllers_api_coordinatorcontroller_coordinatorcontroller_update",
+      "app_models_coordinator"
     ],
-    "82": [
+    "92": [
       "api_app_http_controllers_api_pushsubscriptioncontroller",
       "api_app_http_controllers_api_pushsubscriptioncontroller_pushsubscriptioncontroller",
       "api_app_http_controllers_api_pushsubscriptioncontroller_pushsubscriptioncontroller_destroy",
@@ -1847,7 +1848,7 @@
       "api_app_models_pushsubscription_pushsubscription",
       "api_app_models_pushsubscription_pushsubscription_user"
     ],
-    "83": [
+    "93": [
       "api_app_services_sia_siaassistant_siaassistant",
       "api_app_services_sia_siaassistant_siaassistant_ask",
       "api_app_services_sia_siaassistant_siaassistant_buildcontext",
@@ -1856,7 +1857,7 @@
       "api_app_services_sia_siaassistant_siaassistant_sections",
       "api_app_services_sia_siaassistant_siaassistant_terms"
     ],
-    "84": [
+    "94": [
       "api_composer_allow_plugins_pestphp_pest_plugin",
       "api_composer_allow_plugins_php_http_discovery",
       "api_composer_config",
@@ -1865,7 +1866,16 @@
       "api_composer_config_preferred_install",
       "api_composer_config_sort_packages"
     ],
-    "85": [
+    "95": [
+      "api_tests_feature_audit_audittest_audittest",
+      "api_tests_feature_audit_audittest_audittest_test_audit_endpoint_returns_correct_structure",
+      "api_tests_feature_audit_audittest_audittest_test_audit_records_contain_all_registered_actions",
+      "api_tests_feature_audit_audittest_audittest_test_authenticated_user_can_list_audits",
+      "api_tests_feature_audit_audittest_audittest_test_creating_a_faculty_generates_audit_record",
+      "api_tests_feature_audit_audittest_audittest_test_unauthenticated_cannot_access_audits",
+      "api_tests_feature_audit_audittest_audittest_test_updating_a_faculty_generates_audit_record"
+    ],
+    "96": [
       "api_app_exceptions_handler",
       "api_app_exceptions_handler_handler",
       "api_app_exceptions_handler_handler_register",
@@ -1873,7 +1883,7 @@
       "illuminate_foundation_exceptions_handler",
       "throwable"
     ],
-    "86": [
+    "97": [
       "api_composer_require",
       "api_composer_require_laravel_framework",
       "api_composer_require_laravel_sanctum",
@@ -1881,7 +1891,7 @@
       "api_composer_require_minishlink_web_push",
       "api_composer_require_php"
     ],
-    "87": [
+    "98": [
       "api_database_migrations_2026_09_28_000006_encrypt_coordinator_phone",
       "api_database_migrations_2026_09_28_000006_encrypt_coordinator_phone_down",
       "api_database_migrations_2026_09_28_000006_encrypt_coordinator_phone_isencrypted",
@@ -1889,7 +1899,15 @@
       "illuminate_support_facades_crypt",
       "illuminate_support_facades_db"
     ],
-    "88": [
+    "99": [
+      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest",
+      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_setup",
+      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_bulk_import_requires_authorization_reference_for_non_student_roles",
+      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_editing_a_panel_user_still_requires_the_reference",
+      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_estudiante_does_not_require_authorization_reference",
+      "api_tests_feature_usecases_rnf05authorizationreferencetest_rnf05authorizationreferencetest_test_panel_role_requires_authorization_reference"
+    ],
+    "100": [
       "api_tests_feature_user_usercrudtest_usercrudtest",
       "api_tests_feature_user_usercrudtest_usercrudtest_test_admin_can_create_user",
       "api_tests_feature_user_usercrudtest_usercrudtest_test_admin_can_update_user",
@@ -1897,7 +1915,7 @@
       "api_tests_feature_user_usercrudtest_usercrudtest_test_show_returns_404_for_missing_user",
       "api_tests_feature_user_usercrudtest_usercrudtest_test_user_email_must_be_unique"
     ],
-    "89": [
+    "101": [
       "service_worker",
       "service_worker_cdn_hosts",
       "service_worker_isapicall",
@@ -1905,560 +1923,572 @@
       "service_worker_isjsmodule",
       "service_worker_shell_urls"
     ],
-    "90": [
+    "102": [
       "api_bootstrap_app",
       "api_public_index",
       "illuminate_foundation_application",
       "illuminate_foundation_configuration_exceptions",
       "illuminate_foundation_configuration_middleware"
     ],
-    "91": [
+    "103": [
       "api_composer_autoload",
       "api_composer_autoload_psr_4",
       "api_composer_psr_4_app",
       "api_composer_psr_4_database_factories",
       "api_composer_psr_4_database_seeders"
     ],
-    "92": [
+    "104": [
       "api_config_logging",
       "monolog_handler_nullhandler",
       "monolog_handler_streamhandler",
       "monolog_handler_syslogudphandler",
       "monolog_processor_psrlogmessageprocessor"
     ],
-    "93": [
+    "105": [
+      "api_app_services_auth_googleidtokenverifier",
+      "api_tests_feature_usecases_cu02googlelogintest",
+      "illuminate_http_client_connectionexception",
+      "illuminate_support_facades_http"
+    ],
+    "106": [
       "api_database_factories_userfactory",
       "api_database_factories_userfactory_userfactory",
       "api_database_factories_userfactory_userfactory_definition",
       "illuminate_database_eloquent_factories_factory"
     ],
-    "94": [
+    "107": [
+      "api_tests_feature_usecases_cu03logouttest_cu03logouttest",
+      "api_tests_feature_usecases_cu03logouttest_cu03logouttest_test_logout_revokes_this_token_and_audits",
+      "api_tests_feature_usecases_cu03logouttest_cu03logouttest_test_revoking_an_expired_or_revoked_token_answers_401",
+      "api_tests_feature_usecases_cu03logouttest_cu03logouttest_test_student_without_consent_can_logout"
+    ],
+    "108": [
       "api_tests_unit_exampletest",
       "api_tests_unit_exampletest_exampletest",
       "api_tests_unit_exampletest_exampletest_test_that_true_is_true",
       "phpunit_framework_testcase"
     ],
-    "95": [
+    "109": [
       "docs_especificacion_documentacion_tecnica_semillerosut_acuerdo_0033_2018",
       "docs_especificacion_documentacion_tecnica_semillerosut_bpmn_creacion_semillero",
       "docs_especificacion_documentacion_tecnica_semillerosut_bpmn_vinculacion",
       "docs_especificacion_documentacion_tecnica_semillerosut_ley_1581_2012"
     ],
-    "96": [
+    "110": [
       "docs_especificacion_documentacion_tecnica_semillerosut_despliegue_uml",
       "docs_especificacion_documentacion_tecnica_semillerosut_estimacion_costos",
       "docs_especificacion_documentacion_tecnica_semillerosut_infra_hostinger_vps_atlas",
       "docs_especificacion_documentacion_tecnica_semillerosut_plan_respaldo"
     ],
-    "97": [
+    "111": [
       "api_composer_autoload_dev",
       "api_composer_autoload_dev_psr_4",
       "api_composer_psr_4_tests"
     ],
-    "98": [
+    "112": [
       "api_composer_extra",
       "api_composer_extra_laravel",
       "api_composer_laravel_dont_discover"
     ],
-    "99": [
+    "113": [
       "api_database_migrations_0001_01_01_000000_create_users_table",
       "api_database_migrations_0001_01_01_000000_create_users_table_down",
       "api_database_migrations_0001_01_01_000000_create_users_table_up"
     ],
-    "100": [
+    "114": [
       "api_database_migrations_0001_01_01_000002_create_jobs_table",
       "api_database_migrations_0001_01_01_000002_create_jobs_table_down",
       "api_database_migrations_0001_01_01_000002_create_jobs_table_up"
     ],
-    "101": [
+    "115": [
       "api_database_migrations_2026_02_27_043052_create_personal_access_tokens_table",
       "api_database_migrations_2026_02_27_043052_create_personal_access_tokens_table_down",
       "api_database_migrations_2026_02_27_043052_create_personal_access_tokens_table_up"
     ],
-    "102": [
+    "116": [
       "api_database_migrations_2026_03_06_005511_create_programs_table",
       "api_database_migrations_2026_03_06_005511_create_programs_table_down",
       "api_database_migrations_2026_03_06_005511_create_programs_table_up"
     ],
-    "103": [
+    "117": [
       "api_database_migrations_2026_03_09_052333_create_seedbed_user_table",
       "api_database_migrations_2026_03_09_052333_create_seedbed_user_table_down",
       "api_database_migrations_2026_03_09_052333_create_seedbed_user_table_up"
     ],
-    "104": [
+    "118": [
       "api_database_migrations_2026_03_09_052606_create_projects_table",
       "api_database_migrations_2026_03_09_052606_create_projects_table_down",
       "api_database_migrations_2026_03_09_052606_create_projects_table_up"
     ],
-    "105": [
+    "119": [
       "api_database_migrations_2026_03_09_233413_create_products_table",
       "api_database_migrations_2026_03_09_233413_create_products_table_down",
       "api_database_migrations_2026_03_09_233413_create_products_table_up"
     ],
-    "106": [
+    "120": [
       "api_database_migrations_2026_03_10_005948_create_coordinators_table",
       "api_database_migrations_2026_03_10_005948_create_coordinators_table_down",
       "api_database_migrations_2026_03_10_005948_create_coordinators_table_up"
     ],
-    "107": [
+    "121": [
       "api_database_migrations_2026_03_10_233424_create_cats_table",
       "api_database_migrations_2026_03_10_233424_create_cats_table_down",
       "api_database_migrations_2026_03_10_233424_create_cats_table_up"
     ],
-    "108": [
+    "122": [
       "api_database_migrations_2026_03_10_234345_create_areas_table",
       "api_database_migrations_2026_03_10_234345_create_areas_table_down",
       "api_database_migrations_2026_03_10_234345_create_areas_table_up"
     ],
-    "109": [
+    "123": [
       "api_database_migrations_2026_03_10_234950_create_groups_table",
       "api_database_migrations_2026_03_10_234950_create_groups_table_down",
       "api_database_migrations_2026_03_10_234950_create_groups_table_up"
     ],
-    "110": [
+    "124": [
       "api_database_migrations_2026_03_10_235811_create_objectives_table",
       "api_database_migrations_2026_03_10_235811_create_objectives_table_down",
       "api_database_migrations_2026_03_10_235811_create_objectives_table_up"
     ],
-    "111": [
+    "125": [
       "api_database_migrations_2026_03_11_001608_create_results_table",
       "api_database_migrations_2026_03_11_001608_create_results_table_down",
       "api_database_migrations_2026_03_11_001608_create_results_table_up"
     ],
-    "112": [
+    "126": [
       "api_database_migrations_2026_03_11_002126_create_requests_table",
       "api_database_migrations_2026_03_11_002126_create_requests_table_down",
       "api_database_migrations_2026_03_11_002126_create_requests_table_up"
     ],
-    "113": [
+    "127": [
       "api_database_migrations_2026_03_11_004125_create_proposals_table",
       "api_database_migrations_2026_03_11_004125_create_proposals_table_down",
       "api_database_migrations_2026_03_11_004125_create_proposals_table_up"
     ],
-    "114": [
+    "128": [
       "api_database_migrations_2026_03_11_010102_create_audits_table",
       "api_database_migrations_2026_03_11_010102_create_audits_table_down",
       "api_database_migrations_2026_03_11_010102_create_audits_table_up"
     ],
-    "115": [
+    "129": [
       "api_database_migrations_2026_05_30_000001_add_status_to_cats_areas_groups_objectives_results",
       "api_database_migrations_2026_05_30_000001_add_status_to_cats_areas_groups_objectives_results_down",
       "api_database_migrations_2026_05_30_000001_add_status_to_cats_areas_groups_objectives_results_up"
     ],
-    "116": [
+    "130": [
       "api_database_migrations_2026_05_30_100000_add_review_fields_to_requests_proposals",
       "api_database_migrations_2026_05_30_100000_add_review_fields_to_requests_proposals_down",
       "api_database_migrations_2026_05_30_100000_add_review_fields_to_requests_proposals_up"
     ],
-    "117": [
+    "131": [
       "api_database_migrations_2026_05_30_200000_add_profile_photo_to_users",
       "api_database_migrations_2026_05_30_200000_add_profile_photo_to_users_down",
       "api_database_migrations_2026_05_30_200000_add_profile_photo_to_users_up"
     ],
-    "118": [
+    "132": [
       "api_database_migrations_2026_05_30_300000_create_notificaciones_table",
       "api_database_migrations_2026_05_30_300000_create_notificaciones_table_down",
       "api_database_migrations_2026_05_30_300000_create_notificaciones_table_up"
     ],
-    "119": [
+    "133": [
       "api_database_migrations_2026_07_28_000001_add_description_to_seedbeds",
       "api_database_migrations_2026_07_28_000001_add_description_to_seedbeds_down",
       "api_database_migrations_2026_07_28_000001_add_description_to_seedbeds_up"
     ],
-    "120": [
+    "134": [
       "api_database_migrations_2026_09_28_000002_add_key_and_source_to_sia_messages",
       "api_database_migrations_2026_09_28_000002_add_key_and_source_to_sia_messages_down",
       "api_database_migrations_2026_09_28_000002_add_key_and_source_to_sia_messages_up"
     ],
-    "121": [
+    "135": [
       "api_database_migrations_2026_09_28_000003_add_code_to_faculties",
       "api_database_migrations_2026_09_28_000003_add_code_to_faculties_down",
       "api_database_migrations_2026_09_28_000003_add_code_to_faculties_up"
     ],
-    "122": [
+    "136": [
       "api_database_migrations_2026_09_28_000004_add_google_and_consent_to_users",
       "api_database_migrations_2026_09_28_000004_add_google_and_consent_to_users_down",
       "api_database_migrations_2026_09_28_000004_add_google_and_consent_to_users_up"
     ],
-    "123": [
+    "137": [
       "api_database_migrations_2026_09_28_000005_add_code_and_type_to_programs",
       "api_database_migrations_2026_09_28_000005_add_code_and_type_to_programs_down",
       "api_database_migrations_2026_09_28_000005_add_code_and_type_to_programs_up"
     ],
-    "124": [
+    "138": [
       "api_database_migrations_2026_09_29_000001_add_email_to_cats",
       "api_database_migrations_2026_09_29_000001_add_email_to_cats_down",
       "api_database_migrations_2026_09_29_000001_add_email_to_cats_up"
     ],
-    "125": [
+    "139": [
       "api_database_migrations_2026_09_29_000002_add_phone_and_authorization_to_users",
       "api_database_migrations_2026_09_29_000002_add_phone_and_authorization_to_users_down",
       "api_database_migrations_2026_09_29_000002_add_phone_and_authorization_to_users_up"
     ],
-    "126": [
+    "140": [
       "api_database_migrations_2026_09_29_000005_create_permission_groups",
       "api_database_migrations_2026_09_29_000005_create_permission_groups_down",
       "api_database_migrations_2026_09_29_000005_create_permission_groups_up"
     ],
-    "127": [
+    "141": [
       "api_resources_views_emails_activation_blade",
       "api_resources_views_emails_activation_blade_php_emails_partials_brand_close",
       "api_resources_views_emails_activation_blade_php_emails_partials_brand_open"
     ],
-    "128": [
+    "142": [
       "api_resources_views_emails_reset_password_blade",
       "api_resources_views_emails_reset_password_blade_php_emails_partials_brand_close",
       "api_resources_views_emails_reset_password_blade_php_emails_partials_brand_open"
     ],
-    "129": [
+    "143": [
       "api_routes_console",
       "illuminate_foundation_inspiring",
       "illuminate_support_facades_artisan"
     ],
-    "130": [
+    "144": [
       "api_readme_laravel_framework",
       "readme_stack_laravel12"
     ],
-    "131": [
+    "145": [
       "readme_deploy_hostinger",
       "robots_txt_api"
     ],
-    "132": [
+    "146": [
       "scripts_dev_setup",
       "scripts_dev_setup_sh__entry"
     ],
-    "133": [
+    "147": [
       "api_app_http_controllers_api_authcontroller_php_user"
     ],
-    "134": [
+    "148": [
       "api_app_http_controllers_api_seedbedcontroller_php_closure"
     ],
-    "135": [
+    "149": [
       "api_artisan"
     ],
-    "136": [
+    "150": [
       "api_bootstrap_providers"
     ],
-    "137": [
+    "151": [
       "api_config_app"
     ],
-    "138": [
+    "152": [
       "api_config_auth"
     ],
-    "139": [
+    "153": [
       "api_config_filesystems"
     ],
-    "140": [
+    "154": [
       "api_config_mail"
     ],
-    "141": [
+    "155": [
       "api_config_queue"
     ],
-    "142": [
+    "156": [
       "api_config_rbac"
     ],
-    "143": [
+    "157": [
       "api_config_services"
     ],
-    "144": [
+    "158": [
       "api_db_export"
     ],
-    "145": [
+    "159": [
       "api_resources_views_emails_partials_brand_close_blade"
     ],
-    "146": [
+    "160": [
       "api_resources_views_emails_partials_brand_open_blade"
     ],
-    "147": [
+    "161": [
       "api_resources_views_welcome_blade"
     ],
-    "148": [
+    "162": [
       "api_tests_feature_usecases_accountactivationtest_php_user"
     ],
-    "149": [
+    "163": [
       "app_http_requests_user_storeuserrequest"
     ],
-    "150": [
+    "164": [
       "app_http_requests_user_updateuserrequest"
     ],
-    "151": [
+    "165": [
       "app_http_resources_userresource"
     ],
-    "152": [
+    "166": [
       "apple_touch_icon_152_image"
     ],
-    "153": [
+    "167": [
       "apple_touch_icon_167_image"
     ],
-    "154": [
+    "168": [
       "apple_touch_icon_180_image"
     ],
-    "155": [
+    "169": [
       "assets_images_login_img1_image"
     ],
-    "156": [
+    "170": [
       "assets_images_login_logo_image"
     ],
-    "157": [
+    "171": [
       "claude_casos_uso_cu01_cu30"
     ],
-    "158": [
+    "172": [
       "claude_crud_engine_filtro"
     ],
-    "159": [
+    "173": [
       "claude_decision_funcional_vs_stack"
     ],
-    "160": [
+    "174": [
       "claude_design_tokens"
     ],
-    "161": [
+    "175": [
       "claude_despliegue_hostinger_compartido"
     ],
-    "162": [
+    "176": [
       "claude_docker_local_aislado"
     ],
-    "163": [
+    "177": [
       "claude_especificacion_requerimientos"
     ],
-    "164": [
+    "178": [
       "claude_graphify_grafo"
     ],
-    "165": [
+    "179": [
       "claude_htaccess_routing"
     ],
-    "166": [
+    "180": [
       "claude_numeracion_api_routes"
     ],
-    "167": [
+    "181": [
       "claude_require_role_sync"
     ],
-    "168": [
+    "182": [
       "claude_service_worker_cache"
     ],
-    "169": [
+    "183": [
       "claude_tests_sqlite_memoria"
     ],
-    "170": [
+    "184": [
       "docker_compose_rationale_live_mount"
     ],
-    "171": [
+    "185": [
       "docker_compose_rationale_no_initsql"
     ],
-    "172": [
+    "186": [
       "docker_compose_service_api"
     ],
-    "173": [
+    "187": [
       "docker_compose_service_db"
     ],
-    "174": [
+    "188": [
       "docker_compose_service_frontend"
     ],
-    "175": [
+    "189": [
       "docker_compose_service_phpmyadmin"
     ],
-    "176": [
+    "190": [
       "icon_192_image"
     ],
-    "177": [
+    "191": [
       "icon_192_maskable_image"
     ],
-    "178": [
+    "192": [
       "icon_512_image"
     ],
-    "179": [
+    "193": [
       "icon_512_maskable_image"
     ],
-    "180": [
+    "194": [
       "index_html_app_js_entry"
     ],
-    "181": [
+    "195": [
       "index_html_chartjs_dep"
     ],
-    "182": [
+    "196": [
       "index_html_datatables_dep"
     ],
-    "183": [
+    "197": [
       "index_html_design_tokens_css"
     ],
-    "184": [
+    "198": [
       "index_html_ios_pwa_meta"
     ],
-    "185": [
+    "199": [
       "index_html_status_bar_black_translucent"
     ],
-    "186": [
+    "200": [
       "index_html_sweetalert_dep"
     ],
-    "187": [
+    "201": [
       "index_html_tailwind_dep"
     ],
-    "188": [
+    "202": [
       "index_html_theme_anti_fouc"
     ],
-    "189": [
+    "203": [
       "index_html_viewport_fit_cover"
     ],
-    "190": [
+    "204": [
       "readme_credentials_policy"
     ],
-    "191": [
+    "205": [
       "readme_folder_apache"
     ],
-    "192": [
+    "206": [
       "readme_folder_api"
     ],
-    "193": [
+    "207": [
       "readme_folder_db"
     ],
-    "194": [
+    "208": [
       "readme_pending_improvements"
     ],
-    "195": [
+    "209": [
       "readme_production_status"
     ],
-    "196": [
+    "210": [
       "readme_rationale_auth"
     ],
-    "197": [
+    "211": [
       "readme_rationale_docroot"
     ],
-    "198": [
+    "212": [
       "readme_rationale_microservices"
     ],
-    "199": [
+    "213": [
       "readme_rationale_no_plaintext_passwords"
     ],
-    "200": [
+    "214": [
       "readme_rationale_pwa"
     ],
-    "201": [
+    "215": [
       "readme_stack_apache"
     ],
-    "202": [
+    "216": [
       "readme_stack_docker"
     ],
-    "203": [
+    "217": [
       "readme_stack_mysql9"
     ],
-    "204": [
+    "218": [
       "readme_stack_phpmyadmin"
     ],
-    "205": [
+    "219": [
       "seedbed"
     ]
   },
   "cohesion": {
-    "0": 0.04197530864197531,
-    "1": 0.04371584699453552,
-    "2": 0.09764309764309764,
-    "3": 0.05187074829931973,
-    "4": 0.06666666666666667,
-    "5": 0.11627906976744186,
-    "6": 0.07823613086770982,
-    "7": 0.13229018492176386,
-    "8": 0.08258258258258258,
-    "9": 0.07807807807807808,
-    "10": 0.12436974789915967,
-    "11": 0.07575757575757576,
-    "12": 0.08669354838709678,
-    "13": 0.11397849462365592,
-    "14": 0.09359605911330049,
-    "15": 0.10344827586206896,
-    "16": 0.11904761904761904,
-    "17": 0.13675213675213677,
-    "18": 0.10666666666666667,
-    "19": 0.11594202898550725,
-    "20": 0.08333333333333333,
-    "21": 0.13043478260869565,
-    "22": 0.11067193675889328,
-    "23": 0.11462450592885376,
-    "24": 0.09486166007905138,
-    "25": 0.09486166007905138,
-    "26": 0.18181818181818182,
-    "27": 0.1523809523809524,
-    "28": 0.15714285714285714,
-    "29": 0.10952380952380952,
-    "30": 0.13157894736842105,
-    "31": 0.1736842105263158,
-    "32": 0.19473684210526315,
-    "33": 0.1736842105263158,
-    "34": 0.17647058823529413,
-    "35": 0.19607843137254902,
-    "36": 0.2679738562091503,
-    "37": 0.1830065359477124,
-    "38": 0.22058823529411764,
-    "39": 0.2426470588235294,
-    "40": 0.2,
-    "41": 0.15,
-    "42": 0.15,
-    "43": 0.125,
-    "44": 0.24761904761904763,
-    "45": 0.13333333333333333,
-    "46": 0.26666666666666666,
-    "47": 0.26373626373626374,
-    "48": 0.24175824175824176,
-    "49": 0.23076923076923078,
-    "50": 0.2692307692307692,
-    "51": 0.1794871794871795,
-    "52": 0.2692307692307692,
-    "53": 0.2948717948717949,
-    "54": 0.25757575757575757,
-    "55": 0.24242424242424243,
-    "56": 0.21212121212121213,
-    "57": 0.16666666666666666,
-    "58": 0.25757575757575757,
+    "0": 0.04371584699453552,
+    "1": 0.05187074829931973,
+    "2": 0.10106382978723404,
+    "3": 0.06666666666666667,
+    "4": 0.11205073995771671,
+    "5": 0.0753045404208195,
+    "6": 0.07807807807807808,
+    "7": 0.15714285714285714,
+    "8": 0.0957983193277311,
+    "9": 0.12436974789915967,
+    "10": 0.07575757575757576,
+    "11": 0.08669354838709678,
+    "12": 0.11904761904761904,
+    "13": 0.10153846153846154,
+    "14": 0.13230769230769232,
+    "15": 0.11594202898550725,
+    "16": 0.13768115942028986,
+    "17": 0.08333333333333333,
+    "18": 0.13043478260869565,
+    "19": 0.14624505928853754,
+    "20": 0.09486166007905138,
+    "21": 0.09486166007905138,
+    "22": 0.18181818181818182,
+    "23": 0.1774891774891775,
+    "24": 0.15714285714285714,
+    "25": 0.12857142857142856,
+    "26": 0.12857142857142856,
+    "27": 0.15789473684210525,
+    "28": 0.13157894736842105,
+    "29": 0.1736842105263158,
+    "30": 0.19473684210526315,
+    "31": 0.17894736842105263,
+    "32": 0.17647058823529413,
+    "33": 0.19607843137254902,
+    "34": 0.2679738562091503,
+    "35": 0.1830065359477124,
+    "36": 0.16911764705882354,
+    "37": 0.2426470588235294,
+    "38": 0.175,
+    "39": 0.15,
+    "40": 0.125,
+    "41": 0.24761904761904763,
+    "42": 0.19047619047619047,
+    "43": 0.24761904761904763,
+    "44": 0.13333333333333333,
+    "45": 0.2087912087912088,
+    "46": 0.17582417582417584,
+    "47": 0.24175824175824176,
+    "48": 0.23076923076923078,
+    "49": 0.2692307692307692,
+    "50": 0.1794871794871795,
+    "51": 0.2692307692307692,
+    "52": 0.2948717948717949,
+    "53": 0.24242424242424243,
+    "54": 0.19696969696969696,
+    "55": 0.21212121212121213,
+    "56": 0.16666666666666666,
+    "57": 0.25757575757575757,
+    "58": 0.36363636363636365,
     "59": 0.2727272727272727,
-    "60": 0.2545454545454545,
-    "61": 0.18181818181818182,
+    "60": 0.2,
+    "61": 0.21818181818181817,
     "62": 0.2545454545454545,
-    "63": 0.2727272727272727,
-    "64": 0.32727272727272727,
-    "65": 0.34545454545454546,
+    "63": 0.2545454545454545,
+    "64": 0.2727272727272727,
+    "65": 0.32727272727272727,
     "66": 0.2,
     "67": 0.2,
     "68": 0.2,
     "69": 0.2,
-    "70": 0.28888888888888886,
-    "71": 0.3333333333333333,
-    "72": 0.24444444444444444,
-    "73": 0.2222222222222222,
-    "74": 0.2222222222222222,
-    "75": 0.4444444444444444,
-    "76": 0.3611111111111111,
-    "77": 0.3333333333333333,
-    "78": 0.35714285714285715,
-    "79": 0.25,
-    "80": 0.42857142857142855,
-    "81": 0.47619047619047616,
-    "82": 0.38095238095238093,
-    "83": 0.47619047619047616,
-    "84": 0.2857142857142857,
-    "85": 0.3333333333333333,
-    "86": 0.3333333333333333,
-    "87": 0.4666666666666667,
-    "88": 0.3333333333333333,
-    "89": 0.3333333333333333,
-    "90": 0.4,
-    "91": 0.4,
-    "92": 0.4,
-    "93": 0.6666666666666666,
-    "94": 0.6666666666666666,
-    "95": 0.5,
-    "96": 0.5,
-    "97": 0.6666666666666666,
-    "98": 0.6666666666666666,
-    "99": 0.6666666666666666,
-    "100": 0.6666666666666666,
-    "101": 0.6666666666666666,
-    "102": 0.6666666666666666,
-    "103": 0.6666666666666666,
-    "104": 0.6666666666666666,
+    "70": 0.2,
+    "71": 0.28888888888888886,
+    "72": 0.28888888888888886,
+    "73": 0.24444444444444444,
+    "74": 0.24444444444444444,
+    "75": 0.25,
+    "76": 0.2222222222222222,
+    "77": 0.2222222222222222,
+    "78": 0.2222222222222222,
+    "79": 0.3333333333333333,
+    "80": 0.3888888888888889,
+    "81": 0.4444444444444444,
+    "82": 0.3888888888888889,
+    "83": 0.3611111111111111,
+    "84": 0.3333333333333333,
+    "85": 0.35714285714285715,
+    "86": 0.39285714285714285,
+    "87": 0.2857142857142857,
+    "88": 0.25,
+    "89": 0.25,
+    "90": 0.42857142857142855,
+    "91": 0.2857142857142857,
+    "92": 0.38095238095238093,
+    "93": 0.47619047619047616,
+    "94": 0.2857142857142857,
+    "95": 0.2857142857142857,
+    "96": 0.3333333333333333,
+    "97": 0.3333333333333333,
+    "98": 0.4666666666666667,
+    "99": 0.3333333333333333,
+    "100": 0.3333333333333333,
+    "101": 0.3333333333333333,
+    "102": 0.4,
+    "103": 0.4,
+    "104": 0.4,
     "105": 0.6666666666666666,
     "106": 0.6666666666666666,
-    "107": 0.6666666666666666,
+    "107": 0.5,
     "108": 0.6666666666666666,
-    "109": 0.6666666666666666,
-    "110": 0.6666666666666666,
+    "109": 0.5,
+    "110": 0.5,
     "111": 0.6666666666666666,
     "112": 0.6666666666666666,
     "113": 0.6666666666666666,
@@ -2478,20 +2508,20 @@
     "127": 0.6666666666666666,
     "128": 0.6666666666666666,
     "129": 0.6666666666666666,
-    "130": 1.0,
-    "131": 1.0,
-    "132": 1.0,
-    "133": 1.0,
-    "134": 1.0,
-    "135": 1.0,
-    "136": 1.0,
-    "137": 1.0,
-    "138": 1.0,
-    "139": 1.0,
-    "140": 1.0,
-    "141": 1.0,
-    "142": 1.0,
-    "143": 1.0,
+    "130": 0.6666666666666666,
+    "131": 0.6666666666666666,
+    "132": 0.6666666666666666,
+    "133": 0.6666666666666666,
+    "134": 0.6666666666666666,
+    "135": 0.6666666666666666,
+    "136": 0.6666666666666666,
+    "137": 0.6666666666666666,
+    "138": 0.6666666666666666,
+    "139": 0.6666666666666666,
+    "140": 0.6666666666666666,
+    "141": 0.6666666666666666,
+    "142": 0.6666666666666666,
+    "143": 0.6666666666666666,
     "144": 1.0,
     "145": 1.0,
     "146": 1.0,
@@ -2553,7 +2583,21 @@
     "202": 1.0,
     "203": 1.0,
     "204": 1.0,
-    "205": 1.0
+    "205": 1.0,
+    "206": 1.0,
+    "207": 1.0,
+    "208": 1.0,
+    "209": 1.0,
+    "210": 1.0,
+    "211": 1.0,
+    "212": 1.0,
+    "213": 1.0,
+    "214": 1.0,
+    "215": 1.0,
+    "216": 1.0,
+    "217": 1.0,
+    "218": 1.0,
+    "219": 1.0
   },
   "gods": [
     {
@@ -2564,12 +2608,12 @@
     {
       "id": "services_api_service_apifetch",
       "label": "apiFetch()",
-      "degree": 54
+      "degree": 57
     },
     {
       "id": "core_escape_escapehtml",
       "label": "escapeHtml()",
-      "degree": 46
+      "degree": 49
     },
     {
       "id": "api_app_models_seedbed_seedbed",
@@ -2609,15 +2653,15 @@
   ],
   "surprises": [
     {
-      "source": "renderSkeleton()",
-      "target": "LayoutView()",
+      "source": "bindEvents()",
+      "target": "escapeHtml()",
       "source_files": [
-        "modules/notifications/notifications.module.js",
-        "layout/layout.view.js"
+        "modules/auth/forgot-password.module.js",
+        "core/escape.js"
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",
-      "why": "connects across different repos/directories; bridges separate communities; peripheral node `renderSkeleton()` unexpectedly reaches hub `LayoutView()`"
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `bindEvents()` unexpectedly reaches hub `escapeHtml()`"
     },
     {
       "source": "renderSkeleton()",
@@ -2629,17 +2673,6 @@
       "confidence": "EXTRACTED",
       "relation": "calls",
       "why": "connects across different repos/directories; bridges separate communities; peripheral node `renderSkeleton()` unexpectedly reaches hub `LayoutView()`"
-    },
-    {
-      "source": "bindEvents()",
-      "target": "escapeHtml()",
-      "source_files": [
-        "modules/auth/forgot-password.module.js",
-        "core/escape.js"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "calls",
-      "why": "connects across different repos/directories; bridges separate communities; peripheral node `bindEvents()` unexpectedly reaches hub `escapeHtml()`"
     },
     {
       "source": "CACHE_STORE=database para rate limit de login (RN14)",
@@ -2662,6 +2695,17 @@
       "confidence": "INFERRED",
       "relation": "conceptually_related_to",
       "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "CU02 login PWA con Google OAuth (dominio institucional, RN04)",
+      "target": "CU02 Iniciar sesi\u00f3n con cuenta institucional (PWA)",
+      "source_files": [
+        "CLAUDE.md",
+        "docs/especificacion/Especificacion_Requerimientos_Casos_de_Uso_SemillerosUT.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `CU02 login PWA con Google OAuth (dominio institucional, RN04)` unexpectedly reaches hub `CU02 Iniciar sesi\u00f3n con cuenta institucional (PWA)`"
     }
   ],
   "tokens": {
