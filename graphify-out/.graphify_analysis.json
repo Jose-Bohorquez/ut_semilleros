@@ -2626,13 +2626,13 @@
       "degree": 29
     },
     {
-      "id": "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rn01",
-      "label": "RN01 No eliminaci\u00f3n f\u00edsica, baja por estado inactivo",
+      "id": "core_crud_engine_createcrudmodule",
+      "label": "createCrudModule()",
       "degree": 28
     },
     {
-      "id": "core_crud_engine_createcrudmodule",
-      "label": "createCrudModule()",
+      "id": "docs_especificacion_especificacion_requerimientos_casos_de_uso_semillerosut_rn01",
+      "label": "RN01 No eliminaci\u00f3n f\u00edsica, baja por estado inactivo",
       "degree": 28
     },
     {

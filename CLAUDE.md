@@ -73,13 +73,21 @@ ronda futura: E3 (no poder auto-inactivarse ni inactivar al último ADMIN_SISTEM
 correo de activación) y A1 (último acceso y semilleros a cargo del líder en el detalle).
 
 CU07 no está ligado a RF07/RNF07 tampoco — RF07 es coordinadores (CU12), RNF07 es rendimiento
-(transversal). CU07 + RF02 (facultades) ✅ cumple en código (acta `docs/validacion/CU07.md`),
-validado en producción vía API; **verificación visual en navegador local pendiente** por una caída
-de red de Docker en el host durante esta ronda (contenedores sanos, no arreglable sin sudo
-interactivo). Se agregó `config.pageLength` genérico a `crud.engine.js` (15/página en Facultades,
-10 default sin cambio en el resto) y filtro por estado reutilizando `config.filters` de CU06. Se
-descartó a propósito la extensión DataTables Responsive: el sistema ya tiene su propio responsive
+(transversal). CU07 + RF02 (facultades) ✅ desplegado en producción (acta `docs/validacion/CU07.md`).
+Se agregó `config.pageLength` genérico a `crud.engine.js` (15/página en Facultades, 10 default sin
+cambio en el resto) y filtro por estado reutilizando `config.filters` de CU06. Se descartó a
+propósito la extensión DataTables Responsive: el sistema ya tiene su propio responsive
 (`mobile-card-table`, `style.css` @768px) y dos mecanismos competirían.
+
+CU08 tampoco liga con RF08/RNF08 — RF08 es objetivos (CU19), RNF08 es disponibilidad (transversal).
+CU08 + RF03 (programas) ✅ desplegado en producción (acta `docs/validacion/CU08.md`), mismo patrón
+que CU07: filtro por estado + `pageLength:15`.
+
+**Nota transversal (2026-09-29):** desde CU06, la red local de Docker (puertos 8080/8000) quedó
+inalcanzable desde el host (contenedores sanos, problema de iptables/docker-proxy que necesita
+`sudo` interactivo, fuera de mi alcance). Las rondas CU07/CU08 se validaron con backend vía
+`docker exec` (sin red) + verificación en producción; falta el E2E completo en navegador local
+hasta que Jose resuelva el acceso `sudo` en su máquina.
 
 **Decisiones de CU02 (Jose, 2026-09-28):** con Google entran solo cuentas del dominio institucional
 (`GOOGLE_ALLOWED_DOMAINS`, por defecto `ut.edu.co`, y claim `hd` igual). Única excepción: un

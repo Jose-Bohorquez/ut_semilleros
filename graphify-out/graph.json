@@ -20540,28 +20540,6 @@
       "source_location": "L4"
     },
     {
-      "id": "modules_programs_programs_module",
-      "label": "programs.module.js",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Motor CRUD frontend",
-      "file_type": "code",
-      "norm_label": "programs.module.js",
-      "source_file": "modules/programs/programs.module.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "modules_programs_programs_module_programsmodule",
-      "label": "programsModule",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Motor CRUD frontend",
-      "file_type": "code",
-      "norm_label": "programsmodule",
-      "source_file": "modules/programs/programs.module.js",
-      "source_location": "L5"
-    },
-    {
       "id": "modules_proposals_proposals_module",
       "label": "proposals.module.js",
       "_origin": "ast",
@@ -20656,6 +20634,26 @@
       "norm_label": "facultiesmodule",
       "source_file": "modules/faculties/faculties.module.js",
       "source_location": "L4"
+    },
+    {
+      "id": "modules_programs_programs_module",
+      "label": "programs.module.js",
+      "_origin": "ast",
+      "community": 4,
+      "file_type": "code",
+      "norm_label": "programs.module.js",
+      "source_file": "modules/programs/programs.module.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "modules_programs_programs_module_programsmodule",
+      "label": "programsModule",
+      "_origin": "ast",
+      "community": 4,
+      "file_type": "code",
+      "norm_label": "programsmodule",
+      "source_file": "modules/programs/programs.module.js",
+      "source_location": "L5"
     },
     {
       "id": "manifest",
@@ -69164,5 +69162,5 @@
       "source_file": "docs/especificacion/Especificacion_Requerimientos_Casos_de_Uso_SemillerosUT.md"
     }
   ],
-  "built_at_commit": "4cccdd35f53f933a26e83d827455537a0ba2b1ca"
+  "built_at_commit": "8db4a9dde95461ac89ea2fda8139b15a17fcdff1"
 }
