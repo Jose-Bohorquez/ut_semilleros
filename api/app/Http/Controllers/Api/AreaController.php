@@ -32,6 +32,18 @@ class AreaController extends Controller
     }
 
 
+    /**
+     * Detalle de un área (CU10-A1): fechas y semilleros/propuestas asociados.
+     */
+    public function show($id)
+    {
+        $area = Area::withCount(['seedbeds', 'proposals'])->findOrFail($id);
+
+        return response()->json([
+            'area' => $area,
+        ]);
+    }
+
     public function store(Request $request)
     {
 

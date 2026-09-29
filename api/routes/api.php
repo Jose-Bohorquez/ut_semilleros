@@ -176,8 +176,10 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
        propuesta (POST /proposals sí lo permite) — bug encontrado en la
        validación de RF05, 2026-09-29: podía crear la propuesta pero nunca
        veía el selector de área porque este GET le daba 403. */
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
-         ->get('/areas', [AreaController::class, 'index']);
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')->group(function () {
+        Route::get('/areas',      [AreaController::class, 'index']);
+        Route::get('/areas/{id}', [AreaController::class, 'show']);
+    });
 
     Route::middleware('role:ADMIN_SISTEMA')->group(function () {
         Route::post('/areas',                        [AreaController::class, 'store']);

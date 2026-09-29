@@ -83,4 +83,17 @@ class AreaCrudTest extends TestCase
         $this->assertDatabaseHas('areas', ['id' => $area->id, 'status' => 'INACTIVO']);
         $this->assertDatabaseHas('areas', ['id' => $area->id]);
     }
+
+    /** CU10-A1 */
+    public function test_show_returns_detail_with_related_counts(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $area = Area::create(['name' => 'Test', 'code' => 'A-DET', 'status' => 'ACTIVO']);
+
+        $this->getJson("/api/areas/{$area->id}")
+            ->assertOk()
+            ->assertJsonPath('area.seedbeds_count', 0)
+            ->assertJsonPath('area.proposals_count', 0)
+            ->assertJsonStructure(['area' => ['created_at', 'updated_at']]);
+    }
 }
