@@ -175,7 +175,9 @@ function renderList(proposals) {
                     <label class="pwa-label" for="prop-area">
                         Área de conocimiento <span style="color:var(--color-error)">*</span>
                     </label>
-                    <select class="pwa-input" id="prop-area" name="area_id" required>
+                    <!-- Sin "required" nativo a propósito: bloquearía el submit antes de que
+                         corra la validación propia (mismo mensaje en español, campo por campo). -->
+                    <select class="pwa-input" id="prop-area" name="area_id">
                         <option value="">Selecciona un área...</option>
                     </select>
                     <span class="pwa-field-error" id="err-prop-area"></span>

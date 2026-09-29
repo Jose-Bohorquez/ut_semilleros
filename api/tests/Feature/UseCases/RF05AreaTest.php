@@ -64,6 +64,15 @@ class RF05AreaTest extends TestCase
         }
     }
 
+    /* El estudiante no puede escribir, pero sí necesita leerlas para elegir
+       una al crear su propuesta (bug real: antes daba 403). */
+    public function test_estudiante_can_read_areas_but_not_write(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
+        $this->getJson('/api/areas')->assertOk();
+        $this->postJson('/api/areas', ['code' => 'Z', 'name' => 'Z'])->assertStatus(403);
+    }
+
     /* Criterio: todo semillero tiene al menos un área */
     public function test_seedbed_requires_an_active_area(): void
     {

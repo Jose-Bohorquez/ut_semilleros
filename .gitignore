@@ -78,3 +78,7 @@ graphify-out/.graphify_python
 # público hasta que estén cerradas (2026-09-27)
 docs/qa/
 graphify-out/20*/
+
+# Contraseñas de las cuentas de prueba en producción (mismo patrón que SGAA) — nunca en git,
+# el repo es público (2026-09-29)
+credenciales_prueba.txt

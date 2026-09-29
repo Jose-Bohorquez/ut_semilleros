@@ -383,10 +383,16 @@ class AuthController extends Controller
 
             /* A1: al cambiar la contraseña se cierran las demás sesiones —
                esta (la que la está cambiando) se conserva, para no botar de
-               inmediato a quien acaba de autenticarse con la anterior. */
+               inmediato a quien acaba de autenticarse con la anterior.
+               Guard explícito (review 2026-09-29): ->when($current, ...)
+               trata null como "sin condición" y borraría TODAS las sesiones,
+               incluida la actual, si currentAccessToken() alguna vez viniera
+               null — mejor no tocar nada en ese caso que botar a todos. */
             if ($changingPassword) {
                 $current = $user->currentAccessToken();
-                $user->tokens()->when($current, fn ($q) => $q->where('id', '!=', $current->id))->delete();
+                if ($current) {
+                    $user->tokens()->where('id', '!=', $current->id)->delete();
+                }
             }
         });
 
