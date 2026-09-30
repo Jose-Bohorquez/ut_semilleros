@@ -202,6 +202,10 @@ noCreateFor: ['ESTUDIANTE'],
 
 noEditFor: ['ESTUDIANTE'],
 
+/* CU13-A1: "Guardar borrador" registra el semillero inactivo. Solo aplica
+   al crear (un semillero ya existente se inactiva con el toggle de estado). */
+draftOption: true,
+
 /* CU13 Ronda B: Object.fromEntries(FormData) solo conserva el último
    valor seleccionado en un <select multiple> — hay que leer todas las
    opciones marcadas antes de enviar. */

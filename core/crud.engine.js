@@ -700,6 +700,10 @@ export function createCrudModule(config) {
                         <button type="button" class="btn btn-ghost" id="closeModalBtn">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
+                        ${!record && config.draftOption ? `
+                        <button type="submit" class="btn btn-ghost" id="saveDraftBtn">
+                            <i class="fas fa-file"></i> Guardar borrador
+                        </button>` : ""}
                         <button type="submit" class="btn btn-primary" id="saveBtn">
                             <i class="fas fa-check"></i> Guardar
                         </button>
@@ -861,13 +865,18 @@ export function createCrudModule(config) {
             if (banner) banner.style.display = "none";
 
             submitting = true;
-            const saveBtn = document.getElementById("saveBtn");
+            const isDraft = e.submitter?.id === "saveDraftBtn";
+            const saveBtn = document.getElementById(isDraft ? "saveDraftBtn" : "saveBtn");
             if (saveBtn) {
                 saveBtn.disabled = true;
                 saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
             }
 
             const data = Object.fromEntries(new FormData(form).entries());
+
+            /* CU13 A1: «Guardar borrador» registra el semillero inactivo
+               (no visible en la PWA) sin importar lo elegido en Estado. */
+            if (isDraft) data.status = "INACTIVO";
 
             /* Un campo opcional (required:false) vacío se omite en vez de
                enviarse como "" — evita que reglas tipo "nullable|min:6"
@@ -921,7 +930,9 @@ export function createCrudModule(config) {
                 submitting = false;
                 if (saveBtn) {
                     saveBtn.disabled = false;
-                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Guardar';
+                    saveBtn.innerHTML = isDraft
+                        ? '<i class="fas fa-file"></i> Guardar borrador'
+                        : '<i class="fas fa-check"></i> Guardar';
                 }
             }
         });
