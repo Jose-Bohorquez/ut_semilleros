@@ -23,7 +23,15 @@ fields:[
  {
   name:"content",
   label:"Resultado",
-  type:"text"
+  type:"textarea",
+  hint:"Entre 10 y 2000 caracteres."
+ },
+
+ {
+  name:"result_date",
+  label:"Fecha del resultado",
+  type:"date",
+  required:false
  },
 
  {
@@ -38,8 +46,12 @@ fields:[
 
 ],
 
-noCreateFor: ['ADMIN_SISTEMA'],
+/* CU20: el actor secundario Administrativo es solo consulta (2026-09-30,
+   mismo criterio ya aplicado a semilleros en CU16 y objetivos en CU19).
+   Bug real corregido de paso: aquí se bloqueaba a ADMIN_SISTEMA en vez de
+   permitirlo — la ruta de escritura tampoco lo tenía en el backend. */
+noCreateFor: ['ESTUDIANTE', 'ADMINISTRATIVO'],
 
-noEditFor: ['ADMIN_SISTEMA']
+noEditFor: ['ESTUDIANTE', 'ADMINISTRATIVO']
 
 });

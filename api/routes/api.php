@@ -293,7 +293,7 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
          ->get('/results', [ResultController::class, 'index']);
 
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+    Route::middleware('role:LIDER_SEMILLERO,ADMIN_SISTEMA')->group(function () {
         Route::post('/results',                      [ResultController::class, 'store']);
         Route::put('/results/{id}',                  [ResultController::class, 'update']);
         Route::put('/results/{id}/toggle-status',    [ResultController::class, 'toggleStatus']);

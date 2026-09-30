@@ -165,10 +165,24 @@ en paralelo mientras se prueba y se migra ruta por ruta, no se reemplazó de una
 Personas) y acordeón por módulo para usabilidad; 25 tests nuevos (271 en total) + 8/8 y 5/5 E2E
 local.
 
-Diferencias conocidas a cerrar (2026-09-29): RN06 (líder solo en sus semilleros) no se aplica;
-RN02/RN03 (referencia de autorización escrita) sin campo; RN08 (códigos únicos) en CAT, áreas,
-grupos, facultades y programas (falta semillero); RF15/CU28 reportes no existen. El avance de
-la validación 1 a 1 queda en `docs/qa/` (no versionado mientras haya vulnerabilidades abiertas).
+**CU13 Ronda B (2026-09-29) a CU20 (2026-09-30), resumen** (acta completa por CU en
+`docs/validacion/CUxx.md`): programa/área de semilleros pasaron a selección múltiple (pivots
+`seedbed_program`/`seedbed_area`). CU14 modificar semillero, CU15 estado (inactivar exige motivo
+y rechaza solicitudes pendientes), CU16 consultar semilleros web (Administrativo pasó a solo
+consulta, precedente que se repite en CU19/CU20), CU17 semilleros por facultad PWA, CU18 detalle
+de semillero PWA (+ botón "Ser miembro" = CU22, trabajados juntos) desplegados y validados. CU19
+objetivos y CU20 resultados: mismo hallazgo real en ambos — RN06 (líder solo gestiona lo suyo) no
+existía en absoluto en el controller, corregido con `guardLeaderOwnsSeedbed()`; Administrativo
+alineado a solo consulta. CU20 tuvo además un bug real propio: la ruta de escritura le faltaba
+`ADMIN_SISTEMA` (el admin no podía gestionar resultados) y el módulo frontend bloqueaba al admin
+en vez de a Administrativo — corregido en ambas capas. 336 tests en total. RN06 ya se aplica en
+Seedbed/Objective/Result; sigue faltando en el resto de entidades con dueño (revisar caso por
+caso al llegar a cada CU).
+
+Diferencias conocidas a cerrar (2026-09-29): RN02/RN03 (referencia de autorización escrita) sin
+campo en algunos módulos; RN08 (códigos únicos) en CAT, áreas, grupos, facultades y programas
+(falta semillero); RF15/CU28 reportes no existen. El avance de la validación 1 a 1 queda en
+`docs/qa/` (no versionado mientras haya vulnerabilidades abiertas).
 
 ## Antes de trabajar aquí
 

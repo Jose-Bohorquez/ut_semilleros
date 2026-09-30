@@ -10,6 +10,7 @@ class Result extends Model
     protected $fillable = [
         'seedbed_id',
         'content',
+        'result_date',
         'status'
     ];
 
