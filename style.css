@@ -463,6 +463,15 @@ tbody tr:hover { background: var(--color-surface-2); }
 
 /* DataTables */
 .dataTables_wrapper { font-size: var(--text-sm); color: var(--color-text); }
+
+/* Scroll horizontal propio de la tabla, nunca del documento — antes solo
+   existía esta regla en css/pwa.css (solo mobile, <=768px); en la web de
+   escritorio una tabla con muchas columnas (ej. auditoría) podía desbordar
+   el layout en vez de scrollear internamente (hallazgo real, 2026-09-30). */
+.dataTables_wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .dataTables_filter input {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-input);

@@ -29,14 +29,14 @@ async function renderMembers(seedbedId,members){
         return `
         <tr>
 
-            <td>${escapeHtml(member.id)}</td>
-            <td>${escapeHtml(member.name)}</td>
-            <td>${escapeHtml(member.email)}</td>
-            <td>${escapeHtml(member.pivot.role)}</td>
+            <td data-label="ID">${escapeHtml(member.id)}</td>
+            <td data-label="Nombre">${escapeHtml(member.name)}</td>
+            <td data-label="Email">${escapeHtml(member.email)}</td>
+            <td data-label="Rol">${escapeHtml(member.pivot.role)}</td>
 
-            <td>
+            <td data-label="Acciones">
 
-                <button 
+                <button
                 class="removeMemberBtn"
                 data-seedbed="${seedbedId}"
                 data-user="${escapeHtml(member.id)}">
@@ -60,7 +60,7 @@ async function renderMembers(seedbedId,members){
     Agregar integrante
     </button>
 
-    <table id="membersTable" class="display" style="width:100%">
+    <table id="membersTable" class="display mobile-card-table" style="width:100%">
 
         <thead>
 

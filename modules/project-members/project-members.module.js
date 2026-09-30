@@ -31,14 +31,14 @@ async function renderMembers(projectId,members){
         return `
         <tr>
 
-            <td>${escapeHtml(member.id)}</td>
-            <td>${escapeHtml(member.name)}</td>
-            <td>${escapeHtml(member.email)}</td>
-            <td>${escapeHtml(member.pivot.role)}</td>
+            <td data-label="ID">${escapeHtml(member.id)}</td>
+            <td data-label="Nombre">${escapeHtml(member.name)}</td>
+            <td data-label="Email">${escapeHtml(member.email)}</td>
+            <td data-label="Rol">${escapeHtml(member.pivot.role)}</td>
 
-            <td>
+            <td data-label="Acciones">
 
-                <button 
+                <button
                 class="removeProjectMemberBtn"
                 data-project="${projectId}"
                 data-user="${escapeHtml(member.id)}">
@@ -62,7 +62,7 @@ async function renderMembers(projectId,members){
     Agregar miembro
     </button>
 
-    <table id="projectMembersTable" class="display" style="width:100%">
+    <table id="projectMembersTable" class="display mobile-card-table" style="width:100%">
 
         <thead>
 
@@ -90,6 +90,44 @@ async function renderMembers(projectId,members){
         LayoutView(content);
 
     initLayoutController();
+
+    /* Activar DataTable — antes esta tabla no lo inicializaba en absoluto
+       (hallazgo real, 2026-09-30), quedaba una tabla plana sin buscador,
+       paginación ni exportación, a diferencia del resto del sistema. */
+    setTimeout(() => {
+
+        const tableId = "#projectMembersTable";
+
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().destroy();
+        }
+
+        $(tableId).DataTable({
+
+            pageLength: 10,
+
+            dom: 'Bfrtip',
+
+            buttons: [
+                {extend: 'copy', text: 'Copiar'},
+                {extend: 'excel', text: 'Excel'},
+                {extend: 'pdf', text: 'PDF'},
+                {extend: 'print', text: 'Imprimir'}
+            ],
+
+            language: {
+                search: "Buscar:",
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                paginate: {
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+
+        });
+
+    }, 100);
 
 }
 
