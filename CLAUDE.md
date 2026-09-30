@@ -179,17 +179,36 @@ en vez de a Administrativo — corregido en ambas capas. 336 tests en total. RN0
 Seedbed/Objective/Result; sigue faltando en el resto de entidades con dueño (revisar caso por
 caso al llegar a cada CU).
 
-**CU24 gestionar solicitudes recibidas (2026-09-30, segunda cuenta Claude):** en local, 368 tests en
-verde, **pendiente de deploy** (acta `docs/validacion/CU24.md`). Estaba casi todo por hacer: `index()`
-devolvía todas las solicitudes a cualquier líder (RN06 ausente, igual que CU19/CU20), sin filtros ni
-`show()`; `updateStatus()` no exigía motivo al rechazar, no validaba E2/E3 y **descartaba en
-silencio `reviewed_by`/`reviewed_at`** (no estaban en `$fillable`); Administrativo podía resolver y
-`ADMIN_SISTEMA` no; el módulo frontend era un CRUD genérico sin "Ver". Se rehízo por spec y se
-retiró `PUT /requests/{id}` (editaba user/semillero/estado saltándose E1-E3). La respuesta del
-líder se guarda en `requests.reason`, que CU23 ya mostraba. Aprobar ofrece registrar al estudiante
-como integrante (CU21). **Hallazgo sin corregir:** `requests.phone` se guarda en claro, mientras
-`users.phone` y los teléfonos de coordinadores/integrantes van cifrados (RNF12) — pendiente de
-decisión de Jose.
+**CU21 integrantes (2026-09-30) + CU22 (2026-09-29, junto con CU18) + CU23 (2026-09-30):** CU22
+enviar solicitud ✅ (formulario embebido en el detalle de CU18: programa/teléfono/mensaje, E1 409
+de postulación única, E4 semillero inactivo). CU23 mis solicitudes ✅ — hallazgo real: las
+tarjetas no abrían detalle (flecha decorativa sin `click`), corregido con un sheet que muestra
+mensaje, fecha, programa y la respuesta del líder (`requests.reason`); botón "Ver semilleros" en
+el estado vacío. CU21 integrantes ✅ — **reconstruido completo por decisión de Jose**: lo que
+existía era un pivot de Usuario+rol sin ninguno de los campos de la spec (código, programa, nivel
+PR/PG, dirección/teléfono); tabla nueva `seedbed_members` con esos campos cifrados (mismo patrón
+que Coordinator/CU12), RN06 aplicado (no existía), `ADMIN_SISTEMA` restaurado en escritura,
+Administrativo solo consulta. Pendiente: A1 (precargar el formulario desde una solicitud
+aprobada) — requiere su propia ronda.
+
+**CU24 gestionar solicitudes recibidas (2026-09-30, trabajado por la segunda cuenta Claude en
+paralelo, desplegado y validado en vivo por la cuenta principal):** acta `docs/validacion/CU24.md`,
+368 tests en verde. Estaba casi todo por hacer: `index()` devolvía todas las solicitudes a
+cualquier líder (RN06 ausente, igual que CU19/CU20), sin filtros ni `show()`; `updateStatus()` no
+exigía motivo al rechazar, no validaba E2/E3 y **descartaba en silencio `reviewed_by`/
+`reviewed_at`** (no estaban en `$fillable`); Administrativo podía resolver y `ADMIN_SISTEMA` no;
+el módulo frontend era un CRUD genérico sin "Ver". Se rehízo por spec y se retiró
+`PUT /requests/{id}` (editaba user/semillero/estado saltándose E1-E3). La respuesta del líder se
+guarda en `requests.reason`, que CU23 ya mostraba. Aprobar ofrece registrar al estudiante como
+integrante (CU21, ya reconstruido). **Hallazgo sin corregir:** `requests.phone` se guarda en
+claro, mientras `users.phone` y los teléfonos de coordinadores/integrantes van cifrados (RNF12) —
+pendiente de decisión de Jose.
+
+**Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
+es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda
+cuenta conectada por SSH desde una VM Windows, mismo filesystem/repo/servidor de producción que
+esta). Reglas de coordinación: `git pull` antes de cada ronda, no trabajar el mismo CU en
+paralelo sin avisar, no desplegar a producción los dos a la vez.
 
 Diferencias conocidas a cerrar (2026-09-29): RN02/RN03 (referencia de autorización escrita) sin
 campo en algunos módulos; RN08 (códigos únicos) en CAT, áreas, grupos, facultades y programas
