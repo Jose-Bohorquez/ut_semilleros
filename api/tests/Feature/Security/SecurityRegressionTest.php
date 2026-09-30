@@ -49,11 +49,15 @@ class SecurityRegressionTest extends TestCase
     {
         $student = User::factory()->create(['role' => 'ESTUDIANTE']);
         $other   = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $seedbed = $this->seedbed();
         Sanctum::actingAs($student);
 
         $response = $this->postJson('/api/requests', [
             'user_id'    => $other->id,
-            'seedbed_id' => $this->seedbed()->id,
+            'seedbed_id' => $seedbed->id,
+            'program_id' => $seedbed->programs()->first()->id,
+            'phone'      => '3001234567',
+            'message'    => 'Quiero postularme a este semillero por interés académico.',
             'status'     => 'APROBADA',
         ]);
 
@@ -73,17 +77,24 @@ class SecurityRegressionTest extends TestCase
 
         /* Mandar el id de otro ya no evade la regla: se evalúa contra el propio. */
         $this->postJson('/api/requests', [
-            'user_id' => $other->id, 'seedbed_id' => $seedbed->id, 'status' => 'PENDIENTE',
-        ])->assertStatus(422);
+            'user_id' => $other->id, 'seedbed_id' => $seedbed->id,
+            'program_id' => $seedbed->programs()->first()->id,
+            'phone' => '3001234567', 'message' => 'Mensaje de prueba con longitud suficiente.',
+            'status' => 'PENDIENTE',
+        ])->assertStatus(409);
     }
 
     public function test_staff_can_still_create_request_for_a_student(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
         $student = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $seedbed = $this->seedbed();
 
         $this->postJson('/api/requests', [
-            'user_id' => $student->id, 'seedbed_id' => $this->seedbed()->id, 'status' => 'PENDIENTE',
+            'user_id' => $student->id, 'seedbed_id' => $seedbed->id,
+            'program_id' => $seedbed->programs()->first()->id,
+            'phone' => '3001234567', 'message' => 'Mensaje de prueba con longitud suficiente.',
+            'status' => 'PENDIENTE',
         ])->assertStatus(201);
         $this->assertDatabaseHas('requests', ['user_id' => $student->id]);
     }

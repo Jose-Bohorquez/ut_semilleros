@@ -26,7 +26,13 @@ class MembershipRequest extends Model
 
         'seedbed_id',
 
+        'program_id',
+
         'status',
+
+        'phone',
+
+        'message',
 
         'reason'
 
@@ -46,5 +52,11 @@ class MembershipRequest extends Model
     public function seedbed()
     {
         return $this->belongsTo(Seedbed::class);
+    }
+
+    /** CU22: programa (de los activos del semillero) con el que se postula. */
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
     }
 }

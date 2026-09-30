@@ -169,6 +169,33 @@ function renderList(requests) {
                     <span class="pwa-field-error" id="err-req-seedbed"></span>
                 </div>
 
+                <div class="pwa-form-group">
+                    <label class="pwa-label" for="req-program">
+                        Programa <span style="color:var(--color-error)">*</span>
+                    </label>
+                    <select class="pwa-input pwa-select" id="req-program" name="program_id" required disabled>
+                        <option value="">Selecciona primero un semillero...</option>
+                    </select>
+                    <span class="pwa-field-error" id="err-req-program"></span>
+                </div>
+
+                <div class="pwa-form-group">
+                    <label class="pwa-label" for="req-phone">
+                        Teléfono <span style="color:var(--color-error)">*</span>
+                    </label>
+                    <input class="pwa-input" id="req-phone" name="phone" type="tel" placeholder="Ej: 3001234567" required>
+                    <span class="pwa-field-error" id="err-req-phone"></span>
+                </div>
+
+                <div class="pwa-form-group">
+                    <label class="pwa-label" for="req-message">
+                        Mensaje <span style="color:var(--color-error)">*</span>
+                    </label>
+                    <textarea class="pwa-input" id="req-message" name="message" rows="3"
+                              placeholder="Cuéntale al líder por qué quieres unirte..." required></textarea>
+                    <span class="pwa-field-error" id="err-req-message"></span>
+                </div>
+
                 <button type="submit" class="pwa-btn-primary" id="submitRequestBtn">
                     <i class="fas fa-paper-plane"></i>
                     Enviar solicitud
@@ -206,6 +233,22 @@ function bindEvents() {
         await loadSeedbedsSelect();
     });
 
+    /* CU22 paso 2: el programa depende del semillero elegido (solo sus
+       programas activos). */
+    document.getElementById("req-seedbed")?.addEventListener("change", e => {
+        const seedbed = loadedSeedbeds.find(s => String(s.id) === e.target.value);
+        const programSelect = document.getElementById("req-program");
+        if (!seedbed) {
+            programSelect.innerHTML = `<option value="">Selecciona primero un semillero...</option>`;
+            programSelect.disabled = true;
+            return;
+        }
+        const programs = seedbed.programs || [];
+        programSelect.innerHTML = `<option value="">Selecciona un programa...</option>` +
+            programs.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("");
+        programSelect.disabled = false;
+    });
+
     closeBtn?.addEventListener("click", () => {
         modal.style.display = "none";
     });
@@ -237,6 +280,9 @@ function bindEvents() {
                 body: JSON.stringify({
                     user_id:    user.id,
                     seedbed_id: parseInt(seedbedId),
+                    program_id: document.getElementById("req-program").value,
+                    phone:      document.getElementById("req-phone").value,
+                    message:    document.getElementById("req-message").value,
                     status:     "PENDIENTE",
                 }),
             });
@@ -268,15 +314,17 @@ function bindEvents() {
     });
 }
 
+let loadedSeedbeds = [];
+
 async function loadSeedbedsSelect() {
     const select = document.getElementById("req-seedbed");
     if (!select) return;
     try {
         const data    = await apiFetch("/seedbeds");
-        const activos = (data.seedbeds || []).filter(s => s.status === "ACTIVO");
-        select.innerHTML = activos.length
+        loadedSeedbeds = (data.seedbeds || []).filter(s => s.status === "ACTIVO");
+        select.innerHTML = loadedSeedbeds.length
             ? `<option value="">Selecciona un semillero...</option>` +
-              activos.map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)}</option>`).join("")
+              loadedSeedbeds.map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)}</option>`).join("")
             : `<option value="">No hay semilleros disponibles</option>`;
     } catch {
         select.innerHTML = `<option value="">Error cargando semilleros</option>`;

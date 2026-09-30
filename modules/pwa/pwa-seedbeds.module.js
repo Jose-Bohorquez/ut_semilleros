@@ -7,6 +7,7 @@ import { LayoutView }           from "../../layout/layout.view.js";
 import { initLayoutController } from "../../layout/layout.controller.js";
 import { escapeHtml }      from "../../core/escape.js";
 import { navigateTo }      from "../../core/router.js";
+import { getUser }         from "../../services/storage.service.js";
 
 /* facultad -> lista de esa facultad; null -> pantalla de facultades */
 let currentFacultyId = null;
@@ -288,30 +289,28 @@ function detailSheetHtml() {
     </div>`;
 }
 
+/* CU18 paso 2: nombre, facultad, grupo, CAT, coordinador (nombre y correo),
+   objetivo general y pestañas Misión/Visión/Objetivos + botón «Ser miembro». */
 function openDetail(seedbed) {
     const sheet = document.getElementById("seedbedDetail");
     document.getElementById("detailTitle").textContent = seedbed.name;
-    const progNames = (seedbed.programs || []).map(p => p.name).join(", ");
+    const facultyNames = facultiesOf(seedbed).map(f => f.name).join(", ");
+
+    const infoRow = (label, value) => value ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;
+                     padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
+            <span style="font-size:var(--text-sm);color:var(--color-text-muted)">${label}</span>
+            <span style="font-size:var(--text-sm);font-weight:500">${value}</span>
+        </div>` : "";
+
     document.getElementById("detailContent").innerHTML = `
         <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-5)">
-            ${progNames ? `
-            <div style="display:flex;justify-content:space-between;align-items:center;
-                         padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
-                <span style="font-size:var(--text-sm);color:var(--color-text-muted)">Programa</span>
-                <span style="font-size:var(--text-sm);font-weight:500">${escapeHtml(progNames)}</span>
-            </div>` : ""}
-            ${seedbed.group?.name ? `
-            <div style="display:flex;justify-content:space-between;align-items:center;
-                         padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
-                <span style="font-size:var(--text-sm);color:var(--color-text-muted)">Grupo</span>
-                <span style="font-size:var(--text-sm);font-weight:500">${escapeHtml(seedbed.group.name)}</span>
-            </div>` : ""}
-            ${seedbed.cat?.name ? `
-            <div style="display:flex;justify-content:space-between;align-items:center;
-                         padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
-                <span style="font-size:var(--text-sm);color:var(--color-text-muted)">CAT</span>
-                <span style="font-size:var(--text-sm);font-weight:500">${escapeHtml(seedbed.cat.name)}</span>
-            </div>` : ""}
+            ${infoRow("Facultad", escapeHtml(facultyNames))}
+            ${infoRow("Grupo", seedbed.group?.name ? escapeHtml(seedbed.group.name) : "")}
+            ${infoRow("CAT", seedbed.cat?.name ? escapeHtml(seedbed.cat.name) : "")}
+            ${infoRow("Coordinador", seedbed.coordinator?.name
+                ? `${escapeHtml(seedbed.coordinator.name)}${seedbed.coordinator.email ? ` · ${escapeHtml(seedbed.coordinator.email)}` : ""}`
+                : "")}
             <div style="display:flex;justify-content:space-between;align-items:center;
                          padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
                 <span style="font-size:var(--text-sm);color:var(--color-text-muted)">Estado</span>
@@ -320,25 +319,155 @@ function openDetail(seedbed) {
         </div>
 
         <h4 style="font-size:var(--text-base);font-weight:600;margin:0 0 var(--space-3);color:var(--color-text)">
-            <i class="fas fa-align-left" style="color:var(--color-primary);margin-right:6px"></i>
-            Descripción
+            <i class="fas fa-bullseye" style="color:var(--color-primary);margin-right:6px"></i>
+            Objetivo general
         </h4>
         <p style="font-size:var(--text-sm);color:var(--color-text-2);line-height:1.5;margin:0 0 var(--space-5);
-                  ${seedbed.description ? "" : "font-style:italic;color:var(--color-text-muted)"}">
-            ${seedbed.description
-                ? seedbed.description.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-                : "Este semillero aún no tiene una descripción registrada."}
+                  ${seedbed.objetivo_general ? "" : "font-style:italic;color:var(--color-text-muted)"}">
+            ${escapeHtml(seedbed.objetivo_general || "Este semillero aún no tiene un objetivo general registrado.")}
         </p>
 
-        <h4 style="font-size:var(--text-base);font-weight:600;margin:0 0 var(--space-3);color:var(--color-text)">
-            <i class="fas fa-bullseye" style="color:var(--color-primary);margin-right:6px"></i>
-            Objetivos
-        </h4>
-        <div id="seedbedObjectives">
-            <div class="skeleton skeleton-row"></div>
-            <div class="skeleton skeleton-row"></div>
-        </div>`;
+        <div style="display:flex;gap:4px;margin-bottom:var(--space-3);border-bottom:1px solid var(--color-border)">
+            <button type="button" class="detail-tab-btn active" data-tab="mision" style="flex:1;padding:var(--space-2);border:none;background:none;
+                    border-bottom:2px solid var(--color-primary);color:var(--color-primary);font-weight:600;cursor:pointer">Misión</button>
+            <button type="button" class="detail-tab-btn" data-tab="vision" style="flex:1;padding:var(--space-2);border:none;background:none;
+                    border-bottom:2px solid transparent;color:var(--color-text-muted);font-weight:600;cursor:pointer">Visión</button>
+            <button type="button" class="detail-tab-btn" data-tab="objetivos" style="flex:1;padding:var(--space-2);border:none;background:none;
+                    border-bottom:2px solid transparent;color:var(--color-text-muted);font-weight:600;cursor:pointer">Objetivos</button>
+        </div>
+
+        <div id="detailTabPanes" style="margin-bottom:var(--space-5)">
+            <div data-tab-pane="mision">
+                <p style="font-size:var(--text-sm);color:var(--color-text-2);line-height:1.5;
+                          ${seedbed.mision ? "" : "font-style:italic;color:var(--color-text-muted)"}">
+                    ${escapeHtml(seedbed.mision || "Sin misión registrada.")}
+                </p>
+            </div>
+            <div data-tab-pane="vision" style="display:none">
+                <p style="font-size:var(--text-sm);color:var(--color-text-2);line-height:1.5;
+                          ${seedbed.vision ? "" : "font-style:italic;color:var(--color-text-muted)"}">
+                    ${escapeHtml(seedbed.vision || "Sin visión registrada.")}
+                </p>
+            </div>
+            <div data-tab-pane="objetivos" style="display:none" id="seedbedObjectives">
+                <div class="skeleton skeleton-row"></div>
+                <div class="skeleton skeleton-row"></div>
+            </div>
+        </div>
+
+        <div id="membershipSection"></div>`;
+
+    document.getElementById("detailTabPanes").addEventListener("click", e => {
+        const btn = e.target.closest(".detail-tab-btn");
+        if (!btn) return;
+        document.querySelectorAll(".detail-tab-btn").forEach(b => {
+            const active = b === btn;
+            b.classList.toggle("active", active);
+            b.style.borderBottomColor = active ? "var(--color-primary)" : "transparent";
+            b.style.color = active ? "var(--color-primary)" : "var(--color-text-muted)";
+        });
+        document.querySelectorAll("[data-tab-pane]").forEach(p => {
+            p.style.display = p.dataset.tabPane === btn.dataset.tab ? "" : "none";
+        });
+    });
+
     sheet.style.display = "flex";
+    renderMembershipSection(seedbed);
+}
+
+/* CU18 A1/A2: botón «Ser miembro» — muestra estado según si ya hay
+   solicitud pendiente/aprobada para ESTE semillero (CU22). */
+async function renderMembershipSection(seedbed) {
+    const container = document.getElementById("membershipSection");
+    if (!container) return;
+
+    let myRequests = [];
+    try {
+        const data = await apiFetch("/requests/my");
+        myRequests = data.requests || [];
+    } catch {
+        /* si falla, se asume sin solicitud previa — el backend igual valida al enviar */
+    }
+
+    const existing = myRequests.find(r => r.seedbed_id === seedbed.id);
+
+    if (existing?.status === "APROBADA") {
+        container.innerHTML = `<button type="button" class="pwa-btn-primary" disabled style="opacity:.6">
+            <i class="fas fa-check-circle"></i> Ya eres integrante</button>`;
+        return;
+    }
+    if (existing?.status === "PENDIENTE") {
+        container.innerHTML = `<button type="button" class="pwa-btn-primary" disabled style="opacity:.6">
+            <i class="fas fa-clock"></i> Solicitud pendiente</button>`;
+        return;
+    }
+
+    const programs = seedbed.programs || [];
+    container.innerHTML = `
+        <button type="button" class="pwa-btn-primary" id="joinSeedbedBtn">
+            <i class="fas fa-user-plus"></i> Ser miembro
+        </button>
+        <form id="joinSeedbedForm" style="display:none;margin-top:var(--space-4);flex-direction:column;gap:var(--space-3)">
+            <div class="pwa-form-group">
+                <label class="pwa-label" for="join-program">Programa <span style="color:var(--color-error)">*</span></label>
+                <select class="pwa-input pwa-select" id="join-program" required>
+                    <option value="">Selecciona un programa...</option>
+                    ${programs.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("")}
+                </select>
+                <span class="pwa-field-error" id="err-join-program"></span>
+            </div>
+            <div class="pwa-form-group">
+                <label class="pwa-label" for="join-phone">Teléfono <span style="color:var(--color-error)">*</span></label>
+                <input class="pwa-input" id="join-phone" type="tel" placeholder="Ej: 3001234567" required>
+                <span class="pwa-field-error" id="err-join-phone"></span>
+            </div>
+            <div class="pwa-form-group">
+                <label class="pwa-label" for="join-message">Mensaje <span style="color:var(--color-error)">*</span></label>
+                <textarea class="pwa-input" id="join-message" rows="3" placeholder="Cuéntale al líder por qué quieres unirte..." required></textarea>
+                <span class="pwa-field-error" id="err-join-message"></span>
+            </div>
+            <div id="joinFormError" style="display:none;color:var(--color-error);font-size:var(--text-sm)"></div>
+            <div style="display:flex;gap:var(--space-3)">
+                <button type="button" class="pwa-btn-secondary" id="cancelJoinBtn" style="flex:1">Cancelar</button>
+                <button type="submit" class="pwa-btn-primary" id="submitJoinBtn" style="flex:1">
+                    <i class="fas fa-paper-plane"></i> Enviar
+                </button>
+            </div>
+        </form>`;
+
+    const btn = document.getElementById("joinSeedbedBtn");
+    const form = document.getElementById("joinSeedbedForm");
+    btn.addEventListener("click", () => { btn.style.display = "none"; form.style.display = "flex"; });
+    document.getElementById("cancelJoinBtn").addEventListener("click", () => { form.style.display = "none"; btn.style.display = ""; });
+
+    form.addEventListener("submit", async e => {
+        e.preventDefault();
+        const errBox = document.getElementById("joinFormError");
+        errBox.style.display = "none";
+        const submitBtn = document.getElementById("submitJoinBtn");
+        submitBtn.disabled = true;
+        try {
+            await apiFetch("/requests", {
+                method: "POST",
+                body: JSON.stringify({
+                    user_id: getUser()?.id,
+                    seedbed_id: seedbed.id,
+                    program_id: document.getElementById("join-program").value,
+                    phone: document.getElementById("join-phone").value,
+                    message: document.getElementById("join-message").value,
+                    status: "PENDIENTE",
+                }),
+            });
+            container.innerHTML = `<div class="alert-success" style="padding:var(--space-3);border-radius:var(--radius-btn)">
+                Tu solicitud fue enviada. El líder del semillero te responderá.</div>`;
+        } catch (err) {
+            errBox.textContent = err.status === 0
+                ? "No se pudo enviar. Revisa tu conexión."
+                : (err.message || "No se pudo enviar la solicitud.");
+            errBox.style.display = "block";
+            submitBtn.disabled = false;
+        }
+    });
 }
 
 async function loadObjectivesForSeedbed(seedbedId) {
