@@ -80,6 +80,11 @@ class SiaKnowledgeRetrievalTest extends TestCase
             'foto perfil'           => ['cómo cambio mi foto de perfil', 'foto'],
             'sia admin'             => ['cómo reviso las calificaciones de SIA', 'Panel de SIA'],
             'bug'                   => ['encontré un error en el sistema', 'Reportar un error'],
+            // ── Ronda de auditoría (2026-10-01)
+            'asignar lider'         => ['cómo asigno el líder de un semillero', 'líder responsable de un semillero'],
+            'cambiar correo'        => ['puedo cambiar mi correo en el perfil', 'Perfil: cambiar mis datos'],
+            'limite propuestas'     => ['por qué no me deja registrar más propuestas', 'Registrar una propuesta'],
+            'respuesta evaluador'   => ['dónde veo la respuesta del evaluador de mi propuesta', 'Ver, editar y evaluar mis propuestas'],
         ];
     }
 

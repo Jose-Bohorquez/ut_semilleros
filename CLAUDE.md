@@ -200,9 +200,34 @@ exigía motivo al rechazar, no validaba E2/E3 y **descartaba en silencio `review
 el módulo frontend era un CRUD genérico sin "Ver". Se rehízo por spec y se retiró
 `PUT /requests/{id}` (editaba user/semillero/estado saltándose E1-E3). La respuesta del líder se
 guarda en `requests.reason`, que CU23 ya mostraba. Aprobar ofrece registrar al estudiante como
-integrante (CU21, ya reconstruido). **Hallazgo sin corregir:** `requests.phone` se guarda en
-claro, mientras `users.phone` y los teléfonos de coordinadores/integrantes van cifrados (RNF12) —
-pendiente de decisión de Jose.
+integrante (CU21, ya reconstruido). ~~Hallazgo: `requests.phone` en claro~~ — **corregido en la
+ronda de auditoría (2026-09-30)**, ver abajo.
+
+**Ronda de auditoría de CU01–CU25 + CU26 (2026-09-30, en local, sin desplegar):** informe completo
+en `docs/validacion/AUDITORIA_CU01-CU25_2026-09-30.md` (matriz por CU, hallazgos, decisiones),
+acta `docs/validacion/CU26.md` y estado de CU27–CU30 en `docs/validacion/estado_CU27-CU30_2026-09-30.md`.
+506 tests en verde (antes 434). Lo más importante: **un estudiante podía leer por API semilleros
+inactivos, `authorization_reference`, teléfonos y correos** (el filtro «solo activos» estaba solo en
+el navegador; corregido en el servidor, CU13/17/18); el perfil dejaba cambiar correo y nombre sin
+contraseña (CU05, la spec solo permite teléfono y contraseña); `requests.phone` va ahora cifrado
+(migración `2026_10_01_000001`, **cifra con `APP_KEY`: respaldar `requests` antes**); no existía
+`api/lang` (mensajes `validation.*` crudos; **revisar `APP_LOCALE` en el `.env` de producción**);
+el Administrador puede asignar/reasignar el líder de un semillero (CU14-A2); inactivar por `PUT`
+ya no es posible (solo Activar/Inactivar con motivo); áreas duplicadas en propuestas dejaban una
+propuesta sin áreas (500) y ahora hay transacción. Catálogos: Administrativo/Líder en solo consulta
+también en la interfaz. CU16: filtros por facultad/CAT/área y «Mis semilleros» para el Líder
+(extensión retrocompatible de `config.filters` en `core/crud.engine.js`: `options` como función,
+`roles`, `allLabel`, `test`, `defaultValue`, `emptyFilterMessage`).
+**CU26 «Mis propuestas»**: no existen RF26/RNF26 (le corresponden RF11, RN13, RNF02). **Puente
+reversible de estados (decisión de Jose):** el enum sigue siendo `PENDIENTE/APROBADA/RECHAZADA` y la
+API/PWA muestran Recibida/Viable/Archivada (`status_label`) más la observación del evaluador
+(`proposals.review_note`, migración `2026_10_01_000002`); la migración real del vocabulario va con
+CU27. **Abierto y justificado:** la auditoría no guarda valores anteriores/nuevos ni IP (raíz en CU29,
+no tocado en esta ronda). **Pendiente de decisión:** enlaces «Solicitudes»/«Propuestas» en el menú
+lateral de escritorio (hoy solo en la barra inferior móvil) y restringir `POST /requests` a
+Estudiante. **No verificado:** navegador (el puerto 8080 sigue inaccesible), producción
+(`migrate:status`, `.env`), Google real y las respuestas de SIA con la base nueva. **Graphify no se
+refrescó** (regla: hitos de ~5 CU; el flujo `/graphify . --update` no estaba disponible).
 
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
 es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda
@@ -309,8 +334,8 @@ viven en `css/theme.css`, con variante clara y oscura. Úsalos antes de inventar
 ## Grafo de conocimiento (graphify)
 
 `graphify-out/` mapea frontend + API. `SGAA/`, `todo_ut-edu.space_old/`, `db/` y los `.zip` quedan
-fuera vía `.graphifyignore`. Último refresco: 2026-09-26, con 987 nodos, 1987 aristas y 114
-comunidades. God nodes: `User`, `apiFetch()`, `Controller`, `Seedbed`, `createCrudModule()`,
+fuera vía `.graphifyignore`. Último refresco: commit `0a636ce` (CU13B–CU25, 89 archivos), con 2281
+nodos y 4408 aristas (comprobado el 2026-09-30); la ronda de auditoría posterior no lo refrescó. God nodes: `User`, `apiFetch()`, `Controller`, `Seedbed`, `createCrudModule()`,
 `initLayoutController()`.
 
 - `graphify query "<pregunta>"`: antes de explorar a ciegas (¿dónde se valida X?, ¿qué usa Y?).

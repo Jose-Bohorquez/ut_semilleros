@@ -1,3 +1,36 @@
+# Sesión 2026-09-30 — Auditoría integral de CU01–CU25 y cierre de CU26
+
+Informe completo: `docs/validacion/AUDITORIA_CU01-CU25_2026-09-30.md`. 506 tests en verde (antes 434).
+
+- **CU13/CU17/CU18/CU19 (CRÍTICO):** la API entregaba a un estudiante semilleros y objetivos inactivos,
+  la referencia de autorización, el motivo de inactivación, teléfonos y correos. El filtro «solo
+  activos» estaba únicamente en el navegador. Corregido en el servidor.
+- **CU05:** `PUT /profile` permitía cambiar correo y nombre sin contraseña. La spec solo permite
+  teléfono y contraseña. Corregido; foto de perfil validada (sin SVG, límite real de 2 MB) y límite de
+  intentos de contraseña actual.
+- **i18n:** no existía `api/lang`; las validaciones sin mensaje propio salían como `validation.*`.
+  Agregado `lang/es` y locale por defecto `es` (**revisar `APP_LOCALE` en producción**).
+- **CU22:** `requests.phone` se guardaba en claro. Cifrado con `APP_KEY` (migración con datos
+  existentes, idempotente). Las solicitudes nacen siempre `PENDIENTE`.
+- **CU14/CU15:** el Administrador puede asignar/reasignar el líder; `PUT /seedbeds/{id}` ya no cambia
+  el estado (solo Activar/Inactivar con motivo); el rechazo automático de solicitudes queda auditado.
+- **CU16:** filtros por facultad, CAT y área, «Mis semilleros» para el Líder, sección Resultados en «Ver»;
+  `members_count` e Integrantes leen los integrantes reales (regresión de CU21).
+- **CU18/CU19/CU23:** aviso «Este semillero ya no está disponible»; un objetivo inválido ya no se
+  descarta en silencio; «Solicitudes» y «Propuestas» funcionan sin conexión con el último dato.
+- **CU25:** áreas duplicadas dejaban una propuesta sin áreas (500); ahora hay validación y transacción.
+- **CU06/CU04/CU01:** el cambio de rol no puede dejar el sistema sin administrador; usuarios inactivos
+  no restablecen contraseña; ruta muerta `POST /register` eliminada.
+- **CU07–CU10:** Administrativo y Líder ven los catálogos en solo consulta también en la interfaz.
+- **CU26 «Mis propuestas»:** nuevo. Etiquetas Recibida/Viable/Archivada y observación del evaluador
+  (`proposals.review_note`), detalle al tocar, mensaje de lista vacía y modo sin conexión.
+- **Revisión de seguridad independiente:** `GET /seedbeds` ya no devuelve correo/teléfono de los usuarios ni el CAT completo al estudiante; las copias offline de solicitudes/propuestas se borran al cerrar sesión; la migración del teléfono aborta ante un valor cifrado con otra `APP_KEY`.
+- **SIA:** memoria técnica ampliada a 113 secciones y test de recuperación (57+ preguntas por rol).
+- **Abierto (documentado):** la auditoría no guarda valores anteriores/nuevos (CU29); CU27–CU30 sin
+  implementar (`docs/validacion/estado_CU27-CU30_2026-09-30.md`).
+
+---
+
 # Sesión 2026-09-28 — Validación CU01 (login web), RF01 y RNF01
 
 Primera ronda de la validación 1 a 1 contra `docs/especificacion/` (fuente de verdad funcional).
