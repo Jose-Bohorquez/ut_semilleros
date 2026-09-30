@@ -68,7 +68,15 @@ export function mountSia() {
            aria-label="Reportar un error por WhatsApp" title="Reportar un error (solo bugs)">
           <i class="fab fa-whatsapp" aria-hidden="true"></i><span>Reportar bug</span>
         </a>
+        <button type="button" class="sia-fab sia-fab-toggle" id="sia-toggle-collapse"
+                aria-label="Ocultar los botones de SIA y WhatsApp" title="Ocultar botones">
+          <i class="fas fa-chevron-down" aria-hidden="true"></i>
+        </button>
       </div>
+      <button type="button" class="sia-fab sia-fab-expand" id="sia-toggle-expand" hidden
+              aria-label="Mostrar los botones de SIA y WhatsApp" title="Mostrar botones">
+        <i class="fas fa-chevron-up" aria-hidden="true"></i>
+      </button>
       <section class="sia-panel" id="sia-panel" role="dialog" aria-modal="false" aria-labelledby="sia-title" hidden>
         <header class="sia-head">
           <div class="sia-head-avatar" aria-hidden="true"><i class="fas fa-robot"></i></div>
@@ -94,16 +102,41 @@ export function mountSia() {
     const panel = $("sia-panel"), body = $("sia-body"), form = $("sia-form"), input = $("sia-input");
     let busy = false;
 
-    /* ── Posición: encima de la barra inferior de la PWA cuando existe ── */
+    /* ── Posición: encima de la barra inferior de la PWA cuando existe ──
+       ── y ocultos mientras hay un modal/diálogo abierto (crudModal,
+       SweetAlert2, bottom-sheets) — antes flotaban por encima de todo,
+       tapando campos de formulario (hallazgo real, 2026-09-30). ── */
     const syncOffset = () => {
         const nav = document.querySelector(".pwa-bottom-nav");
         const withNav = !!nav && getComputedStyle(nav).display !== "none";
         root.classList.toggle("sia--with-nav", withNav);
         $("sia-wa").href = whatsappUrl();
+
+        const modalOpen = !!document.querySelector(
+            "#crudModal, .swal2-container, #seedbedDetail:not([style*='display: none']), [role='dialog']:not(#sia-panel)"
+        );
+        root.classList.toggle("sia--modal-open", modalOpen);
     };
-    new MutationObserver(syncOffset).observe(document.getElementById("app") || document.body, { childList: true });
+    new MutationObserver(syncOffset).observe(document.body, { childList: true, subtree: true });
     window.addEventListener("popstate", syncOffset);
     syncOffset();
+
+    /* Ocultar/mostrar manualmente (pedido: "que sea opcional sacarlos" —
+       a veces tapan contenido). Se recuerda entre sesiones. */
+    const COLLAPSE_KEY = "sia_collapsed";
+    const collapsed = (() => { try { return localStorage.getItem(COLLAPSE_KEY) === "1"; } catch { return false; } })();
+    root.classList.toggle("sia--collapsed", collapsed);
+    $("sia-toggle-expand").hidden = !collapsed;
+    $("sia-toggle-collapse").addEventListener("click", () => {
+        root.classList.add("sia--collapsed");
+        $("sia-toggle-expand").hidden = false;
+        try { localStorage.setItem(COLLAPSE_KEY, "1"); } catch {}
+    });
+    $("sia-toggle-expand").addEventListener("click", () => {
+        root.classList.remove("sia--collapsed");
+        $("sia-toggle-expand").hidden = true;
+        try { localStorage.removeItem(COLLAPSE_KEY); } catch {}
+    });
 
     /* ── Render de la conversación ── */
     const log = () => store.get(LOG_KEY, []);

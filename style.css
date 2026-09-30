@@ -1137,8 +1137,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
    Abajo a la izquierda: a la derecha están los «+» de la PWA.
    ========================================================= */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.sia-fabs { position: fixed; left: max(var(--space-4), env(safe-area-inset-left, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 1100; display: flex; flex-direction: column; gap: var(--space-5); align-items: flex-start; } /* SIA arriba, espacio, WhatsApp de bugs abajo */
+.sia-fabs { position: fixed; left: max(var(--space-4), env(safe-area-inset-left, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 1100; display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; transition: opacity .15s ease; } /* SIA arriba, espacio, WhatsApp de bugs, botón de ocultar abajo */
 #sia-root.sia--with-nav .sia-fabs { bottom: calc(60px + var(--space-4) + env(safe-area-inset-bottom, 0px)); }
+
+/* Hallazgo real (2026-09-30): flotaban por encima de cualquier modal
+   (crudModal, SweetAlert2, bottom-sheets), tapando campos de formulario. */
+#sia-root.sia--modal-open .sia-fabs,
+#sia-root.sia--modal-open .sia-fab-expand { display: none; }
+
+/* "Que sea opcional sacarlos": botón para ocultar/mostrar el par completo,
+   se recuerda entre sesiones (localStorage). */
+#sia-root.sia--collapsed .sia-fabs { display: none; }
+.sia-fab-toggle, .sia-fab-expand { min-width: 32px; width: 32px; height: 32px; padding: 0; background: var(--color-text-muted); color: #fff; border: none; box-shadow: var(--shadow-sm, 0 2px 6px rgba(0,0,0,.12)); font-size: .8rem; opacity: .85; }
+.sia-fab-toggle:hover, .sia-fab-expand:hover { opacity: 1; }
+.sia-fab-toggle i, .sia-fab-expand i { font-size: .85rem; }
+.sia-fab-expand { position: fixed; left: max(var(--space-4), env(safe-area-inset-left, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 1100; }
+#sia-root.sia--with-nav .sia-fab-expand { bottom: calc(60px + var(--space-4) + env(safe-area-inset-bottom, 0px)); }
+#sia-root:not(.sia--collapsed) .sia-fab-expand { display: none; }
 .sia-fab { min-width: 48px; height: 48px; border-radius: var(--radius-full); border: none; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 0 var(--space-4); color: #fff; font-weight: var(--weight-semibold); font-size: var(--text-sm); text-decoration: none; cursor: pointer; box-shadow: var(--shadow-lg, 0 8px 20px rgba(0,0,0,.18)); transition: transform .15s ease, box-shadow .15s ease; }
 .sia-fab i { font-size: 1.15rem; }
 .sia-fab:hover { transform: translateY(-2px); }
