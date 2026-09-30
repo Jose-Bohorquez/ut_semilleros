@@ -20,6 +20,8 @@ const STATUS_MAP = {
     RECHAZADA: { label: "Rechazada",  cls: "badge-pwa-error"   },
 };
 
+let loadedRequests = [];
+
 export const pwaRequestsModule = {
 
     async init() {
@@ -59,6 +61,8 @@ async function loadAndRender() {
 }
 
 function renderList(requests) {
+    loadedRequests = requests;
+
     /* Regla de negocio (Jose, 2026-07-28): mientras el estudiante tenga una
        postulación PENDIENTE o APROBADA, no puede crear otra. */
     const tieneActiva = requests.some(r => r.status === "PENDIENTE" || r.status === "APROBADA");
@@ -68,6 +72,9 @@ function renderList(requests) {
                <div class="empty-state-icon"><i class="fas fa-paper-plane"></i></div>
                <h3>Sin solicitudes</h3>
                <p>Aún no has enviado solicitudes de ingreso a ningún semillero.</p>
+               <button type="button" class="pwa-btn-primary" id="goToSeedbedsBtn" style="margin-top:var(--space-3)">
+                   <i class="fas fa-seedling"></i> Ver semilleros
+               </button>
            </div>`
         : requests.map(req => {
             const st = STATUS_MAP[req.status] || { label: escapeHtml(req.status), cls: "badge-pwa-neutral" };
@@ -77,7 +84,7 @@ function renderList(requests) {
                 : "";
 
             return `
-            <div class="pwa-card">
+            <div class="pwa-card" data-request-id="${escapeHtml(req.id)}" style="cursor:pointer">
                 <div class="card-avatar avatar-green">
                     <i class="fas fa-seedling"></i>
                 </div>
@@ -203,10 +210,76 @@ function renderList(requests) {
             </form>
 
         </div>
+    </div>
+
+    <!-- Sheet: detalle de solicitud (CU23 paso 4/5) -->
+    <div id="requestDetailSheet" style="display:none;position:fixed;inset:0;
+         background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-end;justify-content:center">
+        <div style="background:var(--color-surface);width:100%;max-width:600px;
+                    border-radius:var(--radius-card) var(--radius-card) 0 0;
+                    padding:var(--space-6);max-height:85vh;overflow-y:auto;
+                    box-shadow:var(--shadow-card);animation:slideUpModal 200ms ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5)">
+                <h3 id="detailReqTitle" style="margin:0;font-size:var(--text-xl);font-weight:700;color:var(--color-text)"></h3>
+                <button id="closeRequestDetailBtn" style="background:none;border:none;
+                        color:var(--color-text-muted);cursor:pointer;font-size:1.2rem;
+                        width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="detailReqBody"></div>
+        </div>
     </div>`;
 
     document.getElementById("app").innerHTML = LayoutView(content);
     initLayoutController();
+}
+
+function openRequestDetail(req) {
+    const st = STATUS_MAP[req.status] || { label: escapeHtml(req.status), cls: "badge-pwa-neutral" };
+    const date = req.created_at
+        ? new Date(req.created_at).toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" })
+        : "—";
+
+    document.getElementById("detailReqTitle").textContent = req.seedbed?.name || `Semillero #${req.seedbed_id}`;
+    document.getElementById("detailReqBody").innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <div style="display:flex;justify-content:space-between;align-items:center;
+                         padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
+                <span style="font-size:var(--text-sm);color:var(--color-text-muted)">Estado</span>
+                <span class="badge-pwa ${st.cls}">${st.label}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;
+                         padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
+                <span style="font-size:var(--text-sm);color:var(--color-text-muted)">Fecha de envío</span>
+                <span style="font-size:var(--text-sm);font-weight:500">${escapeHtml(date)}</span>
+            </div>
+            ${req.program?.name ? `
+            <div style="display:flex;justify-content:space-between;align-items:center;
+                         padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-light)">
+                <span style="font-size:var(--text-sm);color:var(--color-text-muted)">Programa</span>
+                <span style="font-size:var(--text-sm);font-weight:500">${escapeHtml(req.program.name)}</span>
+            </div>` : ""}
+
+            <h4 style="font-size:var(--text-base);font-weight:600;margin:var(--space-2) 0 0;color:var(--color-text)">
+                <i class="fas fa-comment-dots" style="color:var(--color-primary);margin-right:6px"></i>
+                Mensaje enviado
+            </h4>
+            <p style="font-size:var(--text-sm);color:var(--color-text-2);line-height:1.5;margin:0">
+                ${escapeHtml(req.message || "Sin mensaje.")}
+            </p>
+
+            <h4 style="font-size:var(--text-base);font-weight:600;margin:var(--space-2) 0 0;color:var(--color-text)">
+                <i class="fas fa-reply" style="color:var(--color-primary);margin-right:6px"></i>
+                Respuesta del líder
+            </h4>
+            <p style="font-size:var(--text-sm);line-height:1.5;margin:0;
+                      ${req.reason ? "color:var(--color-text-2)" : "font-style:italic;color:var(--color-text-muted)"}">
+                ${escapeHtml(req.reason || "Aún sin respuesta.")}
+            </p>
+        </div>`;
+
+    document.getElementById("requestDetailSheet").style.display = "flex";
 }
 
 function renderError(msg) {
@@ -255,6 +328,26 @@ function bindEvents() {
 
     modal?.addEventListener("click", e => {
         if (e.target === modal) modal.style.display = "none";
+    });
+
+    /* CU23 paso 4/5: tocar una solicitud abre su detalle */
+    document.getElementById("requestsList")?.addEventListener("click", e => {
+        const card = e.target.closest("[data-request-id]");
+        if (!card) return;
+        const req = loadedRequests.find(r => String(r.id) === card.dataset.requestId);
+        if (req) openRequestDetail(req);
+    });
+
+    document.getElementById("goToSeedbedsBtn")?.addEventListener("click", () => {
+        navigateTo("/seedbeds");
+    });
+
+    const detailSheet = document.getElementById("requestDetailSheet");
+    document.getElementById("closeRequestDetailBtn")?.addEventListener("click", () => {
+        detailSheet.style.display = "none";
+    });
+    detailSheet?.addEventListener("click", e => {
+        if (e.target === detailSheet) detailSheet.style.display = "none";
     });
 
     document.getElementById("newRequestForm")?.addEventListener("submit", async e => {
