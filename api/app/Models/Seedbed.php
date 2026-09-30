@@ -20,7 +20,8 @@ class Seedbed extends Model
         'justificacion',
         'objetivo_general',
         'authorization_reference',
-        'status'
+        'status',
+        'inactivation_reason'
     ];
 
     /**
@@ -79,6 +80,12 @@ public function projects()
 {
     return $this->hasMany(Project::class);
 }
+
+    /** CU15: solicitudes de ingreso al semillero. */
+    public function requests()
+    {
+        return $this->hasMany(MembershipRequest::class);
+    }
 
 
 

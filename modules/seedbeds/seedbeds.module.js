@@ -214,6 +214,67 @@ beforeSave(data, form) {
     data.areas = Array.from(form.querySelector('[name="areas"]')?.selectedOptions || []).map(o => o.value);
 },
 
+/* CU15: al inactivar, informa cuántas solicitudes pendientes tiene el
+   semillero (paso 2) y exige un motivo antes de confirmar (paso 3 / E2).
+   Al activar no se pide nada extra (A1). */
+async customToggleConfirm(record, status) {
+    const isInactivating = status === "ACTIVO";
+    const name = record?.name || "este semillero";
+
+    if (!isInactivating) {
+        const result = await Swal.fire({
+            title: "¿Activar semillero?",
+            html: `<strong>${escapeHtml(name)}</strong> volverá a ser visible en la PWA.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, activar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#22c55e",
+            reverseButtons: true,
+        });
+        return result.isConfirmed ? { body: {} } : null;
+    }
+
+    const pending = record?.pending_requests_count ?? 0;
+
+    const result = await Swal.fire({
+        title: "¿Inactivar semillero?",
+        html: `
+            <p><strong>${escapeHtml(name)}</strong> dejará de ser visible en la PWA.</p>
+            <p>${pending > 0
+                ? `Tiene <strong>${pending}</strong> solicitud${pending === 1 ? "" : "es"} pendiente${pending === 1 ? "" : "s"}: se rechazará${pending === 1 ? "" : "n"} automáticamente con el motivo «Semillero inactivo».`
+                : "No tiene solicitudes pendientes."}</p>
+        `,
+        icon: "warning",
+        input: "textarea",
+        inputLabel: "Motivo de la inactivación",
+        inputPlaceholder: "Ej: Cierre temporal por vacaciones del semestre",
+        inputValidator: value => !value || value.trim().length < 5
+            ? "El motivo debe tener al menos 5 caracteres."
+            : undefined,
+        showCancelButton: true,
+        confirmButtonText: "Sí, inactivar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#f59e0b",
+        reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return null;
+    return { body: { reason: result.value.trim() } };
+},
+
+/* CU15 paso 5: muestra cuántas solicitudes quedaron rechazadas. */
+async onToggled(response) {
+    const count = response?.rejected_requests_count ?? 0;
+    if (count > 0) {
+        await Swal.fire({
+            icon: "info",
+            title: "Solicitudes rechazadas",
+            text: `Se rechazaron automáticamente ${count} solicitud${count === 1 ? "" : "es"} pendiente${count === 1 ? "" : "s"}.`,
+        });
+    }
+},
+
 /* ── Sección extra dentro del mismo modal: Objetivos ──────────────────── */
 extraFormHtml(record) {
     /* CU14 E3: se envía junto al formulario la marca de tiempo que el

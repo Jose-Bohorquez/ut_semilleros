@@ -32,7 +32,9 @@ class SeedbedController extends Controller
     /** Listar semilleros */
     public function index()
     {
-        $seedbeds = Seedbed::with(self::RELATIONS)->get();
+        $seedbeds = Seedbed::with(self::RELATIONS)
+            ->withCount(['requests as pending_requests_count' => fn ($q) => $q->where('status', 'PENDIENTE')])
+            ->get();
 
         return response()->json([
             "seedbeds"=>$seedbeds
@@ -45,7 +47,9 @@ class SeedbedController extends Controller
      */
     public function show($id)
     {
-        $seedbed = Seedbed::with(array_merge(self::RELATIONS, ['users']))->findOrFail($id);
+        $seedbed = Seedbed::with(array_merge(self::RELATIONS, ['users']))
+            ->withCount(['requests as pending_requests_count' => fn ($q) => $q->where('status', 'PENDIENTE')])
+            ->findOrFail($id);
 
         return response()->json([
             'seedbed' => $seedbed,
@@ -110,19 +114,50 @@ class SeedbedController extends Controller
     }
 
 
-    public function toggleStatus($id)
+    /**
+     * CU15: activar/inactivar semillero.
+     * - Al inactivar: motivo obligatorio (E2), rechaza automáticamente las
+     *   solicitudes pendientes con la razón "Semillero inactivo".
+     * - Al activar (A1): sin motivo, no toca las solicitudes.
+     */
+    public function toggleStatus(Request $request, $id)
     {
 
         $seedbed = Seedbed::findOrFail($id);
         $this->guardLeaderOwnsSeedbed($seedbed);
 
-        $seedbed->status = $seedbed->status === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+        $isInactivating = $seedbed->status === 'ACTIVO';
+        $rejectedCount = 0;
 
+        if ($isInactivating) {
+            $validated = $request->validate([
+                'reason' => 'required|string|min:5',
+            ], [
+                'reason.required' => 'Debes indicar el motivo para inactivar el semillero.',
+                'reason.min' => 'El motivo debe tener al menos 5 caracteres.',
+            ]);
+
+            $seedbed->inactivation_reason = $validated['reason'];
+
+            $rejectedCount = $seedbed->requests()
+                ->where('status', 'PENDIENTE')
+                ->update([
+                    'status' => 'RECHAZADA',
+                    'reason' => 'Semillero inactivo',
+                    'reviewed_by' => auth()->id(),
+                    'reviewed_at' => now(),
+                ]);
+        } else {
+            $seedbed->inactivation_reason = null;
+        }
+
+        $seedbed->status = $isInactivating ? 'INACTIVO' : 'ACTIVO';
         $seedbed->save();
 
         return response()->json([
             "message" => "Estado semillero actualizado",
-            "seedbed" => $seedbed
+            "seedbed" => $seedbed,
+            "rejected_requests_count" => $rejectedCount,
         ]);
 
     }

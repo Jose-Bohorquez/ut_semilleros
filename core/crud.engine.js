@@ -792,6 +792,31 @@ export function createCrudModule(config) {
             const record    = recordsCache.find(r => r.id == id);
             const name      = record?.name || record?.title || `#${id}`;
 
+            /* Hook opcional: un módulo puede pedir datos extra (ej. motivo) o
+               mostrar información adicional antes de confirmar el cambio de
+               estado. Devuelve `false`/`null` para cancelar, o un objeto
+               `{ body }` con el payload a enviar en el PUT. */
+            if (config.customToggleConfirm) {
+                const custom = await config.customToggleConfirm(record, status);
+                if (!custom) return;
+
+                try {
+                    const response = await apiFetch(`/${entity}/${id}/toggle-status`, {
+                        method: "PUT",
+                        body: JSON.stringify(custom.body || {}),
+                    });
+                    await config.onToggled?.(response);
+                    Swal.fire({
+                        icon: "success", title: "Estado actualizado",
+                        timer: 1500, showConfirmButton: false, toast: true, position: "top-end",
+                    });
+                    await init();
+                } catch (err) {
+                    Swal.fire({ icon: "error", title: "Error", text: err.message });
+                }
+                return;
+            }
+
             const result = await Swal.fire({
                 title:             `¿${label.charAt(0).toUpperCase() + label.slice(1)} registro?`,
                 html:              `Se cambiará el estado de <strong>${escapeHtml(name)}</strong>.`,

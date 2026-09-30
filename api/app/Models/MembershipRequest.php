@@ -26,7 +26,9 @@ class MembershipRequest extends Model
 
         'seedbed_id',
 
-        'status'
+        'status',
+
+        'reason'
 
     ];
 

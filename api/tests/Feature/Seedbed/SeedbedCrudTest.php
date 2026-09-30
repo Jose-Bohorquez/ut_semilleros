@@ -204,9 +204,45 @@ class SeedbedCrudTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
         $seedbed  = $this->makeSeedbed(['code' => 'SB-2']);
-        $response = $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status");
+        $response = $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status", ['reason' => 'Cierre temporal de prueba']);
         $response->assertStatus(200);
-        $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id, 'status' => 'INACTIVO']);
+        $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id, 'status' => 'INACTIVO', 'inactivation_reason' => 'Cierre temporal de prueba']);
+    }
+
+    /* ───── CU15: cambiar estado (E2 motivo obligatorio, rechazo automático de solicitudes) ───── */
+
+    public function test_inactivating_without_reason_is_rejected(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $seedbed = $this->makeSeedbed(['code' => 'SB-CU15-1']);
+        $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status")
+            ->assertStatus(422)->assertJsonValidationErrors(['reason']);
+    }
+
+    public function test_inactivating_rejects_pending_requests_automatically(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $seedbed = $this->makeSeedbed(['code' => 'SB-CU15-2']);
+        $estudiante = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $pending = \App\Models\MembershipRequest::create([
+            'user_id' => $estudiante->id, 'seedbed_id' => $seedbed->id, 'status' => 'PENDIENTE',
+        ]);
+
+        $response = $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status", ['reason' => 'Cierre por vacaciones']);
+
+        $response->assertStatus(200)->assertJsonPath('rejected_requests_count', 1);
+        $this->assertDatabaseHas('requests', [
+            'id' => $pending->id, 'status' => 'RECHAZADA', 'reason' => 'Semillero inactivo',
+        ]);
+    }
+
+    public function test_activating_does_not_require_reason(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $seedbed = $this->makeSeedbed(['code' => 'SB-CU15-3', 'status' => 'INACTIVO']);
+        $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status")
+            ->assertStatus(200);
+        $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id, 'status' => 'ACTIVO']);
     }
 
     /* ───── RN06: el líder solo modifica los semilleros de los que es responsable ───── */
