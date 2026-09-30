@@ -4,13 +4,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use App\Models\Proposal;
+use App\Models\Program;
 
 class ProposalController extends Controller
 {
     private const MESSAGES = [
-        'area_id.required' => 'El área es obligatoria.',
-        'area_id.exists'   => 'El área seleccionada no existe o está inactiva.',
+        'areas.required'      => 'Debes seleccionar al menos un área de conocimiento.',
+        'areas.min'            => 'Debes seleccionar al menos un área de conocimiento.',
+        'program_id.required' => 'El programa es obligatorio.',
+        'description.min'     => 'La descripción debe tener entre 20 y 2000 caracteres.',
+        'description.max'     => 'La descripción debe tener entre 20 y 2000 caracteres.',
     ];
 
     public function index()
@@ -18,7 +23,8 @@ class ProposalController extends Controller
 
         $proposals = Proposal::with([
             'user:id,name',
-            'area'
+            'areas',
+            'program:id,name'
         ])->get();
 
         return response()->json([
@@ -31,15 +37,26 @@ class ProposalController extends Controller
     public function store(Request $request)
     {
 
+        /* E3 / RN15: máximo 5 propuestas por estudiante en 24 horas. Se
+           evalúa sobre el autor real (el estudiante mismo, o el que venga en
+           el payload si lo crea un Líder/Administrativo a nombre de otro). */
+        $authorId = auth()->user()->role === 'ESTUDIANTE' ? auth()->id() : (int) $request->input('user_id');
+        $this->guardDailyLimit($authorId);
+
         $validated = $request->validate([
 
             "user_id"=>"required|exists:users,id",
 
-            "area_id"=>["required", Rule::exists('areas', 'id')->where('status', 'ACTIVO')],
+            "program_id"=>["required", "integer", $this->activeProgramRule()],
+
+            "areas"=>"required|array|min:1",
+            "areas.*"=>["integer", $this->activeAreaItemRule()],
 
             "title"=>"required|string|max:255",
 
-            "description"=>"required|string",
+            "description"=>"required|string|min:20|max:2000",
+
+            "phone"=>"nullable|string|max:30",
 
             "status"=>"required|in:PENDIENTE,APROBADA,RECHAZADA"
 
@@ -54,7 +71,12 @@ class ProposalController extends Controller
             $validated['status']  = 'PENDIENTE';
         }
 
+        $areas = $validated['areas'];
+        unset($validated['areas']);
+
         $proposal = Proposal::create($validated);
+        $proposal->areas()->attach($areas);
+        $proposal->load(['user:id,name', 'areas', 'program:id,name']);
 
         return response()->json([
             "message"=>"Propuesta creada",
@@ -86,16 +108,16 @@ class ProposalController extends Controller
 
             "user_id"=>"required|exists:users,id",
 
-            "area_id"=>[
-                "required",
-                (int) $request->input("area_id") === (int) $proposal->area_id
-                    ? "exists:areas,id"
-                    : Rule::exists('areas', 'id')->where('status', 'ACTIVO'),
-            ],
+            "program_id"=>["required", "integer", $this->activeProgramRule($proposal)],
+
+            "areas"=>"required|array|min:1",
+            "areas.*"=>["integer", $this->activeAreaItemRule($proposal)],
 
             "title"=>"required|string|max:255",
 
-            "description"=>"required|string",
+            "description"=>"required|string|min:20|max:2000",
+
+            "phone"=>"nullable|string|max:30",
 
             "status"=>"required|in:PENDIENTE,APROBADA,RECHAZADA"
 
@@ -110,7 +132,12 @@ class ProposalController extends Controller
             $validated['user_id'] = $proposal->user_id;
         }
 
+        $areas = $validated['areas'];
+        unset($validated['areas']);
+
         $proposal->update($validated);
+        $proposal->areas()->sync($areas);
+        $proposal->load(['user:id,name', 'areas', 'program:id,name']);
 
         return response()->json([
             "message"=>"Propuesta actualizada",
@@ -146,7 +173,7 @@ class ProposalController extends Controller
     public function myProposals()
     {
         $user = auth()->user();
-        $proposals = Proposal::with(['user:id,name', 'area'])
+        $proposals = Proposal::with(['user:id,name', 'areas', 'program:id,name'])
             ->where('user_id', $user->id)
             ->latest()
             ->get();
@@ -159,6 +186,50 @@ class ProposalController extends Controller
         return response()->json([
             'message' => 'La eliminación no está permitida. Use cambio de estado.',
         ], 405);
+    }
+
+    /* E3 / RN15: máximo 5 propuestas en 24 horas por estudiante. */
+    private function guardDailyLimit(int $userId): void
+    {
+        $count = Proposal::where('user_id', $userId)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->count();
+
+        if ($count >= 5) {
+            $e = ValidationException::withMessages([
+                'limit' => ['Has alcanzado el límite diario de propuestas.'],
+            ]);
+            $e->status = 429;
+            throw $e;
+        }
+    }
+
+    /* Programa activo, o el que ya tenía la propuesta al editar. */
+    private function activeProgramRule(?Proposal $current = null): \Closure
+    {
+        return function ($attribute, $value, $fail) use ($current) {
+            $program = Program::find($value);
+            if (!$program) {
+                $fail('El programa seleccionado no existe.');
+                return;
+            }
+            if ($program->status !== 'ACTIVO' && (!$current || $current->program_id !== (int) $value)) {
+                $fail('El programa seleccionado no está activo.');
+            }
+        };
+    }
+
+    /* Área activa, o una que ya tenía asignada la propuesta que se edita
+       (mismo criterio que activeAreaItemRule en SeedbedController, CU13). */
+    private function activeAreaItemRule(?Proposal $current = null): \Closure
+    {
+        $currentIds = $current ? $current->areas()->pluck('areas.id')->all() : [];
+        return function (string $attribute, $value, \Closure $fail) use ($currentIds) {
+            if (in_array((int) $value, $currentIds, true)) return;
+            if (!\App\Models\Area::where('id', $value)->where('status', 'ACTIVO')->exists()) {
+                $fail('El área seleccionada no existe o está inactiva.');
+            }
+        };
     }
 
 }

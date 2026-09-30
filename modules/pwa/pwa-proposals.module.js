@@ -22,21 +22,42 @@ const STATUS_MAP = {
 
 let proposalsCache = [];
 let areasCache = null;
+let programsCache = null;
 
-/* RF05: solo áreas activas, salvo la que ya tenía asignada la propuesta que se edita */
-async function loadAreaOptions(currentAreaId = null) {
+/* RF05: solo áreas activas, salvo las que ya tenía asignadas la propuesta que
+   se edita. CU25: selección múltiple (checkboxes), antes era un <select> único. */
+async function loadAreaOptions(currentAreaIds = []) {
     if (!areasCache) {
         try { areasCache = (await apiFetch("/areas")).areas || []; }
         catch { areasCache = []; }
     }
-    const select = document.getElementById("prop-area");
-    if (!select) return;
+    const container = document.getElementById("prop-areas");
+    if (!container) return;
     const options = areasCache
-        .filter(a => a.status === "ACTIVO" || a.id === currentAreaId)
-        .map(a => `<option value="${a.id}">${escapeHtml(a.name)}${a.status !== "ACTIVO" ? " (inactiva)" : ""}</option>`)
+        .filter(a => a.status === "ACTIVO" || currentAreaIds.includes(a.id))
+        .map(a => `
+            <label class="pwa-checkbox-item">
+                <input type="checkbox" name="areas" value="${a.id}" ${currentAreaIds.includes(a.id) ? "checked" : ""}>
+                ${escapeHtml(a.name)}${a.status !== "ACTIVO" ? " (inactiva)" : ""}
+            </label>`)
         .join("");
-    select.innerHTML = '<option value="">Selecciona un área...</option>' + options;
-    select.value = currentAreaId || "";
+    container.innerHTML = options || `<p class="pwa-hint">No hay áreas disponibles.</p>`;
+}
+
+/* CU25 paso 2: programa (de los programas activos). */
+async function loadProgramOptions(currentProgramId = null) {
+    if (!programsCache) {
+        try { programsCache = (await apiFetch("/programs")).programs || []; }
+        catch { programsCache = []; }
+    }
+    const select = document.getElementById("prop-program");
+    if (!select) return;
+    const options = programsCache
+        .filter(p => p.status === "ACTIVO" || p.id === currentProgramId)
+        .map(p => `<option value="${p.id}">${escapeHtml(p.name)}${p.status !== "ACTIVO" ? " (inactivo)" : ""}</option>`)
+        .join("");
+    select.innerHTML = '<option value="">Selecciona un programa...</option>' + options;
+    select.value = currentProgramId || "";
 }
 
 export const pwaProposalsModule = {
@@ -106,7 +127,7 @@ function renderList(proposals) {
                         <div class="card-title">${escapeHtml(p.title)}</div>
                         <div class="card-subtitle">
                             <span class="badge-pwa ${st.cls}">${st.label}</span>
-                            ${p.area ? `<span class="badge-pwa badge-pwa-neutral">${escapeHtml(p.area.name)}</span>` : ""}
+                            ${(p.areas || []).map(a => `<span class="badge-pwa badge-pwa-neutral">${escapeHtml(a.name)}</span>`).join("")}
                         </div>
                         <div class="card-meta">
                             <i class="fas fa-calendar-alt" style="margin-right:4px"></i>${date}
@@ -172,15 +193,22 @@ function renderList(proposals) {
                 <input type="hidden" id="prop-id" name="id" value="">
 
                 <div class="pwa-form-group">
-                    <label class="pwa-label" for="prop-area">
-                        Área de conocimiento <span style="color:var(--color-error)">*</span>
+                    <label class="pwa-label" for="prop-program">
+                        Programa <span style="color:var(--color-error)">*</span>
                     </label>
-                    <!-- Sin "required" nativo a propósito: bloquearía el submit antes de que
-                         corra la validación propia (mismo mensaje en español, campo por campo). -->
-                    <select class="pwa-input" id="prop-area" name="area_id">
-                        <option value="">Selecciona un área...</option>
+                    <select class="pwa-input" id="prop-program" name="program_id">
+                        <option value="">Selecciona un programa...</option>
                     </select>
-                    <span class="pwa-field-error" id="err-prop-area"></span>
+                    <span class="pwa-field-error" id="err-prop-program"></span>
+                </div>
+
+                <div class="pwa-form-group">
+                    <label class="pwa-label">
+                        Áreas de conocimiento <span style="color:var(--color-error)">*</span>
+                    </label>
+                    <!-- Selección múltiple (CU25 paso 2) -->
+                    <div id="prop-areas" class="pwa-checkbox-group"></div>
+                    <span class="pwa-field-error" id="err-prop-areas"></span>
                 </div>
 
                 <div class="pwa-form-group">
@@ -197,9 +225,15 @@ function renderList(proposals) {
                         Descripción <span style="color:var(--color-error)">*</span>
                     </label>
                     <textarea class="pwa-input" id="prop-desc" name="description"
-                              rows="4" placeholder="Describe tu propuesta de investigación..."
+                              rows="4" placeholder="Describe tu propuesta de investigación (mínimo 20 caracteres)..."
                               style="resize:vertical;height:auto" required></textarea>
                     <span class="pwa-field-error" id="err-prop-desc"></span>
+                </div>
+
+                <div class="pwa-form-group">
+                    <label class="pwa-label" for="prop-phone">Teléfono (opcional)</label>
+                    <input class="pwa-input" id="prop-phone" name="phone" type="tel" placeholder="Ej: 3001234567">
+                    <span class="pwa-field-error" id="err-prop-phone"></span>
                 </div>
 
                 <!-- Nota: el estudiante no puede cambiar el estado -->
@@ -262,25 +296,30 @@ function bindListEvents() {
     form?.addEventListener("submit", async e => {
         e.preventDefault();
 
-        const id    = document.getElementById("prop-id").value;
-        const areaId= document.getElementById("prop-area").value;
-        const title = document.getElementById("prop-title").value.trim();
-        const desc  = document.getElementById("prop-desc").value.trim();
-        const btn   = document.getElementById("saveProposalBtn");
-        const banner= document.getElementById("sheetBanner");
+        const id      = document.getElementById("prop-id").value;
+        const programId = document.getElementById("prop-program").value;
+        const areaIds = Array.from(document.querySelectorAll('#prop-areas input[name="areas"]:checked')).map(c => c.value);
+        const title   = document.getElementById("prop-title").value.trim();
+        const desc    = document.getElementById("prop-desc").value.trim();
+        const phone   = document.getElementById("prop-phone").value.trim();
+        const btn     = document.getElementById("saveProposalBtn");
+        const banner  = document.getElementById("sheetBanner");
 
         /* Limpiar errores */
-        document.getElementById("err-prop-area").textContent  = "";
-        document.getElementById("err-prop-title").textContent = "";
-        document.getElementById("err-prop-desc").textContent  = "";
+        document.getElementById("err-prop-program").textContent = "";
+        document.getElementById("err-prop-areas").textContent   = "";
+        document.getElementById("err-prop-title").textContent   = "";
+        document.getElementById("err-prop-desc").textContent    = "";
 
         let hasErr = false;
-        if (!areaId){ document.getElementById("err-prop-area").innerHTML =
-            '<i class="fas fa-exclamation-circle"></i> El área es obligatoria'; hasErr = true; }
+        if (!programId) { document.getElementById("err-prop-program").innerHTML =
+            '<i class="fas fa-exclamation-circle"></i> El programa es obligatorio'; hasErr = true; }
+        if (!areaIds.length) { document.getElementById("err-prop-areas").innerHTML =
+            '<i class="fas fa-exclamation-circle"></i> Selecciona al menos un área'; hasErr = true; }
         if (!title) { document.getElementById("err-prop-title").innerHTML =
             '<i class="fas fa-exclamation-circle"></i> El título es obligatorio'; hasErr = true; }
-        if (!desc)  { document.getElementById("err-prop-desc").innerHTML  =
-            '<i class="fas fa-exclamation-circle"></i> La descripción es obligatoria'; hasErr = true; }
+        if (!desc || desc.length < 20) { document.getElementById("err-prop-desc").innerHTML =
+            '<i class="fas fa-exclamation-circle"></i> La descripción debe tener al menos 20 caracteres'; hasErr = true; }
         if (hasErr) return;
 
         btn.disabled = true;
@@ -289,7 +328,7 @@ function bindListEvents() {
 
         const user    = getUser();
         const isEdit  = !!id;
-        const payload = { user_id: user.id, area_id: areaId, title, description: desc, status: "PENDIENTE" };
+        const payload = { user_id: user.id, program_id: programId, areas: areaIds, title, description: desc, phone: phone || null, status: "PENDIENTE" };
 
         try {
             if (isEdit) {
@@ -328,29 +367,34 @@ function openSheet(proposal) {
     const idInp  = document.getElementById("prop-id");
     const titInp = document.getElementById("prop-title");
     const descInp= document.getElementById("prop-desc");
+    const phoneInp= document.getElementById("prop-phone");
     const banner = document.getElementById("sheetBanner");
     const btnTxt = document.getElementById("saveBtnText");
 
     if (banner) banner.style.display = "none";
-    document.getElementById("err-prop-title").textContent = "";
-    document.getElementById("err-prop-desc").textContent  = "";
-    document.getElementById("err-prop-area").textContent  = "";
+    document.getElementById("err-prop-title").textContent   = "";
+    document.getElementById("err-prop-desc").textContent    = "";
+    document.getElementById("err-prop-areas").textContent   = "";
+    document.getElementById("err-prop-program").textContent = "";
 
     if (proposal) {
         title.innerHTML  = '<i class="fas fa-edit" style="color:var(--color-primary);margin-right:8px"></i>Editar Propuesta';
         idInp.value  = proposal.id;
         titInp.value = proposal.title;
         descInp.value= proposal.description;
+        if (phoneInp) phoneInp.value = proposal.phone || "";
         if (btnTxt) btnTxt.textContent = "Actualizar propuesta";
     } else {
         title.innerHTML  = '<i class="fas fa-plus-circle" style="color:var(--color-primary);margin-right:8px"></i>Nueva Propuesta';
         idInp.value  = "";
         titInp.value = "";
         descInp.value= "";
+        if (phoneInp) phoneInp.value = "";
         if (btnTxt) btnTxt.textContent = "Guardar propuesta";
     }
 
-    loadAreaOptions(proposal?.area_id ?? null);
+    loadAreaOptions((proposal?.areas || []).map(a => a.id));
+    loadProgramOptions(proposal?.program_id ?? null);
 
     sheet.style.display = "flex";
     setTimeout(() => titInp?.focus(), 100);

@@ -107,9 +107,12 @@ class SecurityRegressionTest extends TestCase
         $other   = User::factory()->create(['role' => 'ESTUDIANTE']);
         Sanctum::actingAs($student);
 
-        $area = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
+        $area    = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
+        $faculty = Faculty::create(['name' => 'F', 'status' => 'ACTIVO']);
+        $program = Program::create(['name' => 'P', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
         $this->postJson('/api/proposals', [
-            'user_id' => $other->id, 'area_id' => $area->id, 'title' => 'qa_sec', 'description' => 'd', 'status' => 'APROBADA',
+            'user_id' => $other->id, 'program_id' => $program->id, 'areas' => [$area->id],
+            'title' => 'qa_sec', 'description' => 'Descripción con longitud suficiente para pasar validación.', 'status' => 'APROBADA',
         ])->assertStatus(201);
 
         $this->assertDatabaseHas('proposals', ['title' => 'qa_sec', 'user_id' => $student->id, 'status' => 'PENDIENTE']);
@@ -120,11 +123,15 @@ class SecurityRegressionTest extends TestCase
         $student  = User::factory()->create(['role' => 'ESTUDIANTE']);
         $other    = User::factory()->create(['role' => 'ESTUDIANTE']);
         $area     = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
-        $proposal = Proposal::create(['user_id' => $student->id, 'area_id' => $area->id, 'title' => 't', 'description' => 'd', 'status' => 'PENDIENTE']);
+        $faculty  = Faculty::create(['name' => 'F', 'status' => 'ACTIVO']);
+        $program  = Program::create(['name' => 'P', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
+        $proposal = Proposal::create(['user_id' => $student->id, 'program_id' => $program->id, 'title' => 't', 'description' => 'Descripción con longitud suficiente.', 'status' => 'PENDIENTE']);
+        $proposal->areas()->attach($area->id);
         Sanctum::actingAs($student);
 
         $this->putJson("/api/proposals/{$proposal->id}", [
-            'user_id' => $other->id, 'area_id' => $area->id, 'title' => 't2', 'description' => 'd2', 'status' => 'APROBADA',
+            'user_id' => $other->id, 'program_id' => $program->id, 'areas' => [$area->id],
+            'title' => 't2', 'description' => 'Descripción actualizada con longitud suficiente.', 'status' => 'APROBADA',
         ])->assertStatus(200);
 
         $proposal->refresh();

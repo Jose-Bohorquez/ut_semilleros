@@ -21,18 +21,30 @@ fields:[
   display:"name"
  },
 
- /* RF05: toda propuesta tiene al menos un área */
  {
-  name:"area_id",
-  label:"Área",
+  name:"program_id",
+  label:"Programa",
   type:"relation",
+  relation:"programs",
+  display:"name"
+ },
+
+ /* RF05 / CU25: toda propuesta tiene al menos un área, selección múltiple
+    (antes area_id único). Mismo patrón que programas/áreas de semilleros
+    (CU13 Ronda B). */
+ {
+  name:"areas",
+  label:"Áreas",
+  type:"relation-multi",
   relation:"areas",
   display:"name"
  },
 
  {name:"title",label:"Título",type:"text"},
 
- {name:"description",label:"Descripción",type:"text"},
+ {name:"description",label:"Descripción",type:"textarea",hint:"Entre 20 y 2000 caracteres."},
+
+ {name:"phone",label:"Teléfono",type:"text",required:false},
 
  {
   name:"status",
@@ -46,6 +58,13 @@ fields:[
  }
 
 ],
+
+/* CU13 Ronda B / CU25: Object.fromEntries(FormData) solo conserva el último
+   valor seleccionado en un <select multiple> — hay que leer todas las
+   opciones marcadas antes de enviar. */
+beforeSave(data, form) {
+    data.areas = Array.from(form.querySelector('[name="areas"]')?.selectedOptions || []).map(o => o.value);
+},
 
 readonlyFor: ['ESTUDIANTE'],
 

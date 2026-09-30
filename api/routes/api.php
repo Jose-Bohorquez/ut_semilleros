@@ -134,7 +134,11 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
+    /* CU25: el ESTUDIANTE necesita leer los programas para elegir uno al
+       crear su propuesta — mismo hallazgo que ya se corrigió en /areas
+       (2026-09-29): sin esto, el selector de programa del formulario
+       quedaría vacío por un 403. */
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')->group(function () {
         Route::get('/programs',      [ProgramController::class, 'index']);
         Route::get('/programs/{id}', [ProgramController::class, 'show']);
     });

@@ -9,23 +9,38 @@ class Proposal extends Model
 
     protected $fillable = [
         'user_id',
-        'area_id',
+        'program_id',
         'title',
         'description',
+        'phone',
         'status'
     ];
+
+    /* RNF03: dato personal cifrado en reposo con APP_KEY, mismo patrón que
+       Coordinator/SeedbedMember. */
+    protected function casts(): array
+    {
+        return [
+            'phone' => 'encrypted',
+        ];
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Área de conocimiento (RF05: toda propuesta tiene al menos un área)
-     */
-    public function area()
+    public function program()
     {
-        return $this->belongsTo(Area::class);
+        return $this->belongsTo(Program::class);
+    }
+
+    /**
+     * Áreas de conocimiento (CU25: selección múltiple, antes area_id único).
+     */
+    public function areas()
+    {
+        return $this->belongsToMany(Area::class, 'proposal_area');
     }
 
 }

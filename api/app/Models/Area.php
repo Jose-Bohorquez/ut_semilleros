@@ -20,9 +20,11 @@ class Area extends Model
         return $this->belongsToMany(Seedbed::class, 'seedbed_area');
     }
 
+    /* CU25: propuesta puede tener varias áreas, se pasó a muchos-a-muchos
+       (antes area_id único en proposals). */
     public function proposals()
     {
-        return $this->hasMany(Proposal::class);
+        return $this->belongsToMany(Proposal::class, 'proposal_area');
     }
 
 }
