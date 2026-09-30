@@ -86,8 +86,9 @@ class RF02FacultyTest extends TestCase
     {
         $f = Faculty::create(['code' => 'F', 'name' => 'F', 'status' => 'INACTIVO']);
         $p = Program::create(['name' => 'P', 'faculty_id' => $f->id, 'status' => 'ACTIVO']);
-        $this->postJson('/api/seedbeds', ['name' => 'S', 'program_id' => $p->id, 'status' => 'ACTIVO'])
-            ->assertStatus(422)->assertJsonValidationErrors(['program_id']);
+        $area = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
+        $this->postJson('/api/seedbeds', ['name' => 'S', 'programs' => [$p->id], 'areas' => [$area->id], 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO'])
+            ->assertStatus(422)->assertJsonValidationErrors(['programs.0']);
     }
 
     public function test_seedbed_keeps_its_program_on_edit(): void
@@ -95,9 +96,11 @@ class RF02FacultyTest extends TestCase
         $f = Faculty::create(['code' => 'F', 'name' => 'F', 'status' => 'ACTIVO']);
         $p = Program::create(['name' => 'P', 'faculty_id' => $f->id, 'status' => 'ACTIVO']);
         $area = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
-        $s = Seedbed::create(['code' => 'SB-' . uniqid(), 'name' => 'S', 'program_id' => $p->id, 'area_id' => $area->id, 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO']);
+        $s = Seedbed::create(['code' => 'SB-' . uniqid(), 'name' => 'S', 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO']);
+        $s->programs()->attach($p->id);
+        $s->areas()->attach($area->id);
         $f->update(['status' => 'INACTIVO']);
-        $this->putJson("/api/seedbeds/{$s->id}", ['code' => $s->code, 'name' => 'S2', 'program_id' => $p->id, 'area_id' => $area->id, 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO'])->assertOk();
+        $this->putJson("/api/seedbeds/{$s->id}", ['code' => $s->code, 'name' => 'S2', 'programs' => [$p->id], 'areas' => [$area->id], 'objetivo_general' => 'Objetivo general de prueba', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO'])->assertOk();
     }
 
     /* RN07: altas y cambios quedan en la auditoría (AuditObserver) */

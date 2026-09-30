@@ -12,11 +12,9 @@ class Seedbed extends Model
         'code',
         'name',
         'description',
-        'program_id',
         'group_id',
         'cat_id',
         'coordinator_id',
-        'area_id',
         'mision',
         'vision',
         'justificacion',
@@ -26,19 +24,20 @@ class Seedbed extends Model
     ];
 
     /**
-     * Relación con programa
+     * Programas del semillero (CU13 Ronda B: selección múltiple, antes FK simple).
      */
-    public function program()
+    public function programs()
     {
-        return $this->belongsTo(Program::class);
+        return $this->belongsToMany(Program::class, 'seedbed_program')->withTimestamps();
     }
 
     /**
-     * Área de conocimiento (RF05: todo semillero tiene al menos un área)
+     * Áreas de conocimiento del semillero (RF05: al menos una; CU13 Ronda B:
+     * selección múltiple, antes FK simple).
      */
-    public function area()
+    public function areas()
     {
-        return $this->belongsTo(Area::class);
+        return $this->belongsToMany(Area::class, 'seedbed_area')->withTimestamps();
     }
 
     /** CU13: grupo de investigación, CAT y coordinador del semillero. */

@@ -13,10 +13,11 @@ class Area extends Model
         'status'
     ];
 
-    /** CU10-A1: "información relacionada" en el detalle. */
+    /** CU10-A1: "información relacionada" en el detalle. CU13 Ronda B: un
+     *  semillero puede tener varias áreas, se pasó a muchos-a-muchos. */
     public function seedbeds()
     {
-        return $this->hasMany(Seedbed::class);
+        return $this->belongsToMany(Seedbed::class, 'seedbed_area');
     }
 
     public function proposals()

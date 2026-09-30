@@ -12,7 +12,9 @@ use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
- * RF13 — Gestión de Semilleros (CU13)
+ * RF13 — Gestión de Semilleros (CU13). Ronda B: programas y áreas son
+ * selección múltiple (tablas pivote seedbed_program / seedbed_area), no un
+ * solo program_id/area_id como en la Ronda A.
  */
 class SeedbedCrudTest extends TestCase
 {
@@ -29,14 +31,30 @@ class SeedbedCrudTest extends TestCase
         return Area::create(['name' => 'Área Test', 'code' => 'AT-' . uniqid(), 'status' => 'ACTIVO']);
     }
 
+    /** Crea un semillero directo en BD (sin pasar por el endpoint), con su
+     *  programa y área ya asignados en las tablas pivote. */
+    private function makeSeedbed(array $overrides = []): Seedbed
+    {
+        $seedbed = Seedbed::create(array_merge([
+            'code' => 'SB-' . uniqid(),
+            'name' => 'Semillero',
+            'objetivo_general' => 'x objetivo largo',
+            'authorization_reference' => 'Of 1',
+            'status' => 'ACTIVO',
+        ], $overrides));
+        $seedbed->programs()->attach($this->program()->id);
+        $seedbed->areas()->attach($this->area()->id);
+        return $seedbed;
+    }
+
     /** Payload base válido para crear/editar (CU13 paso 7/8). */
     private function payload(array $overrides = []): array
     {
         return array_merge([
             'code'             => 'SB-' . uniqid(),
             'name'             => 'Semillero Test',
-            'program_id'       => $this->program()->id,
-            'area_id'          => $this->area()->id,
+            'programs'         => [$this->program()->id],
+            'areas'            => [$this->area()->id],
             'objetivo_general' => 'Fomentar la investigación aplicada',
             'authorization_reference' => 'Oficio 001 de 2026',
             'status'           => 'ACTIVO',
@@ -64,6 +82,28 @@ class SeedbedCrudTest extends TestCase
         $this->assertDatabaseHas('seedbeds', ['name' => 'Semillero Innovación']);
     }
 
+    /** CU13: crea con múltiples programas y múltiples áreas a la vez. */
+    public function test_can_create_seedbed_with_multiple_programs_and_areas(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $p1 = $this->program();
+        $p2 = $this->program();
+        $a1 = $this->area();
+        $a2 = $this->area();
+
+        $response = $this->postJson('/api/seedbeds', $this->payload([
+            'programs' => [$p1->id, $p2->id],
+            'areas'    => [$a1->id, $a2->id],
+        ]));
+        $response->assertStatus(201);
+
+        $seedbedId = $response->json('seedbed.id');
+        $this->assertDatabaseHas('seedbed_program', ['seedbed_id' => $seedbedId, 'program_id' => $p1->id]);
+        $this->assertDatabaseHas('seedbed_program', ['seedbed_id' => $seedbedId, 'program_id' => $p2->id]);
+        $this->assertDatabaseHas('seedbed_area', ['seedbed_id' => $seedbedId, 'area_id' => $a1->id]);
+        $this->assertDatabaseHas('seedbed_area', ['seedbed_id' => $seedbedId, 'area_id' => $a2->id]);
+    }
+
     /** CU13 paso 9: el líder que crea queda asignado como responsable. */
     public function test_creating_leader_is_assigned_as_responsible(): void
     {
@@ -77,17 +117,24 @@ class SeedbedCrudTest extends TestCase
         ]);
     }
 
-    public function test_seedbed_create_requires_program_id(): void
+    public function test_seedbed_create_requires_at_least_one_program(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
-        $response = $this->postJson('/api/seedbeds', $this->payload(['program_id' => null]));
-        $response->assertStatus(422);
+        $response = $this->postJson('/api/seedbeds', $this->payload(['programs' => []]));
+        $response->assertStatus(422)->assertJsonValidationErrors(['programs']);
+    }
+
+    public function test_seedbed_create_requires_at_least_one_area(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        $response = $this->postJson('/api/seedbeds', $this->payload(['areas' => []]));
+        $response->assertStatus(422)->assertJsonValidationErrors(['areas']);
     }
 
     public function test_seedbed_create_rejects_nonexistent_program(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
-        $response = $this->postJson('/api/seedbeds', $this->payload(['program_id' => 9999]));
+        $response = $this->postJson('/api/seedbeds', $this->payload(['programs' => [9999]]));
         $response->assertStatus(422);
     }
 
@@ -117,12 +164,33 @@ class SeedbedCrudTest extends TestCase
     public function test_admin_can_update_any_seedbed(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
-        $program  = $this->program();
-        $area     = $this->area();
-        $seedbed  = Seedbed::create(['code' => 'SB-1', 'name' => 'Original', 'program_id' => $program->id, 'area_id' => $area->id, 'objetivo_general' => 'x objetivo largo', 'authorization_reference' => 'Of 1', 'status' => 'ACTIVO']);
-        $response = $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload(['code' => 'SB-1', 'name' => 'Actualizado', 'program_id' => $program->id, 'area_id' => $area->id]));
+        $seedbed  = $this->makeSeedbed(['code' => 'SB-1', 'name' => 'Original']);
+        $response = $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload([
+            'code' => 'SB-1', 'name' => 'Actualizado',
+            'programs' => $seedbed->programs()->pluck('programs.id')->all(),
+            'areas'    => $seedbed->areas()->pluck('areas.id')->all(),
+        ]));
         $response->assertStatus(200);
         $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id, 'name' => 'Actualizado']);
+    }
+
+    /** Actualizar puede cambiar la lista completa de programas/áreas (sync). */
+    public function test_update_replaces_programs_and_areas(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $seedbed = $this->makeSeedbed(['code' => 'SB-SYNC']);
+        $oldProgramId = $seedbed->programs()->first()->id;
+        $newProgram = $this->program();
+        $newArea = $this->area();
+
+        $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload([
+            'code' => 'SB-SYNC',
+            'programs' => [$newProgram->id],
+            'areas' => [$newArea->id],
+        ]))->assertStatus(200);
+
+        $this->assertDatabaseMissing('seedbed_program', ['seedbed_id' => $seedbed->id, 'program_id' => $oldProgramId]);
+        $this->assertDatabaseHas('seedbed_program', ['seedbed_id' => $seedbed->id, 'program_id' => $newProgram->id]);
     }
 
     public function test_seedbed_update_returns_404_for_missing(): void
@@ -135,18 +203,17 @@ class SeedbedCrudTest extends TestCase
     public function test_admin_can_toggle_any_seedbed_status(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
-        $seedbed  = Seedbed::create(['code' => 'SB-2', 'name' => 'Test', 'program_id' => $this->program()->id, 'area_id' => $this->area()->id, 'objetivo_general' => 'x objetivo largo', 'authorization_reference' => 'Of 2', 'status' => 'ACTIVO']);
+        $seedbed  = $this->makeSeedbed(['code' => 'SB-2']);
         $response = $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status");
         $response->assertStatus(200);
         $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id, 'status' => 'INACTIVO']);
-        $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id]);
     }
 
     /* ───── RN06: el líder solo modifica los semilleros de los que es responsable ───── */
 
     public function test_leader_cannot_update_seedbed_they_do_not_lead(): void
     {
-        $seedbed = Seedbed::create(['code' => 'SB-3', 'name' => 'Ajeno', 'program_id' => $this->program()->id, 'area_id' => $this->area()->id, 'objetivo_general' => 'x objetivo largo', 'authorization_reference' => 'Of 3', 'status' => 'ACTIVO']);
+        $seedbed = $this->makeSeedbed(['code' => 'SB-3', 'name' => 'Ajeno']);
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
 
         $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload(['code' => 'SB-3']))
@@ -156,18 +223,21 @@ class SeedbedCrudTest extends TestCase
     public function test_leader_can_update_seedbed_they_lead(): void
     {
         $lider = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
-        $seedbed = Seedbed::create(['code' => 'SB-4', 'name' => 'Propio', 'program_id' => $this->program()->id, 'area_id' => $this->area()->id, 'objetivo_general' => 'x objetivo largo', 'authorization_reference' => 'Of 4', 'status' => 'ACTIVO']);
+        $seedbed = $this->makeSeedbed(['code' => 'SB-4', 'name' => 'Propio']);
         $seedbed->users()->attach($lider->id, ['role' => 'LIDER']);
         Sanctum::actingAs($lider);
 
-        $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload(['code' => 'SB-4', 'name' => 'Actualizado']))
-            ->assertStatus(200);
+        $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload([
+            'code' => 'SB-4', 'name' => 'Actualizado',
+            'programs' => $seedbed->programs()->pluck('programs.id')->all(),
+            'areas'    => $seedbed->areas()->pluck('areas.id')->all(),
+        ]))->assertStatus(200);
         $this->assertDatabaseHas('seedbeds', ['id' => $seedbed->id, 'name' => 'Actualizado']);
     }
 
     public function test_leader_cannot_toggle_status_of_seedbed_they_do_not_lead(): void
     {
-        $seedbed = Seedbed::create(['code' => 'SB-5', 'name' => 'Ajeno', 'program_id' => $this->program()->id, 'area_id' => $this->area()->id, 'objetivo_general' => 'x objetivo largo', 'authorization_reference' => 'Of 5', 'status' => 'ACTIVO']);
+        $seedbed = $this->makeSeedbed(['code' => 'SB-5', 'name' => 'Ajeno']);
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
 
         $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status")->assertStatus(403);
@@ -178,11 +248,11 @@ class SeedbedCrudTest extends TestCase
     public function test_show_returns_detail(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
-        $seedbed = Seedbed::create(['code' => 'SB-6', 'name' => 'Detalle', 'program_id' => $this->program()->id, 'area_id' => $this->area()->id, 'objetivo_general' => 'x objetivo largo', 'authorization_reference' => 'Of 6', 'status' => 'ACTIVO']);
+        $seedbed = $this->makeSeedbed(['code' => 'SB-6', 'name' => 'Detalle']);
 
         $this->getJson("/api/seedbeds/{$seedbed->id}")
             ->assertOk()
             ->assertJsonPath('seedbed.code', 'SB-6')
-            ->assertJsonPath('seedbed.program.id', $seedbed->program_id);
+            ->assertJsonPath('seedbed.programs.0.id', $seedbed->programs()->first()->id);
     }
 }

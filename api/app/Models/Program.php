@@ -24,10 +24,11 @@ class Program extends Model
         return $this->belongsTo(Faculty::class);
     }
 
-    /** CU08-A1: "información relacionada" en el detalle. */
+    /** CU08-A1: "información relacionada" en el detalle. CU13 Ronda B: un
+     *  semillero puede tener varios programas, se pasó a muchos-a-muchos. */
     public function seedbeds()
     {
-        return $this->hasMany(Seedbed::class);
+        return $this->belongsToMany(Seedbed::class, 'seedbed_program');
     }
 
 }

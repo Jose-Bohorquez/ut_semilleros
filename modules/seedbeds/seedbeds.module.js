@@ -53,19 +53,20 @@ fields:[
   required:false
  },
 
+ /* CU13 Ronda B: selección múltiple (antes un solo programa) */
  {
-  name:"program_id",
-  label:"Programa",
-  type:"relation",
+  name:"programs",
+  label:"Programas",
+  type:"relation-multi",
   relation:"programs",
   display:"name"
  },
 
- /* RF05: todo semillero tiene al menos un área */
+ /* RF05: todo semillero tiene al menos un área. CU13 Ronda B: selección múltiple. */
  {
-  name:"area_id",
-  label:"Área",
-  type:"relation",
+  name:"areas",
+  label:"Áreas",
+  type:"relation-multi",
   relation:"areas",
   display:"name"
  },
@@ -132,6 +133,14 @@ actions:[
 noCreateFor: ['ESTUDIANTE'],
 
 noEditFor: ['ESTUDIANTE'],
+
+/* CU13 Ronda B: Object.fromEntries(FormData) solo conserva el último
+   valor seleccionado en un <select multiple> — hay que leer todas las
+   opciones marcadas antes de enviar. */
+beforeSave(data, form) {
+    data.programs = Array.from(form.querySelector('[name="programs"]')?.selectedOptions || []).map(o => o.value);
+    data.areas = Array.from(form.querySelector('[name="areas"]')?.selectedOptions || []).map(o => o.value);
+},
 
 /* ── Sección extra dentro del mismo modal: Objetivos ──────────────────── */
 extraFormHtml() {

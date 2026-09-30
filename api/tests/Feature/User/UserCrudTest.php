@@ -233,7 +233,9 @@ class UserCrudTest extends TestCase
         $faculty = \App\Models\Faculty::create(['code' => 'F1', 'name' => 'F', 'status' => 'ACTIVO']);
         $program = \App\Models\Program::create(['code' => 'P1', 'name' => 'P', 'type' => 'PREGRADO', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
         $area = \App\Models\Area::create(['code' => 'A1', 'name' => 'A', 'status' => 'ACTIVO']);
-        $seedbed = \App\Models\Seedbed::create(['name' => 'Semillero X', 'program_id' => $program->id, 'area_id' => $area->id, 'status' => 'ACTIVO']);
+        $seedbed = \App\Models\Seedbed::create(['name' => 'Semillero X', 'status' => 'ACTIVO']);
+        $seedbed->programs()->attach($program->id);
+        $seedbed->areas()->attach($area->id);
         $seedbed->users()->attach($lider->id, ['role' => 'LIDER']);
 
         $this->getJson("/api/users/{$lider->id}")

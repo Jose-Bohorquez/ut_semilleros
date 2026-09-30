@@ -15,9 +15,10 @@ class SeedbedController extends Controller
     private const MESSAGES = [
         'code.required'      => 'El código es obligatorio.',
         'code.unique'        => 'Ya existe un semillero con ese código.',
-        'program_id.exists'  => 'El programa seleccionado no existe o está inactivo (o su facultad lo está).',
-        'area_id.required'   => 'El área es obligatoria.',
-        'area_id.exists'     => 'El área seleccionada no existe o está inactiva.',
+        'programs.required'  => 'Debes seleccionar al menos un programa.',
+        'programs.min'       => 'Debes seleccionar al menos un programa.',
+        'areas.required'     => 'Debes seleccionar al menos un área.',
+        'areas.min'          => 'Debes seleccionar al menos un área.',
         'group_id.exists'    => 'El grupo seleccionado no existe o está inactivo.',
         'cat_id.exists'      => 'El CAT seleccionado no existe o está inactivo.',
         'coordinator_id.exists' => 'El coordinador seleccionado no existe o está inactivo.',
@@ -26,7 +27,7 @@ class SeedbedController extends Controller
         'authorization_reference.required' => 'La referencia de la aprobación del área administrativa es obligatoria (RN03).',
     ];
 
-    private const RELATIONS = ['program', 'area', 'group', 'cat', 'coordinator'];
+    private const RELATIONS = ['programs', 'areas', 'group', 'cat', 'coordinator'];
 
     /** Listar semilleros */
     public function index()
@@ -59,7 +60,13 @@ class SeedbedController extends Controller
         $validated = $request->validate($this->rules(null), self::MESSAGES);
         $validated['status'] = $validated['status'] ?? 'ACTIVO';
 
+        $programs = $validated['programs'];
+        $areas = $validated['areas'];
+        unset($validated['programs'], $validated['areas']);
+
         $seedbed = Seedbed::create($validated);
+        $seedbed->programs()->attach($programs);
+        $seedbed->areas()->attach($areas);
 
         /* CU13 paso 9: "asigna al líder como responsable". Solo cuando quien
            crea es Líder — si crea Admin/Administrativo no hay un líder
@@ -70,7 +77,7 @@ class SeedbedController extends Controller
 
         return response()->json([
             "message" => "Semillero creado",
-            "seedbed" => $seedbed
+            "seedbed" => $seedbed->load(['programs', 'areas'])
         ],201);
 
     }
@@ -86,11 +93,17 @@ class SeedbedController extends Controller
 
         $validated = $request->validate($this->rules($id, $seedbed), self::MESSAGES);
 
+        $programs = $validated['programs'];
+        $areas = $validated['areas'];
+        unset($validated['programs'], $validated['areas']);
+
         $seedbed->update($validated);
+        $seedbed->programs()->sync($programs);
+        $seedbed->areas()->sync($areas);
 
         return response()->json([
             "message" => "Semillero actualizado",
-            "seedbed" => $seedbed
+            "seedbed" => $seedbed->load(['programs', 'areas'])
         ]);
 
     }
@@ -146,8 +159,10 @@ class SeedbedController extends Controller
             "code" => ["required", "string", "max:50", Rule::unique('seedbeds', 'code')->ignore($ignoreId)],
             "name" => "required|string|max:255",
             "description" => "nullable|string",
-            "program_id" => ["required", "exists:programs,id", $this->activeProgramRule($current)],
-            "area_id" => ["required", $this->activeAreaRule($current)],
+            "programs" => ["required", "array", "min:1"],
+            "programs.*" => ["integer", $this->activeProgramItemRule($current)],
+            "areas" => ["required", "array", "min:1"],
+            "areas.*" => ["integer", $this->activeAreaItemRule($current)],
             "group_id" => ["nullable", $this->activeGroupRule($current)],
             "cat_id" => ["nullable", Rule::exists('cats', 'id')->where('status', 'ACTIVO')],
             "coordinator_id" => ["nullable", Rule::exists('coordinators', 'id')->where('status', 'ACTIVO')],
@@ -162,30 +177,34 @@ class SeedbedController extends Controller
     }
 
     /* RF02 / RF03: no se asigna un semillero a un programa inactivo ni a uno
-       cuya facultad esté inactiva. Conserva el valor actual si no cambia. */
-    private function activeProgramRule(?Seedbed $current): \Closure
+       cuya facultad esté inactiva. Conserva los programas ya asignados aunque
+       se hayan inactivado después (mismo criterio que antes, ahora por ítem
+       de la lista en vez de un solo valor). */
+    private function activeProgramItemRule(?Seedbed $current): \Closure
     {
-        return function (string $attribute, $value, \Closure $fail) use ($current) {
-            if ($current && (int) $value === (int) $current->program_id) return;
+        $currentIds = $current ? $current->programs()->pluck('programs.id')->all() : [];
+        return function (string $attribute, $value, \Closure $fail) use ($currentIds) {
+            if (in_array((int) $value, $currentIds, true)) return;
             $program = Program::with('faculty')->find($value);
-            if (!$program) return;
+            if (!$program) {
+                $fail('El programa seleccionado no existe.');
+                return;
+            }
             if ($program->status !== 'ACTIVO' || $program->faculty?->status !== 'ACTIVO') {
                 $fail('El programa seleccionado o su facultad están inactivos.');
             }
         };
     }
 
-    private function activeAreaRule(?Seedbed $current): mixed
+    private function activeAreaItemRule(?Seedbed $current): \Closure
     {
-        if ($current) {
-            return function (string $attribute, $value, \Closure $fail) use ($current) {
-                if ((int) $value === (int) $current->area_id) return;
-                if (!\App\Models\Area::where('id', $value)->where('status', 'ACTIVO')->exists()) {
-                    $fail('El área seleccionada no existe o está inactiva.');
-                }
-            };
-        }
-        return Rule::exists('areas', 'id')->where('status', 'ACTIVO');
+        $currentIds = $current ? $current->areas()->pluck('areas.id')->all() : [];
+        return function (string $attribute, $value, \Closure $fail) use ($currentIds) {
+            if (in_array((int) $value, $currentIds, true)) return;
+            if (!\App\Models\Area::where('id', $value)->where('status', 'ACTIVO')->exists()) {
+                $fail('El área seleccionada no existe o está inactiva.');
+            }
+        };
     }
 
     private function activeGroupRule(?Seedbed $current): \Closure

@@ -178,6 +178,11 @@ export function createCrudModule(config) {
                     return `<td data-label="${f.label}">${escapeHtml(rel ? rel[f.display] : (record[f.name] ?? ""))}</td>`;
                 }
 
+                if (f.type === "relation-multi") {
+                    const names = (record[f.name] || []).map(item => item[f.display]).join(", ");
+                    return `<td data-label="${f.label}">${escapeHtml(names)}</td>`;
+                }
+
                 const val = record[f.name] ?? "";
 
                 /* Render status as badge */
@@ -466,6 +471,47 @@ export function createCrudModule(config) {
                     <span class="field-error-msg" id="err-${f.name}"></span>
                 </div>`);
 
+                requiredFields.push(f.name);
+                continue;
+            }
+
+            /* RELATION-MULTI (CU13 Ronda B: selección múltiple, ej. programas/áreas
+               de un semillero) — mismo patrón que RELATION pero con <select multiple>
+               y el valor actual como array de objetos relacionados en vez de un id. */
+            if (f.type === "relation-multi") {
+                try {
+                    const relData = await apiFetch(`/${f.relation}`);
+                    const items   = relData?.[f.relation] || [];
+                    const currentIds = (record?.[f.name] || []).map(item => String(item.id));
+                    const isOff = item => item.status === "INACTIVO";
+                    const selectable = items.filter(item =>
+                        !isOff(item) || currentIds.includes(String(item.id)));
+                    const options = selectable.map(item => {
+                        const selected = currentIds.includes(String(item.id)) ? "selected" : "";
+                        const label = (item[f.display] ?? item.id) + (isOff(item) ? " (inactivo)" : "");
+                        return `<option value="${escapeHtml(item.id)}" ${selected}>${escapeHtml(label)}</option>`;
+                    }).join("");
+
+                    inputs.push(`
+                    <div class="form-group">
+                        <label for="field-${f.name}">${labelHtml}</label>
+                        <select id="field-${f.name}" name="${f.name}" multiple required size="5">
+                            ${options}
+                        </select>
+                        <span class="field-error-msg" id="err-${f.name}"></span>
+                    </div>`);
+
+                } catch (err) {
+                    console.error(`[CRUD] Error al cargar /${f.relation}:`, err.message);
+                    inputs.push(`
+                    <div class="form-group">
+                        <label for="field-${f.name}">${labelHtml}</label>
+                        <select id="field-${f.name}" name="${f.name}" multiple disabled style="border-color:var(--color-error)">
+                            <option>⚠ Error al cargar datos</option>
+                        </select>
+                        <span class="field-error-msg">No se pudo cargar la lista. Cierra el formulario e inténtalo de nuevo.</span>
+                    </div>`);
+                }
                 requiredFields.push(f.name);
                 continue;
             }
@@ -832,6 +878,11 @@ export function createCrudModule(config) {
                     delete data[f.name];
                 }
             }
+
+            /* CU13 Ronda B: campos fuera de `fields` (ej. selección múltiple
+               en extraFormHtml) que el módulo necesita inyectar en el payload
+               antes de enviarlo. */
+            config.beforeSave?.(data, form);
 
             try {
                 let response;
