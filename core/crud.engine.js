@@ -46,10 +46,38 @@ export function createCrudModule(config) {
             if (entity === "proposals") endpoint = "/proposals/my";
         }
 
-        const data   = await apiFetch(endpoint);
+        let data;
+        try {
+            data = await apiFetch(endpoint);
+        } catch (err) {
+            /* E4: fallo de conexión al cargar el listado inicial (transversal
+               CU07-CU13) — antes quedaba una pantalla en blanco sin aviso. */
+            renderLoadError(err);
+            return;
+        }
         recordsCache = data[entity] || [];
         renderTable(recordsCache);
         bindEvents();
+    }
+
+    function renderLoadError(err) {
+        const isConnFailure = (err.status || 0) === 0;
+        document.getElementById("app").innerHTML = LayoutView(`
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-plug"></i>
+            </div>
+            <h3>${isConnFailure ? "Sin conexión con el servidor" : "No se pudo cargar la información"}</h3>
+            <p>${isConnFailure
+                ? "No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo."
+                : escapeHtml(err.message || "Ocurrió un error inesperado.")}</p>
+            <button class="btn btn-primary" id="retryLoadBtn-${entity}">
+                <i class="fas fa-redo"></i>
+                Reintentar
+            </button>
+        </div>`);
+        initLayoutController();
+        document.getElementById(`retryLoadBtn-${entity}`)?.addEventListener("click", init);
     }
 
 
