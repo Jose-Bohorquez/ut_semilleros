@@ -11,6 +11,74 @@ import { escapeHtml }      from "../../core/escape.js";
    poder reordenarlos/editarlos/quitarlos de verdad, no solo agregar)
    ========================================================= */
 
+/* =========================================================
+   PESTAÑAS DEL FORMULARIO (CU13 paso 2/4/6: «Datos generales» /
+   «Misión y visión» / «Justificación»). Se arma reorganizando el DOM
+   después de montado el modal, sin tocar el motor genérico crud.engine.js.
+   ========================================================= */
+
+function setupSeedbedTabs() {
+    const form = document.getElementById("crudForm-seedbeds");
+    if (!form) return;
+
+    const misionGroup = document.getElementById("field-mision")?.closest(".form-group");
+    const visionGroup = document.getElementById("field-vision")?.closest(".form-group");
+    const justGroup   = document.getElementById("field-justificacion")?.closest(".form-group");
+    if (!misionGroup && !visionGroup && !justGroup) return;   /* campos no encontrados: no arma pestañas */
+
+    const generalPane = document.createElement("div");
+    generalPane.dataset.tabPane = "general";
+    /* Todo lo que ya es hijo directo del form (menos misión/visión/justificación)
+       pasa a la pestaña "Datos generales", en su orden original. */
+    Array.from(form.children).forEach(child => {
+        if (child === misionGroup || child === visionGroup || child === justGroup) return;
+        if (child.tagName === "H3" || child.id === "formErrorBanner" || child.classList.contains("form-legend")) return;
+        if (child.classList.contains("modal-actions")) return;
+        generalPane.appendChild(child);
+    });
+
+    const misionPane = document.createElement("div");
+    misionPane.dataset.tabPane = "mision";
+    misionPane.style.display = "none";
+    if (misionGroup) misionPane.appendChild(misionGroup);
+    if (visionGroup) misionPane.appendChild(visionGroup);
+
+    const justPane = document.createElement("div");
+    justPane.dataset.tabPane = "justificacion";
+    justPane.style.display = "none";
+    if (justGroup) justPane.appendChild(justGroup);
+
+    const nav = document.createElement("div");
+    nav.className = "form-tabs-nav";
+    nav.style.cssText = "display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--color-border);flex-wrap:wrap";
+    nav.innerHTML = `
+        <button type="button" class="btn btn-ghost btn-sm form-tab-btn active" data-tab="general" style="border-bottom:2px solid var(--color-primary)">Datos generales</button>
+        <button type="button" class="btn btn-ghost btn-sm form-tab-btn" data-tab="mision">Misión y visión</button>
+        <button type="button" class="btn btn-ghost btn-sm form-tab-btn" data-tab="justificacion">Justificación</button>
+    `;
+
+    const modalActions = form.querySelector(".modal-actions");
+    form.insertBefore(nav, modalActions);
+    form.insertBefore(generalPane, modalActions);
+    form.insertBefore(misionPane, modalActions);
+    form.insertBefore(justPane, modalActions);
+
+    const panes = { general: generalPane, mision: misionPane, justificacion: justPane };
+    nav.addEventListener("click", e => {
+        const btn = e.target.closest(".form-tab-btn");
+        if (!btn) return;
+        nav.querySelectorAll(".form-tab-btn").forEach(b => {
+            b.classList.remove("active");
+            b.style.borderBottom = "";
+        });
+        btn.classList.add("active");
+        btn.style.borderBottom = "2px solid var(--color-primary)";
+        Object.entries(panes).forEach(([key, pane]) => {
+            pane.style.display = key === btn.dataset.tab ? "" : "none";
+        });
+    });
+}
+
 function objectiveRowHtml(id = "", content = "") {
     const safe = String(content).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     return `
@@ -224,6 +292,8 @@ async afterFormMount(record) {
             }
         }
     });
+
+    setupSeedbedTabs();
 },
 
 /* ── Tras guardar el semillero: crear/actualizar sus objetivos, en el

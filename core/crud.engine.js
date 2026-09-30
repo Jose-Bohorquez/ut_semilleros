@@ -465,13 +465,13 @@ export function createCrudModule(config) {
                 inputs.push(`
                 <div class="form-group">
                     <label for="field-${f.name}">${labelHtml}</label>
-                    <select id="field-${f.name}" name="${f.name}" required>
+                    <select id="field-${f.name}" name="${f.name}" ${isRequired ? "required" : ""}>
                         ${options}
                     </select>
                     <span class="field-error-msg" id="err-${f.name}"></span>
                 </div>`);
 
-                requiredFields.push(f.name);
+                if (isRequired) requiredFields.push(f.name);
                 continue;
             }
 
@@ -539,7 +539,7 @@ export function createCrudModule(config) {
                     inputs.push(`
                     <div class="form-group">
                         <label for="field-${f.name}">${labelHtml}</label>
-                        <select id="field-${f.name}" name="${f.name}" required>
+                        <select id="field-${f.name}" name="${f.name}" ${isRequired ? "required" : ""}>
                             <option value="">Seleccione...</option>
                             ${options}
                         </select>
