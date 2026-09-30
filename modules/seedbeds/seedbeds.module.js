@@ -215,8 +215,15 @@ beforeSave(data, form) {
 },
 
 /* ── Sección extra dentro del mismo modal: Objetivos ──────────────────── */
-extraFormHtml() {
+extraFormHtml(record) {
+    /* CU14 E3: se envía junto al formulario la marca de tiempo que el
+       actor tenía cargada, para detectar si otro usuario ya modificó el
+       semillero mientras tanto. Solo aplica al editar. */
+    const concurrencyInput = record
+        ? `<input type="hidden" name="expected_updated_at" value="${escapeHtml(record.updated_at)}">`
+        : "";
     return `
+    ${concurrencyInput}
     <div class="form-group">
         <label>Objetivos <span class="optional-hint">(opcional, puedes agregar, reordenar y quitar varios)</span></label>
         <div id="objectivesRepeater"></div>

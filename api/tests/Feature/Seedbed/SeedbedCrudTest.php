@@ -255,4 +255,37 @@ class SeedbedCrudTest extends TestCase
             ->assertJsonPath('seedbed.code', 'SB-6')
             ->assertJsonPath('seedbed.programs.0.id', $seedbed->programs()->first()->id);
     }
+
+    /* ───── CU14 E3: edición concurrente ───── */
+
+    public function test_update_rejects_when_modified_by_another_user_meanwhile(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $seedbed = $this->makeSeedbed(['code' => 'SB-CONC']);
+        $staleTimestamp = $seedbed->updated_at->copy()->subMinute()->toJSON();
+
+        $response = $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload([
+            'code' => 'SB-CONC',
+            'programs' => $seedbed->programs()->pluck('programs.id')->all(),
+            'areas' => $seedbed->areas()->pluck('areas.id')->all(),
+            'expected_updated_at' => $staleTimestamp,
+        ]));
+
+        $response->assertStatus(409);
+    }
+
+    public function test_update_succeeds_when_timestamp_matches(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $seedbed = $this->makeSeedbed(['code' => 'SB-CONC2']);
+
+        $response = $this->putJson("/api/seedbeds/{$seedbed->id}", $this->payload([
+            'code' => 'SB-CONC2',
+            'programs' => $seedbed->programs()->pluck('programs.id')->all(),
+            'areas' => $seedbed->areas()->pluck('areas.id')->all(),
+            'expected_updated_at' => $seedbed->updated_at->toJSON(),
+        ]));
+
+        $response->assertStatus(200);
+    }
 }

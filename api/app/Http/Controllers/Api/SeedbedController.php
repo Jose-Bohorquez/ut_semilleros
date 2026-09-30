@@ -90,6 +90,7 @@ class SeedbedController extends Controller
 
         $seedbed = Seedbed::findOrFail($id);
         $this->guardLeaderOwnsSeedbed($seedbed);
+        $this->guardConcurrentEdit($request, $seedbed);
 
         $validated = $request->validate($this->rules($id, $seedbed), self::MESSAGES);
 
@@ -149,6 +150,26 @@ class SeedbedController extends Controller
                 'seedbed' => ['Solo puedes modificar los semilleros de los que eres responsable (RN06).'],
             ]);
             $e->status = 403;
+            throw $e;
+        }
+    }
+
+    /**
+     * CU14 E3: si otro usuario modificó el semillero después de que el
+     * actor abrió el formulario, se rechaza con 409 (no se pisa el cambio
+     * ajeno en silencio). El frontend envía la marca de tiempo que tenía
+     * cargada; si no la envía (clientes antiguos), no se valida.
+     */
+    private function guardConcurrentEdit(Request $request, Seedbed $seedbed): void
+    {
+        $expected = $request->input('expected_updated_at');
+        if (!$expected) return;
+
+        if (!$seedbed->updated_at->equalTo($expected)) {
+            $e = ValidationException::withMessages([
+                'seedbed' => ['El semillero fue modificado por otro usuario; recargue para ver los cambios.'],
+            ]);
+            $e->status = 409;
             throw $e;
         }
     }
