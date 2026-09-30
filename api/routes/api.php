@@ -305,31 +305,34 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | SOLICITUDES (RF10 / CU10)
-    |   GET list  → A, L, ADM
-    |   POST/PUT  → L, ADM
-    |   update-status → L, ADM
-    |   GET /my   → E (sus propias solicitudes)
-    |   POST      → E (crear la suya)
+    | SOLICITUDES (RF10 / CU22, CU23, CU24)
+    |   GET list, GET {id} → A, L, ADM (CU24: el líder solo ve las de sus
+    |                         semilleros, RN06; Administrativo solo consulta)
+    |   POST      → L, ADM, E (CU22: crear la suya)
+    |   update-status → L, ADM (CU24: aprobar/rechazar; RN06 en el controller)
+    |   GET /my   → E (CU23: sus propias solicitudes)
     |----------------------------------------------------------------------
     */
 
     Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
          ->get('/requests', [RequestController::class, 'index']);
 
+    /* GET propias — solo E. Va antes que /requests/{id} para que "my" no se
+       interprete como un id. */
+    Route::middleware('role:ESTUDIANTE')
+         ->get('/requests/my', [RequestController::class, 'myRequests']);
+
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
+         ->get('/requests/{id}', [RequestController::class, 'show'])
+         ->whereNumber('id');
+
     /* POST /requests — L, ADM, E (cada uno crea las suyas) */
     Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
          ->post('/requests', [RequestController::class, 'store']);
 
-    /* PUT (update + status) — solo L, ADM */
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO')->group(function () {
-        Route::put('/requests/{id}',               [RequestController::class, 'update']);
-        Route::put('/requests/{id}/update-status', [RequestController::class, 'updateStatus']);
-    });
-
-    /* GET propias — solo E */
-    Route::middleware('role:ESTUDIANTE')
-         ->get('/requests/my', [RequestController::class, 'myRequests']);
+    /* Aprobar/rechazar — solo L y ADM (CU24-A3: Administrativo solo consulta) */
+    Route::middleware('role:LIDER_SEMILLERO,ADMIN_SISTEMA')
+         ->put('/requests/{id}/update-status', [RequestController::class, 'updateStatus']);
 
     /*
     |----------------------------------------------------------------------

@@ -31,8 +31,8 @@ En Android con Chrome: abre https://ut-edu.online, toca el menú (⋮) y elige �
 
 ## Roles y qué puede hacer cada uno
 - Administrador del sistema: control total. Gestiona usuarios (incluida la carga masiva e inactivación), facultades, programas, CAT, áreas, grupos, coordinadores, semilleros y objetivos, y consulta la auditoría.
-- Administrativo: consulta la información y gestiona semilleros, objetivos, resultados, proyectos y productos; revisa (aprueba o rechaza) solicitudes y propuestas.
-- Líder de semillero: registra y mantiene semilleros, sus objetivos, resultados, integrantes y coordinadores, y aprueba o rechaza las solicitudes y propuestas.
+- Administrativo: consulta la información y gestiona semilleros, objetivos, resultados, proyectos y productos; revisa (aprueba o rechaza) propuestas. Las solicitudes de vinculación las consulta pero no las aprueba ni las rechaza.
+- Líder de semillero: registra y mantiene semilleros, sus objetivos, resultados, integrantes y coordinadores, y aprueba o rechaza las solicitudes de sus semilleros y las propuestas.
 - Estudiante: consulta los semilleros activos, envía solicitudes de vinculación y registra propuestas desde la app.
 Si una opción no aparece en tu menú, tu rol no tiene acceso a ella. Si crees que deberías tenerlo, pídelo al administrador del sistema.
 
@@ -56,7 +56,7 @@ La evaluación (aprobar o rechazar) la hacen el líder de semillero o el persona
 En el panel web, menú «Semilleros»: crea o edita un semillero con nombre, descripción, programa y estado. Dentro del mismo formulario agregas los objetivos, los ordenas con las flechas ↑↓, los editas o los quitas. Para dar de baja un semillero se cambia su estado a inactivo (en el sistema no se borra información; todo se inactiva). Los resultados se gestionan en el menú «Resultados».
 
 ## Solicitudes y propuestas recibidas (líderes y administrativos)
-En el panel web, en «Solicitudes» y «Propuestas» ves las recibidas. Ábrelas para revisarlas y cámbiales el estado a Aprobada o Rechazada. El estudiante ve el nuevo estado en su app.
+En el panel web, en «Solicitudes» el líder ve las solicitudes de vinculación de sus semilleros (nombre del semillero, estudiante, programa, fecha y estado); por defecto aparecen las pendientes, y puede filtrar por semillero, estado o rango de fechas. Con «Ver» abre los datos del estudiante y su mensaje, y elige «Aprobar» (con una respuesta opcional) o «Rechazar» (el motivo es obligatorio). Al aprobar, el sistema ofrece registrar de una vez al estudiante como integrante del semillero. El estudiante ve el nuevo estado y la respuesta en su app. Una solicitud que ya fue resuelta (por ejemplo, porque el semillero se inactivó) no se puede volver a cambiar. Un líder solo gestiona las solicitudes de los semilleros de los que es responsable. El Administrativo ve las de todos los semilleros pero solo en modo consulta, sin botones de aprobar o rechazar; el administrador del sistema sí puede resolverlas. En «Propuestas» se ven y revisan las propuestas recibidas: se abren y se les cambia el estado a Aprobada o Rechazada.
 
 ## Usuarios y carga masiva (administrador)
 En «Usuarios» el administrador crea, edita y activa o inactiva cuentas (no se eliminan). Con «Importar usuarios» pega o sube una lista de correos; el sistema crea las cuentas sin contraseña y envía a cada persona un correo para activar su cuenta. Al inactivar a un usuario se cierran sus sesiones abiertas.

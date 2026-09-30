@@ -89,38 +89,12 @@ class RequestCrudTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function test_authenticated_user_can_update_request(): void
+    /* CU24: el PUT genérico /requests/{id} se retiró (permitía saltarse E1-E3);
+       la resolución va solo por update-status — ver RequestManagementTest. */
+    public function test_generic_request_update_route_no_longer_exists(): void
     {
-        $actingUser = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
-        $dataUser   = User::factory()->create(['role' => 'ESTUDIANTE']);
-        Sanctum::actingAs($actingUser);
-        $seedbed  = $this->seedbed();
-        $req      = MembershipRequest::create([
-            'user_id'    => $dataUser->id,
-            'seedbed_id' => $seedbed->id,
-            'status'     => 'PENDIENTE',
-        ]);
-        $response = $this->putJson("/api/requests/{$req->id}", [
-            'user_id'    => $dataUser->id,
-            'seedbed_id' => $seedbed->id,
-            'status'     => 'APROBADA',
-        ]);
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('requests', ['id' => $req->id, 'status' => 'APROBADA']);
-    }
-
-    public function test_request_update_returns_404_for_missing(): void
-    {
-        $actingUser = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
-        $dataUser   = User::factory()->create(['role' => 'ESTUDIANTE']);
-        Sanctum::actingAs($actingUser);
-        $seedbed  = $this->seedbed();
-        $response = $this->putJson('/api/requests/9999', [
-            'user_id'    => $dataUser->id,
-            'seedbed_id' => $seedbed->id,
-            'status'     => 'APROBADA',
-        ]);
-        $response->assertStatus(404);
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMIN_SISTEMA']));
+        $this->putJson('/api/requests/1', ['status' => 'APROBADA'])->assertStatus(405);
     }
 
     /* ───── CU22: programa, teléfono, mensaje ───── */

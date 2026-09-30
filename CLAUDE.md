@@ -179,6 +179,18 @@ en vez de a Administrativo — corregido en ambas capas. 336 tests en total. RN0
 Seedbed/Objective/Result; sigue faltando en el resto de entidades con dueño (revisar caso por
 caso al llegar a cada CU).
 
+**CU24 gestionar solicitudes recibidas (2026-09-30, segunda cuenta Claude):** en local, 368 tests en
+verde, **pendiente de deploy** (acta `docs/validacion/CU24.md`). Estaba casi todo por hacer: `index()`
+devolvía todas las solicitudes a cualquier líder (RN06 ausente, igual que CU19/CU20), sin filtros ni
+`show()`; `updateStatus()` no exigía motivo al rechazar, no validaba E2/E3 y **descartaba en
+silencio `reviewed_by`/`reviewed_at`** (no estaban en `$fillable`); Administrativo podía resolver y
+`ADMIN_SISTEMA` no; el módulo frontend era un CRUD genérico sin "Ver". Se rehízo por spec y se
+retiró `PUT /requests/{id}` (editaba user/semillero/estado saltándose E1-E3). La respuesta del
+líder se guarda en `requests.reason`, que CU23 ya mostraba. Aprobar ofrece registrar al estudiante
+como integrante (CU21). **Hallazgo sin corregir:** `requests.phone` se guarda en claro, mientras
+`users.phone` y los teléfonos de coordinadores/integrantes van cifrados (RNF12) — pendiente de
+decisión de Jose.
+
 Diferencias conocidas a cerrar (2026-09-29): RN02/RN03 (referencia de autorización escrita) sin
 campo en algunos módulos; RN08 (códigos únicos) en CAT, áreas, grupos, facultades y programas
 (falta semillero); RF15/CU28 reportes no existen. El avance de la validación 1 a 1 queda en
