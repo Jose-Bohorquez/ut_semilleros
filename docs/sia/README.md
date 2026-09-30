@@ -23,7 +23,8 @@
     CONOCIMIENTO. Las secciones relevantes de `api/resources/sia/base-conocimiento.md` se eligen
     por coincidencia de términos, y se suman las respuestas corregidas activas. Se envían los
     últimos 6 mensajes, con `max_completion_tokens` 400 y `reasoning_effort=low`. Cada consulta
-    gasta ≈ 1.100 tokens.
+    gasta ≈ 1.100 tokens antes de la ampliación de la base (2026-09-30) y ≈ 1.500–1.900 después;
+    conviene vigilar «tokens por minuto» en el panel (límite gratis: 8.000 TPM por cuenta).
   - `SiaController` expone `POST /api/sia/chat` y `/api/sia/close`, que son públicas (throttle
     15/min), y `/api/sia/admin/*` solo para `role:ADMIN_SISTEMA`.
 - **Tablas:** `sia_conversations` (calificación, comentario y revisión), `sia_messages` (tokens,
@@ -114,3 +115,45 @@ En el panel, «Respondidas sin API hoy» mide cuánto cupo se está ahorrando.
   - Rotación: varias cuentas usadas.
   - Panel con las 3 cuentas.
 - Limpieza: usuarios `qa_temp_sia_*` y conversaciones de prueba eliminados.
+
+## Memoria técnica ampliada (2026-09-30)
+
+`api/resources/sia/base-conocimiento.md` pasó de 15 secciones (11 KB) a ~112 (84 KB), redactadas
+contra el código real del front y del API, no solo contra la especificación: cubre el panel web por
+rol (menús, permisos, catálogos, usuarios, perfil, notificaciones, RBAC, auditoría), el núcleo de
+semilleros (registrar, editar, inactivar, objetivos, resultados, integrantes, solicitudes recibidas,
+propuestas, proyectos, productos), la app del estudiante (explorar, «Ser miembro», solicitudes,
+propuestas, perfil, offline, instalación), glosario y solución de problemas, con los nombres
+exactos de botones y los mensajes de error que ve el usuario.
+
+**Cómo está armada y cómo mantenerla**
+- Una sección `## ` por tarea, de 400–1.200 caracteres (un test lo exige: máx. 1.500). El título es
+  una pregunta natural con sinónimos (crear/registrar, inactivar/desactivar, unirme/postularme,
+  envío/enviar…): pesa el doble en la búsqueda.
+- El archivo **debe empezar por `## Qué es el sistema`**: esa sección va siempre. También va siempre
+  `## Roles y qué puede hacer cada uno` (constante `ROLES_SECTION`), porque el prompt le pide a SIA
+  decir si el rol de quien pregunta puede hacer algo. Las demás se eligen: las 3 con más términos.
+- Búsqueda: raíz de 5 letras, un punto por término y una fracción por repeticiones (desempata);
+  las siglas `cat` y `pwa` cuentan aunque tengan menos de 4 letras (como palabra completa).
+- `tests/Feature/Sia/SiaKnowledgeRetrievalTest.php`: 57 preguntas reales por rol que deben traer la
+  sección esperada, más límites de tamaño. **Al agregar o renombrar una sección, corre ese test.**
+- Cuando cambie una función del sistema, actualiza su sección en el mismo commit.
+
+**Discrepancias encontradas al redactarla (código vs. documentos)**, para decidir:
+- `docs/roles-usuarios.md` y `docs/manuales/manual_estudiante.md` / `manual_lider_semillero.md`
+  están desactualizados (Administrativo ya solo consulta semilleros/objetivos/resultados; la
+  solicitud pide programa, teléfono y mensaje; aprobar no vuelve integrante al estudiante).
+- El menú lateral de escritorio no lista «Solicitudes» ni «Propuestas» (solo la barra inferior
+  móvil): SIA lo explica así mientras no se cambie.
+- RBAC (`/admin/rbac`): ninguna ruta usa aún `permission:`; guardar permisos no cambia el acceso.
+- Importar usuarios no envía `authorization_reference`: las filas que no son Estudiante fallan (RN02).
+- Propuestas: sin motivo ni observación del evaluador; el estudiante no sabe por qué la rechazaron.
+- Sin aviso automático (campana/push) al aprobar o rechazar solicitudes o propuestas.
+- Sin conexión solo funcionan `/seedbeds` y `/objectives`; «Solicitudes» y «Propuestas» no.
+- Botón «Inactivar» de Proyectos llama a una ruta que no existe; el Líder no tiene «Productos».
+- Quitar un objetivo desde «Editar» semillero lo borra de forma permanente.
+- No hay módulo de Reportes (CU28/RF15).
+
+**Pendiente de validar en producción:** las respuestas del modelo real con la base nueva (el
+Docker local no resuelve DNS hacia Groq). El test de recuperación prueba qué contexto recibe SIA,
+no cómo lo redacta el modelo.

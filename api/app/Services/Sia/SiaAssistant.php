@@ -18,6 +18,11 @@ use Illuminate\Support\Str;
  */
 class SiaAssistant
 {
+    private const ROLES_SECTION = '## Roles y qué puede hacer cada uno';
+
+    /** Siglas de menos de 4 letras que sí identifican un tema del sistema. */
+    private const SHORT_TERMS = ['cat', 'pwa'];
+
     private const STOPWORDS = ['como','para','que','con','los','las','una','uno','del','por','mas','pero','este','esta','esto','sus','son','hay','puedo','quiero','hacer','donde','cuando','cual','cuales','sobre','tengo','tiene','tener','sistema','semillero','semilleros','favor','hola','gracias','buenas','ayuda'];
 
     private const SYSTEM_PROMPT = <<<TXT
@@ -128,9 +133,22 @@ TXT;
 
         if ($sections) {
             $parts[] = array_shift($sections);            // la sección 0 (qué es el sistema) siempre va
+
+            /* La matriz de roles también va siempre: el prompt le pide a SIA decir
+               si el rol de quien pregunta puede hacer algo, y eso no depende de que
+               la pregunta repita palabras de esa sección. */
+            foreach ($sections as $i => $sec) {
+                if (str_starts_with($sec, self::ROLES_SECTION)) {
+                    $parts[] = $sec;
+                    unset($sections[$i]);
+                    break;
+                }
+            }
+
             $scored  = [];
             foreach ($sections as $i => $sec) {
-                $scored[$i] = $this->score($terms, $sec);
+                /* El título describe la tarea ("Crear un semillero…"): pesa el doble. */
+                $scored[$i] = $this->score($terms, $sec) + $this->score($terms, strtok($sec, "\n"));
             }
             arsort($scored);
             foreach (array_slice($scored, 0, 3, true) as $i => $score) {
@@ -160,17 +178,28 @@ TXT;
     private function terms(string $text): array
     {
         $norm  = Str::of($text)->ascii()->lower()->replaceMatches('/[^a-z0-9 ]/', ' ')->toString();
-        $words = array_filter(explode(' ', $norm), fn ($w) => strlen($w) >= 4 && !in_array($w, self::STOPWORDS, true));
+        $words = array_filter(explode(' ', $norm), fn ($w) => (strlen($w) >= 4 || in_array($w, self::SHORT_TERMS, true)) && !in_array($w, self::STOPWORDS, true));
         /* raíz de 5 letras: «postularme», «postulación», «postular» coinciden */
         return array_values(array_unique(array_map(fn ($w) => substr($w, 0, 5), $words)));
     }
 
-    private function score(array $terms, string $text): int
+    /**
+     * Un punto por cada término presente, más una fracción por las repeticiones
+     * (hasta 4): desempata entre secciones que comparten los mismos términos.
+     * Las siglas cortas (CAT) se buscan como palabra completa: "cat" también
+     * está dentro de "catálogos".
+     */
+    private function score(array $terms, string $text): float
     {
         $hay = Str::of($text)->ascii()->lower()->toString();
-        $n = 0;
+        $n = 0.0;
         foreach ($terms as $t) {
-            $n += substr_count($hay, $t) > 0 ? 1 : 0;
+            $count = strlen($t) < 4
+                ? preg_match_all('/\b' . preg_quote($t, '/') . '\b/', $hay)
+                : substr_count($hay, $t);
+            if ($count > 0) {
+                $n += 1 + 0.2 * min($count - 1, 4);
+            }
         }
         return $n;
     }
