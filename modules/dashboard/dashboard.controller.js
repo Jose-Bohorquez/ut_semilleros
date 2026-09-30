@@ -104,6 +104,10 @@ async function loadKPIs(role) {
         setKPI("kpi-seedbeds", active, `${total} total`, "up");
     }
 
+    if (role === "LIDER_SEMILLERO") {
+        renderMySeedbedSummary(seedbedsData?.seedbeds || []);
+    }
+
     if (usersData?.users) {
         const total  = usersData.users.length;
         const active = usersData.users.filter(u => u.status === "ACTIVO").length;
@@ -203,6 +207,46 @@ function renderRecentActivity(proposals, requests) {
 
 function escapeAttr(str) {
     return String(str).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ─── Mi semillero (solo LIDER_SEMILLERO) ────────────
+   Filtra client-side, sobre los seedbeds que loadKPIs ya trajo, los que
+   este usuario lidera (pivot seedbed_user.role === LIDER) — sin llamada
+   nueva a la API. Usa los campos ya calculados por el backend desde CU16
+   (members_count, faculty_names) en vez de pedirlos aparte. */
+function renderMySeedbedSummary(seedbeds) {
+    const container = document.getElementById("mySeedbedSummary");
+    if (!container) return;
+
+    const me = getUser();
+    const mine = seedbeds.filter(s =>
+        (s.users || []).some(u => u.id === me?.id && u.pivot?.role === "LIDER")
+    );
+
+    if (!mine.length) {
+        container.innerHTML = `
+            <div class="empty-state" style="margin-top:0;grid-column:1/-1;">
+                <div class="empty-state-icon"><i class="fas fa-seedling"></i></div>
+                <h3>Aún no lideras ningún semillero</h3>
+                <p>Cuando el sistema te asigne como responsable de un semillero, su resumen
+                   aparecerá aquí.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = mine.map(s => `
+        <div class="my-seedbed-card">
+            <div class="my-seedbed-card-header">
+                <span class="my-seedbed-name">${escapeAttr(s.name)}</span>
+                <span class="sys-card-badge ${s.status === "ACTIVO" ? "is-ok" : ""}">${escapeAttr(s.status)}</span>
+            </div>
+            ${s.faculty_names ? `<p class="my-seedbed-faculty"><i class="fas fa-university"></i> ${escapeAttr(s.faculty_names)}</p>` : ""}
+            <div class="my-seedbed-stats">
+                <span><i class="fas fa-users"></i> ${s.members_count ?? 0} integrante${(s.members_count ?? 0) === 1 ? "" : "s"}</span>
+            </div>
+            <a href="/admin/seedbeds" data-link class="sys-card-link">Ver detalle <i class="fas fa-arrow-right"></i></a>
+        </div>
+    `).join("");
 }
 
 function setKPI(id, value, trendLabel, direction) {

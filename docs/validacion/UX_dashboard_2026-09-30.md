@@ -62,10 +62,24 @@ backend. Cero cambios en `api/`.
 - Validación en vivo con cuenta LIDER_SEMILLERO real: ya no hay una zona en blanco grande debajo
   de "Acceso rápido"; actividad reciente poblada. Sin errores en consola del navegador.
 
+## Ronda 2 (mismo día, a petición de Jose de profundizar más)
+
+Jose pidió seguir mejorando la UX del dashboard, "se le falta mucho". Se agregó:
+
+- **"Mi semillero" (solo Líder):** tarjeta con nombre, estado, facultad(es) y número de
+  integrantes del semillero que lidera — **sin llamada nueva a la API**, filtra client-side sobre
+  los datos que `loadKPIs()` ya trae, usando `members_count`/`faculty_names` (campos que el
+  backend ya calculaba desde CU16). Si el líder no lidera ningún semillero todavía, muestra un
+  estado vacío honesto en vez de nada — validado en vivo con la cuenta de líder de prueba: **hoy
+  ningún semillero real en producción tiene un líder asignado por pivot** (CU21, integrantes,
+  aún no está implementado), así que el estado vacío es correcto, no un bug.
+- CSS nuevo (`.my-seedbed-grid`, `.my-seedbed-card`) con la misma animación de entrada y el mismo
+  lenguaje visual que el resto del dashboard.
+
 ## Pendiente
 
 - No se rediseñó la vista de Estudiante en detalle (solo se benefició de "Actividad reciente"
   genérica) — pendiente de una ronda específica si Jose quiere algo más allá de esto.
-- No se agregó un panel "Resumen de mi semillero" específico para Líder (nombre, estado,
-  objetivos/resultados) — requeriría una llamada nueva a la API; se dejó fuera de esta ronda para
-  no ampliar el alcance sin confirmación previa.
+- La tarjeta "Mi semillero" no se pudo validar visualmente con datos reales (llena) porque ningún
+  semillero en producción tiene líder asignado aún — se validará en cuanto CU21 (integrantes) se
+  implemente y haya al menos un líder real asignado.

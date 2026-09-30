@@ -113,6 +113,17 @@ export function DashboardView() {
 
     </div>
 
+    <!-- ── MI SEMILLERO (solo LIDER_SEMILLERO) ─────── -->
+    ${role === "LIDER_SEMILLERO" ? `
+    <h3 class="section-title">
+        <i class="fas fa-seedling" style="color:var(--color-primary);margin-right:6px"></i>
+        Mi semillero
+    </h3>
+    <div id="mySeedbedSummary" class="my-seedbed-grid">
+        <div class="skeleton skeleton-row" style="width:100%;height:120px"></div>
+    </div>
+    ` : ""}
+
     <!-- ── PANEL DEL SISTEMA (solo ADMIN_SISTEMA) ──── -->
     ${isSystemAdmin ? `
     <h3 class="section-title">

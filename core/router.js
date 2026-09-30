@@ -86,8 +86,8 @@ export const routes = {
 
         if (!requireAuth()) return;
 
-        const view = await import("../modules/dashboard/dashboard.view.js?v=3");
-        const controller = await import("../modules/dashboard/dashboard.controller.js?v=3");
+        const view = await import("../modules/dashboard/dashboard.view.js?v=4");
+        const controller = await import("../modules/dashboard/dashboard.controller.js?v=4");
 
         const content = view.DashboardView();
 
