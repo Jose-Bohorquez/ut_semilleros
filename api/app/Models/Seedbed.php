@@ -24,6 +24,9 @@ class Seedbed extends Model
         'inactivation_reason'
     ];
 
+    /* CU16: campos calculados que se agregan al JSON del listado. */
+    protected $appends = ['faculty_names', 'leader_name', 'members_count'];
+
     /**
      * Programas del semillero (CU13 Ronda B: selección múltiple, antes FK simple).
      */
@@ -85,6 +88,30 @@ public function projects()
     public function requests()
     {
         return $this->hasMany(MembershipRequest::class);
+    }
+
+    /* CU16 paso 2: se calculan aquí (no en columnas) porque un semillero
+       puede tener varios programas (Ronda B) — la facultad sale de ahí. */
+    public function getFacultyNamesAttribute(): string
+    {
+        if (!$this->relationLoaded('programs')) return '';
+        return $this->programs
+            ->pluck('faculty.name')
+            ->filter()
+            ->unique()
+            ->implode(', ');
+    }
+
+    public function getLeaderNameAttribute(): string
+    {
+        if (!$this->relationLoaded('users')) return '';
+        $leader = $this->users->first(fn ($u) => $u->pivot->role === 'LIDER');
+        return $leader?->name ?? 'Sin asignar';
+    }
+
+    public function getMembersCountAttribute(): int
+    {
+        return $this->relationLoaded('users') ? $this->users->count() : 0;
     }
 
 

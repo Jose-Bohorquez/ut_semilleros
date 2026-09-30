@@ -424,6 +424,10 @@ export function createCrudModule(config) {
 
             if (f.name === "id") continue;
 
+            /* CU16: columna calculada de solo lectura (ej. facultad, líder,
+               integrantes) — se muestra en la tabla pero no en el formulario. */
+            if (f.readonly) continue;
+
             /* Todos los campos son obligatorios por defecto — un módulo puede
                marcar required:false explícitamente (ej. una descripción). */
             const isRequired = f.required !== false;

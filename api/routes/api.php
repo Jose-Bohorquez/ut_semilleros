@@ -229,12 +229,11 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | SEMILLEROS (RF13 / CU13)
+    | SEMILLEROS (RF13 / CU13-CU16)
     |   GET list+show → todos los roles (A, L, ADM, E)
-    |   POST/PUT/TOGGLE → L, ADM_SISTEMA, ADMINISTRATIVO (Jose, 2026-07-28: el
-    |     admin debe poder crear/editar semilleros desde el panel, no solo el
-    |     líder; ADMINISTRATIVO ya veía el botón en el frontend pero el backend
-    |     se lo rechazaba con 403 — mismo bug que ya se encontró en propuestas)
+    |   POST/PUT/TOGGLE → L, ADM_SISTEMA (CU16 A2, 2026-09-30: Administrativo
+    |     consulta pero no edita — revierte la decisión previa del
+    |     2026-07-28 para alinear con la especificación de CU16)
     |----------------------------------------------------------------------
     */
 
@@ -244,7 +243,7 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
          ->get('/seedbeds/{id}', [SeedbedController::class, 'show']);
 
-    Route::middleware('role:LIDER_SEMILLERO,ADMIN_SISTEMA,ADMINISTRATIVO')->group(function () {
+    Route::middleware('role:LIDER_SEMILLERO,ADMIN_SISTEMA')->group(function () {
         Route::post('/seedbeds',                         [SeedbedController::class, 'store']);
         Route::put('/seedbeds/{id}',                     [SeedbedController::class, 'update']);
         Route::put('/seedbeds/{id}/toggle-status',       [SeedbedController::class, 'toggleStatus']);

@@ -26,7 +26,21 @@ class SecurityRegressionTest extends TestCase
     {
         $faculty = Faculty::create(['name' => 'Facultad Sec', 'status' => 'ACTIVO']);
         $program = Program::create(['name' => 'Programa Sec', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
-        return Seedbed::create(['name' => 'Semillero Sec', 'program_id' => $program->id, 'status' => 'ACTIVO']);
+        $seedbed = Seedbed::create(['name' => 'Semillero Sec', 'status' => 'ACTIVO']);
+        $seedbed->programs()->attach($program->id);
+        return $seedbed;
+    }
+
+    /* CU16 A2: Administrativo consulta pero no edita semilleros (alineado
+       2026-09-30, revierte la decisión previa del 2026-07-28). */
+    public function test_administrativo_cannot_write_seedbeds(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['role' => 'ADMINISTRATIVO']));
+        $seedbed = $this->seedbed();
+
+        $this->postJson('/api/seedbeds', ['name' => 'X'])->assertStatus(403);
+        $this->putJson("/api/seedbeds/{$seedbed->id}", ['name' => 'Y'])->assertStatus(403);
+        $this->putJson("/api/seedbeds/{$seedbed->id}/toggle-status")->assertStatus(403);
     }
 
     /* ── C-02: el cliente no controla user_id/status en postulaciones ── */

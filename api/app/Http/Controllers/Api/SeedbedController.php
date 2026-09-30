@@ -27,12 +27,14 @@ class SeedbedController extends Controller
         'authorization_reference.required' => 'La referencia de la aprobación del área administrativa es obligatoria (RN03).',
     ];
 
-    private const RELATIONS = ['programs', 'areas', 'group', 'cat', 'coordinator'];
+    /* CU16 paso 2: el listado muestra facultad, líder e integrantes además
+       de lo que ya se cargaba. */
+    private const LIST_RELATIONS = ['programs.faculty', 'areas', 'group', 'cat', 'coordinator', 'users'];
 
     /** Listar semilleros */
     public function index()
     {
-        $seedbeds = Seedbed::with(self::RELATIONS)
+        $seedbeds = Seedbed::with(self::LIST_RELATIONS)
             ->withCount(['requests as pending_requests_count' => fn ($q) => $q->where('status', 'PENDIENTE')])
             ->get();
 
@@ -47,7 +49,7 @@ class SeedbedController extends Controller
      */
     public function show($id)
     {
-        $seedbed = Seedbed::with(array_merge(self::RELATIONS, ['users']))
+        $seedbed = Seedbed::with(self::LIST_RELATIONS)
             ->withCount(['requests as pending_requests_count' => fn ($q) => $q->where('status', 'PENDIENTE')])
             ->findOrFail($id);
 
@@ -81,7 +83,7 @@ class SeedbedController extends Controller
 
         return response()->json([
             "message" => "Semillero creado",
-            "seedbed" => $seedbed->load(['programs', 'areas'])
+            "seedbed" => $seedbed->load(['programs.faculty', 'areas', 'users'])
         ],201);
 
     }
@@ -108,7 +110,7 @@ class SeedbedController extends Controller
 
         return response()->json([
             "message" => "Semillero actualizado",
-            "seedbed" => $seedbed->load(['programs', 'areas'])
+            "seedbed" => $seedbed->load(['programs.faculty', 'areas', 'users'])
         ]);
 
     }

@@ -114,6 +114,10 @@ fields:[
 
  {name:"name",label:"Nombre",type:"text"},
 
+ /* CU16 paso 2: facultad, líder e integrantes en el listado (calculados en
+    el backend, no se editan aquí). */
+ {name:"faculty_names",label:"Facultad",type:"text",readonly:true},
+
  {
   name:"description",
   label:"Descripción",
@@ -138,6 +142,10 @@ fields:[
   relation:"areas",
   display:"name"
  },
+
+ {name:"leader_name",label:"Líder",type:"text",readonly:true},
+
+ {name:"members_count",label:"Integrantes",type:"text",readonly:true},
 
  /* CU13: grupo, CAT y coordinador (opcionales) */
  {
@@ -193,14 +201,32 @@ fields:[
 
 actions:[
  {
+  label:"Ver",
+  class:"viewSeedbedBtn"
+ },
+ {
   label:"INTEGRANTES",
   class:"membersBtn"
  }
 ],
 
-noCreateFor: ['ESTUDIANTE'],
+/* CU16 paso 2/3: filtro por estado. Facultad/CAT/Área requieren catálogo
+   dinámico que el motor genérico de filtros (opciones estáticas) no
+   soporta hoy — pendiente, documentado en CU16.md. */
+filters: [
+    { field: "status", label: "Estado", options: [
+        { value: "ACTIVO", label: "ACTIVO" },
+        { value: "INACTIVO", label: "INACTIVO" },
+    ] },
+],
 
-noEditFor: ['ESTUDIANTE'],
+pageLength: 15,
+
+/* CU16 A2: Administrativo consulta, no edita (alineado a la spec,
+   2026-09-30 — antes tenía escritura por decisión previa del proyecto). */
+noCreateFor: ['ESTUDIANTE', 'ADMINISTRATIVO'],
+
+noEditFor: ['ESTUDIANTE', 'ADMINISTRATIVO'],
 
 /* CU13-A1: "Guardar borrador" registra el semillero inactivo. Solo aplica
    al crear (un semillero ya existente se inactiva con el toggle de estado). */
@@ -413,5 +439,62 @@ document.addEventListener("click", async function(e) {
     const btn = e.target.closest(".membersBtn");
     if (btn) {
         seedbedMembersModule.init(btn.dataset.id);
+    }
+});
+
+/* =========================================================
+   CU16 paso 5/6: VER — vista consolidada de solo lectura
+   (datos generales, misión/visión, justificación, objetivos, integrantes).
+   Resultados aún no está vinculado a este módulo (pendiente, ver CU16.md).
+   ========================================================= */
+
+document.addEventListener("click", async function(e) {
+    const btn = e.target.closest(".viewSeedbedBtn");
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    try {
+        const [seedbedData, objectivesData] = await Promise.all([
+            apiFetch(`/seedbeds/${id}`),
+            apiFetch("/objectives"),
+        ]);
+        const s = seedbedData.seedbed;
+        const objectives = (objectivesData.objectives || []).filter(o => o.seedbed_id == id);
+        const members = s.users || [];
+
+        Swal.fire({
+            title: escapeHtml(s.name),
+            width: 700,
+            html: `
+                <div style="text-align:left;font-size:0.9rem">
+                    <h4>Datos generales</h4>
+                    <p><strong>Código:</strong> ${escapeHtml(s.code || "—")}</p>
+                    <p><strong>Facultad:</strong> ${escapeHtml(s.faculty_names || "—")}</p>
+                    <p><strong>Programas:</strong> ${escapeHtml((s.programs || []).map(p => p.name).join(", ") || "—")}</p>
+                    <p><strong>Áreas:</strong> ${escapeHtml((s.areas || []).map(a => a.name).join(", ") || "—")}</p>
+                    <p><strong>Estado:</strong> ${escapeHtml(s.status)}</p>
+                    <p><strong>Objetivo general:</strong> ${escapeHtml(s.objetivo_general || "—")}</p>
+
+                    <h4>Misión y visión</h4>
+                    <p><strong>Misión:</strong> ${escapeHtml(s.mision || "—")}</p>
+                    <p><strong>Visión:</strong> ${escapeHtml(s.vision || "—")}</p>
+
+                    <h4>Justificación</h4>
+                    <p>${escapeHtml(s.justificacion || "—")}</p>
+
+                    <h4>Objetivos</h4>
+                    ${objectives.length
+                        ? `<ul>${objectives.map(o => `<li>${escapeHtml(o.content)}</li>`).join("")}</ul>`
+                        : "<p>Sin objetivos registrados.</p>"}
+
+                    <h4>Integrantes (${members.length})</h4>
+                    ${members.length
+                        ? `<ul>${members.map(m => `<li>${escapeHtml(m.name)} (${escapeHtml(m.pivot?.role || "")})</li>`).join("")}</ul>`
+                        : "<p>Sin integrantes registrados.</p>"}
+                </div>
+            `,
+        });
+    } catch (err) {
+        Swal.fire({ icon: "error", title: "No se pudo cargar el detalle", text: err.message });
     }
 });
