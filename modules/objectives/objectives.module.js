@@ -32,7 +32,8 @@ fields: [
  {
   name: "content",
   label: "Objetivo",
-  type: "text"
+  type: "textarea",
+  hint: "Entre 10 y 2000 caracteres."
  },
 
  {
@@ -47,8 +48,10 @@ fields: [
 
 ],
 
-noCreateFor: ['ESTUDIANTE'],
+/* CU19: el actor secundario Administrativo es solo consulta (2026-09-30,
+   mismo criterio ya aplicado a semilleros en CU16). */
+noCreateFor: ['ESTUDIANTE', 'ADMINISTRATIVO'],
 
-noEditFor: ['ESTUDIANTE']
+noEditFor: ['ESTUDIANTE', 'ADMINISTRATIVO']
 
 });
