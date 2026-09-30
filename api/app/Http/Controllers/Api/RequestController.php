@@ -160,19 +160,22 @@ class RequestController extends Controller
 
             "message"=>"required|string|min:10|max:1000",
 
-            "status"=>"required|in:PENDIENTE,APROBADA,RECHAZADA"
+            /* Ya no es obligatorio (CU22-H2): si llega se valida el formato por
+               compatibilidad, pero el valor se ignora — ver más abajo. */
+            "status"=>"nullable|in:PENDIENTE,APROBADA,RECHAZADA"
 
         ], self::MESSAGES);
 
         /* Seguridad (hallazgo C-02, 2026-09-27): un ESTUDIANTE solo puede
-           postularse a sí mismo y siempre queda PENDIENTE — el user_id y el
-           status que mande el cliente se ignoran. Antes podía crear su
-           postulación ya APROBADA o a nombre de otro estudiante. La
-           aprobación solo ocurre por PUT /requests/{id}/update-status (L, ADM). */
+           postularse a sí mismo — el user_id que mande el cliente se ignora.
+           CU22-H2: para TODOS los roles la solicitud nace PENDIENTE (CU22
+           paso 4: «queda en estado Pendiente»); la aprobación/rechazo solo
+           ocurre por PUT /requests/{id}/update-status (CU24). Antes un
+           Líder/Administrativo podía crearla ya APROBADA y saltarse CU24. */
         if (auth()->user()->role === 'ESTUDIANTE') {
             $validated['user_id'] = auth()->id();
-            $validated['status']  = 'PENDIENTE';
         }
+        $validated['status'] = 'PENDIENTE';
 
         /* E4 (CU22): el semillero debe estar activo. */
         $seedbed = Seedbed::findOrFail($validated['seedbed_id']);

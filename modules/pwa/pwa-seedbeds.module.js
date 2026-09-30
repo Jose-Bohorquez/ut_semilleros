@@ -245,10 +245,63 @@ function bindSeedbedCardClicks(seedbeds) {
             const id = parseInt(card.dataset.id);
             const seedbed = seedbeds.find(s => s.id === id) || allSeedbeds.find(s => s.id === id);
             if (!seedbed) return;
-            openDetail(seedbed);
+            /* CU18 E1: antes de mostrar el detalle se consulta el semillero;
+               si ya no está disponible se avisa y se vuelve al listado. */
+            const fresh = await fetchAvailableSeedbed(seedbed);
+            if (!fresh) return;
+            openDetail(fresh);
             await loadObjectivesForSeedbed(id);
         });
     });
+}
+
+/* CU18 E1: consulta GET /seedbeds/{id}. Devuelve el semillero vigente, o null
+   si el servidor dice que ya no está disponible (404: inactivado mientras el
+   estudiante lo veía), tras mostrar «Este semillero ya no está disponible»,
+   cerrar el detalle y refrescar el listado. Sin conexión apiFetch entrega la
+   última copia guardada (con su aviso, CU18 A3) o falla con status 0; en ese
+   caso, y ante cualquier otro error, se conserva lo que ya traía el listado. */
+async function fetchAvailableSeedbed(fallback) {
+    try {
+        const data = await apiFetch(`/seedbeds/${fallback.id}`);
+        const fresh = data?.seedbed;
+        if (fresh && fresh.status && fresh.status !== "ACTIVO") {
+            await handleSeedbedUnavailable(fallback.id);
+            return null;
+        }
+        return fresh || fallback;
+    } catch (err) {
+        if (err.status === 404) {
+            await handleSeedbedUnavailable(fallback.id);
+            return null;
+        }
+        return fallback;
+    }
+}
+
+async function handleSeedbedUnavailable(seedbedId) {
+    const sheet = document.getElementById("seedbedDetail");
+    if (sheet) sheet.style.display = "none";
+    allSeedbeds = allSeedbeds.filter(s => s.id !== seedbedId);
+
+    await Swal.fire({
+        icon: "info",
+        title: "Este semillero ya no está disponible",
+        confirmButtonText: "Aceptar",
+    });
+
+    /* Refresca el listado desde el servidor (que solo entrega activos); si no
+       hay red se queda con la lista local ya depurada. */
+    try {
+        const data = await apiFetch("/seedbeds");
+        allSeedbeds = (data.seedbeds || []).filter(s => s.status === "ACTIVO");
+    } catch { /* se conserva allSeedbeds depurado */ }
+
+    if (currentFacultyId && allSeedbeds.some(s => facultiesOf(s).some(f => f.id === currentFacultyId))) {
+        renderFacultySeedbeds(currentFacultyId);
+    } else {
+        renderFacultyList();
+    }
 }
 
 function fabHtml() {
@@ -437,7 +490,15 @@ async function renderMembershipSection(seedbed) {
 
     const btn = document.getElementById("joinSeedbedBtn");
     const form = document.getElementById("joinSeedbedForm");
-    btn.addEventListener("click", () => { btn.style.display = "none"; form.style.display = "flex"; });
+    btn.addEventListener("click", async () => {
+        /* CU18 E1: el semillero pudo inactivarse mientras el estudiante lo veía. */
+        btn.disabled = true;
+        const ok = await fetchAvailableSeedbed(seedbed);
+        if (!ok) return;   /* ya se avisó, se cerró el detalle y se refrescó el listado */
+        btn.disabled = false;
+        btn.style.display = "none";
+        form.style.display = "flex";
+    });
     document.getElementById("cancelJoinBtn").addEventListener("click", () => { form.style.display = "none"; btn.style.display = ""; });
 
     form.addEventListener("submit", async e => {

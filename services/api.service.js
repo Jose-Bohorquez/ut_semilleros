@@ -60,7 +60,10 @@ export async function flushPendingRevokes() {
    respuesta depende del token (rol), y así la copia queda atada al usuario.
    ========================================================= */
 
-const OFFLINE_ENDPOINTS = [/^\/seedbeds(\/\d+)?$/, /^\/objectives$/];
+/* CU23-E1: «Mis solicitudes» (y, por coherencia, «Mis propuestas») también se
+   consultan sin conexión: /my devuelve solo lo del usuario autenticado y la
+   copia queda atada a su id y se borra al cerrar sesión. */
+const OFFLINE_ENDPOINTS = [/^\/seedbeds(\/\d+)?$/, /^\/objectives$/, /^\/requests\/my$/, /^\/proposals\/my$/];
 
 function offlineKey(endpoint) {
     const uid = getUser()?.id;

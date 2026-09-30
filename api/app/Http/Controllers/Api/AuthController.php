@@ -294,27 +294,43 @@ class AuthController extends Controller
     public function updatePhoto(Request $request)
     {
         $request->validate([
-            'photo' => 'required|string',
+            /* Tope antes del regex y del base64_decode: 2 MB de imagen ≈ 2,8 M de caracteres en base64. */
+            'photo' => 'required|string|max:3000000',
         ]);
 
-        $photo = $request->photo;
+        /* CU05-H2/H3: no basta con el prefijo «data:image/...». Se decodifica
+           el base64 (estricto), se mide el tamaño REAL y getimagesizefromstring()
+           comprueba que los bytes sean de verdad una imagen de un tipo
+           permitido. SVG queda fuera a propósito: es XML con scripts
+           incrustables y se pinta en <img> de otros usuarios. */
+        $formato = 'Formato de imagen no válido. Use JPEG, PNG, GIF, WebP o BMP.';
 
-        /* Solo se aceptan imágenes en base64 con prefijo data URI */
-        if (!preg_match('/^data:image\/(jpeg|jpg|png|gif|webp|bmp|svg\+xml);base64,/i', $photo)) {
+        if (!preg_match('/^data:image\/(?:jpeg|jpg|png|gif|webp|bmp);base64,(.+)$/is', $request->photo, $m)) {
+            return response()->json(['message' => $formato], 422);
+        }
+
+        $bytes = base64_decode($m[1], true);
+
+        if ($bytes === false || $bytes === '') {
+            return response()->json(['message' => $formato], 422);
+        }
+
+        /* Límite único: 2 MB de imagen decodificada (mismo texto en el frontend). */
+        if (strlen($bytes) > 2 * 1024 * 1024) {
             return response()->json([
-                'message' => 'Formato de imagen no válido. Use JPEG, PNG, GIF, WebP o BMP.',
+                'message' => 'La imagen es demasiado grande. Máximo 2 MB.',
             ], 422);
         }
 
-        /* Límite: ~2 MB codificado en base64 */
-        if (strlen($photo) > 2 * 1024 * 1024) {
-            return response()->json([
-                'message' => 'La imagen es demasiado grande. Máximo 1.5 MB.',
-            ], 422);
+        $info = @getimagesizefromstring($bytes);
+
+        if ($info === false || !in_array($info['mime'] ?? '', ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'], true)) {
+            return response()->json(['message' => $formato], 422);
         }
 
+        /* Se guarda con el MIME real detectado, no con el que declaró el cliente. */
         $user = $request->user();
-        $user->update(['profile_photo' => $photo]);
+        $user->update(['profile_photo' => 'data:' . $info['mime'] . ';base64,' . base64_encode($bytes)]);
 
         return response()->json([
             'message' => 'Foto de perfil actualizada correctamente',
@@ -333,17 +349,19 @@ class AuthController extends Controller
     }
 
     /**
-     * CU05 — Consultar y actualizar perfil (paso 3-5: nombre, correo y
-     * teléfono; A1: cambiar contraseña).
+     * CU05 — Consultar y actualizar perfil. La especificación solo permite
+     * actualizar el teléfono (paso 3-5) y cambiar la contraseña (A1); nombre,
+     * correo y rol se muestran de solo lectura y los cambia el ADMIN_SISTEMA
+     * en CU06. CU05-H1: antes este endpoint aceptaba `name` y `email` sin
+     * contraseña actual ni reverificación (toma de cuenta con un token
+     * robado). Si un cliente viejo aún los envía se IGNORAN sin error, para
+     * no romperlo.
      */
     public function updateProfile(Request $request)
     {
         $user = $request->user();
 
         $validated = $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-
             /* E1: entre 7 y 15 dígitos (se admite un "+" inicial, no se
                cuenta en el largo). */
             'phone' => ['nullable', 'regex:/^\+?[0-9]{7,15}$/'],
@@ -357,18 +375,38 @@ class AuthController extends Controller
             'current_password.required_with' => 'Escribe tu contraseña actual.',
         ]);
 
-        /* E2 */
-        if (!empty($validated['password']) && !Hash::check($validated['current_password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'current_password' => ['La contraseña actual no es correcta.'],
-            ]);
+        /* E2 — con límite de intentos por usuario (CU05-H3): sin él, un token
+           robado permitiría adivinar la contraseña actual sin freno. Se cuenta
+           antes de comparar (como RN14 en el login) y un acierto limpia. */
+        if (!empty($validated['password'])) {
+            $pwKey = 'profile-password:' . $user->id;
+
+            if (RateLimiter::tooManyAttempts($pwKey, 5)) {
+                $seconds = RateLimiter::availableIn($pwKey);
+
+                return response()->json([
+                    'message'     => "Demasiados intentos con la contraseña actual. Intenta de nuevo en {$seconds} segundos.",
+                    'retry_after' => $seconds,
+                ], 429);
+            }
+
+            RateLimiter::hit($pwKey, 60);
+
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                throw ValidationException::withMessages([
+                    'current_password' => ['La contraseña actual no es correcta.'],
+                ]);
+            }
+
+            RateLimiter::clear($pwKey);
         }
 
-        $data = [
-            'name'  => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-        ];
+        /* Solo se toca el teléfono si la petición lo trae: así un cambio de
+           contraseña que no lo envía no lo borra. */
+        $data = [];
+        if ($request->exists('phone')) {
+            $data['phone'] = $validated['phone'] ?? null;
+        }
 
         $changingPassword = !empty($validated['password']);
         if ($changingPassword) {
@@ -379,7 +417,9 @@ class AuthController extends Controller
 
             /* Auditoría (CU29): $user->update() ya la genera solo (AuditObserver),
                no hace falta un Audit::create manual aquí. */
-            $user->update($data);
+            if ($data) {
+                $user->update($data);
+            }
 
             /* A1: al cambiar la contraseña se cierran las demás sesiones —
                esta (la que la está cambiando) se conserva, para no botar de
@@ -465,7 +505,10 @@ class AuthController extends Controller
         RateLimiter::hit($throttleKey, 600);
 
         try {
-            Password::sendResetLink(['email' => $email]);
+            /* CU04-H1: solo las cuentas ACTIVAS reciben enlace. Se filtra en la
+               consulta del broker (no antes), así la respuesta es idéntica
+               esté el correo registrado, inactivo o no exista. */
+            Password::sendResetLink(['email' => $email, 'status' => 'ACTIVO']);
         } catch (\Throwable $e) {
             /* E4: si el correo de un solo uso falla al enviarse (SMTP caído,
                dominio que rechaza el mensaje, etc.) esto NUNCA debe filtrarse
@@ -522,12 +565,14 @@ class AuthController extends Controller
 
             $status = Password::broker($broker)->reset(
 
+                /* CU04-H1: un usuario INACTIVO no puede restablecer (el broker
+                   responde INVALID_USER → el mismo «enlace no válido»). */
                 $request->only(
                     'email',
                     'password',
                     'password_confirmation',
                     'token'
-                ),
+                ) + ['status' => 'ACTIVO'],
 
                 function ($user, $password) use (&$resetUser) {
 

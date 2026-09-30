@@ -39,6 +39,17 @@ class MembershipRequest extends Model
     ];
 
     /**
+     * RNF03/RNF12: el teléfono del estudiante se cifra en reposo con APP_KEY
+     * (mismo patrón que Proposal, Coordinator y SeedbedMember).
+     */
+    protected function casts(): array
+    {
+        return [
+            'phone' => 'encrypted',
+        ];
+    }
+
+    /**
      * Usuario que realiza la solicitud.
      */
     public function user()

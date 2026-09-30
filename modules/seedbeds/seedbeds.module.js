@@ -4,6 +4,31 @@ import { createCrudModule } from "../../core/crud.engine.js";
 import { seedbedMembersModule } from "../seedbed-members/seedbed-members.module.js";
 import { apiFetch } from "../../services/api.service.js";
 import { escapeHtml }      from "../../core/escape.js";
+import { getUser }         from "../../services/storage.service.js";
+import { navigateTo }      from "../../core/router.js";
+
+/* CU19: límites del contenido de un objetivo (mismos que el servidor). */
+const OBJECTIVE_MIN = 10;
+const OBJECTIVE_MAX = 2000;
+
+const isAdmin = () => getUser()?.role === "ADMIN_SISTEMA";
+
+/* CU16 A1: id del líder responsable (fila LIDER de seedbed_user), o null. */
+function leaderIdOf(seedbed) {
+    const leader = (seedbed?.users || []).find(u => u.pivot?.role === "LIDER");
+    return leader ? leader.id : null;
+}
+
+/* CU16 paso 2: opciones únicas {value,label} (por id) de una relación de los
+   semilleros, ordenadas por nombre. */
+function distinctOptions(records, pick) {
+    const map = new Map();
+    records.forEach(r => pick(r).forEach(item => {
+        if (item && item.id != null && !map.has(String(item.id))) map.set(String(item.id), item.name || String(item.id));
+    }));
+    return Array.from(map, ([value, label]) => ({ value, label }))
+        .sort((a, b) => a.label.localeCompare(b.label, "es"));
+}
 
 /* =========================================================
    OBJETIVOS ANIDADOS EN EL MISMO FORMULARIO DE SEMILLERO
@@ -91,8 +116,11 @@ function objectiveRowHtml(id = "", content = "") {
                 <i class="fas fa-chevron-down"></i>
             </button>
         </div>
-        <input type="text" class="objective-input" placeholder="Ej: Fomentar la investigación aplicada en..."
-               value="${safe}" style="flex:1">
+        <div style="flex:1">
+            <input type="text" class="objective-input" placeholder="Ej: Fomentar la investigación aplicada en..."
+                   value="${safe}" maxlength="${OBJECTIVE_MAX}" style="width:100%">
+            <span class="field-error-msg objective-error-msg" style="display:none;color:var(--color-error)"></span>
+        </div>
         <button type="button" class="btn btn-ghost btn-sm removeObjectiveBtn" title="Quitar" style="flex-shrink:0">
             <i class="fas fa-times"></i>
         </button>
@@ -210,10 +238,27 @@ actions:[
  }
 ],
 
-/* CU16 paso 2/3: filtro por estado. Facultad/CAT/Área requieren catálogo
-   dinámico que el motor genérico de filtros (opciones estáticas) no
-   soporta hoy — pendiente, documentado en CU16.md. */
+/* CU16 paso 2/3 y A1: filtros combinables por facultad, CAT, área y estado
+   (más el buscador de DataTables) y «Mis semilleros» para el Líder.
+   Las opciones se arman con los semilleros cargados (solo valores que existen
+   en el listado, sin pedir catálogos aparte que un rol podría no poder leer). */
 filters: [
+    /* A1: el Líder ve primero sus semilleros; puede volver a «Todos». El
+       responsable se identifica por id (users[].pivot.role = LIDER), no por
+       nombre, porque dos personas pueden llamarse igual. */
+    { field: "mine", label: "Ver", roles: ["LIDER_SEMILLERO"], allLabel: "Todos los semilleros",
+      options: [{ value: "mine", label: "Mis semilleros" }],
+      test: (s) => leaderIdOf(s) !== null && String(leaderIdOf(s)) === String(getUser()?.id),
+      defaultValue: () => "mine" },
+    { field: "faculty", label: "Facultad",
+      options: (recs) => distinctOptions(recs, s => (s.programs || []).map(p => p.faculty)),
+      test: (s, v) => (s.programs || []).some(p => String(p.faculty?.id) === v) },
+    { field: "cat", label: "CAT",
+      options: (recs) => distinctOptions(recs, s => [s.cat]),
+      test: (s, v) => String(s.cat?.id ?? s.cat_id ?? "") === v },
+    { field: "area", label: "Área",
+      options: (recs) => distinctOptions(recs, s => s.areas || []),
+      test: (s, v) => (s.areas || []).some(a => String(a.id) === v) },
     { field: "status", label: "Estado", options: [
         { value: "ACTIVO", label: "ACTIVO" },
         { value: "INACTIVO", label: "INACTIVO" },
@@ -221,6 +266,9 @@ filters: [
 ],
 
 pageLength: 15,
+
+/* CU16 E1: texto exacto cuando los filtros/búsqueda no devuelven nada. */
+emptyFilterMessage: "No se encontraron semilleros con los filtros seleccionados",
 
 /* CU16 A2: Administrativo consulta, no edita (alineado a la spec,
    2026-09-30 — antes tenía escritura por decisión previa del proyecto). */
@@ -238,6 +286,13 @@ draftOption: true,
 beforeSave(data, form) {
     data.programs = Array.from(form.querySelector('[name="programs"]')?.selectedOptions || []).map(o => o.value);
     data.areas = Array.from(form.querySelector('[name="areas"]')?.selectedOptions || []).map(o => o.value);
+
+    /* CU15-H1: al EDITAR el estado no se envía (el servidor lo rechaza); solo
+       cambia con Activar/Inactivar. `expected_updated_at` solo existe al editar. */
+    if (form.querySelector('[name="expected_updated_at"]')) delete data.status;
+
+    /* CU14-A2: líder responsable, solo lo envía el Admin y solo si eligió uno. */
+    if (!data.leader_id) delete data.leader_id;
 },
 
 /* CU15: al inactivar, informa cuántas solicitudes pendientes tiene el
@@ -309,8 +364,17 @@ extraFormHtml(record) {
     const concurrencyInput = record
         ? `<input type="hidden" name="expected_updated_at" value="${escapeHtml(record.updated_at)}">`
         : "";
+    /* CU14-A2: solo el Administrador asigna/reasigna al líder responsable.
+       Las opciones se cargan en afterFormMount (GET /users). */
+    const leaderSelect = isAdmin() ? `
+    <div class="form-group">
+        <label for="field-leader_id">Líder responsable <span class="optional-hint">(opcional)</span></label>
+        <select id="field-leader_id" name="leader_id"><option value="">Cargando...</option></select>
+        <span class="field-error-msg" id="err-leader_id"></span>
+    </div>` : "";
     return `
     ${concurrencyInput}
+    ${leaderSelect}
     <div class="form-group">
         <label>Objetivos <span class="optional-hint">(opcional, puedes agregar, reordenar y quitar varios)</span></label>
         <div id="objectivesRepeater"></div>
@@ -325,6 +389,54 @@ extraFormHtml(record) {
 async afterFormMount(record) {
     const repeater = document.getElementById("objectivesRepeater");
     if (!repeater) return;
+
+    /* CU15-H1: al editar, el selector «Estado» no aplica (se cambia con
+       Activar/Inactivar). Se oculta y se deshabilita para que no viaje. */
+    if (record) {
+        const statusSelect = document.getElementById("field-status");
+        if (statusSelect) {
+            statusSelect.disabled = true;
+            statusSelect.closest(".form-group")?.setAttribute("style", "display:none");
+        }
+    }
+
+    /* CU14-A2: opciones del líder responsable (solo Admin). */
+    const leaderSelect = document.getElementById("field-leader_id");
+    if (leaderSelect) {
+        try {
+            const data = await apiFetch("/users");
+            const leaders = (data.users || []).filter(u => u.role === "LIDER_SEMILLERO" && u.status === "ACTIVO");
+            const currentId = (record?.users || []).find(u => u.pivot?.role === "LIDER")?.id;
+            leaderSelect.innerHTML = `<option value="">${currentId ? "Mantener el líder actual" : "Sin asignar"}</option>` +
+                leaders.map(u => `<option value="${escapeHtml(u.id)}" ${u.id === currentId ? "selected" : ""}>${escapeHtml(u.name)}</option>`).join("");
+        } catch {
+            leaderSelect.innerHTML = `<option value="">No se pudo cargar la lista de líderes</option>`;
+            leaderSelect.disabled = true;
+        }
+    }
+
+    /* CU19-H1 / E1: valida los objetivos ANTES de que el formulario se envíe
+       (y el modal se cierre). Este listener corre antes que el del motor
+       (que está en <body>) y corta la propagación si algo no cumple. */
+    document.getElementById("crudForm-seedbeds")?.addEventListener("submit", e => {
+        let firstBad = null;
+        repeater.querySelectorAll(".objective-row").forEach((row, i) => {
+            const input = row.querySelector(".objective-input");
+            const msg = row.querySelector(".objective-error-msg");
+            const len = input.value.trim().length;
+            let error = "";
+            if (len > 0 && len < OBJECTIVE_MIN) error = `El objetivo debe tener al menos ${OBJECTIVE_MIN} caracteres.`;
+            else if (len > OBJECTIVE_MAX) error = `El objetivo no puede superar los ${OBJECTIVE_MAX} caracteres.`;
+            if (msg) { msg.textContent = error; msg.style.display = error ? "block" : "none"; }
+            if (error && !firstBad) firstBad = input;
+        });
+        if (firstBad) {
+            e.preventDefault();
+            e.stopPropagation();
+            firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+            firstBad.focus();
+        }
+    });
 
     if (record) {
         try {
@@ -402,9 +514,15 @@ async onSaved(response, isEdit, editId) {
 
     const rows = document.querySelectorAll("#objectivesRepeater .objective-row");
     let order = 0;
+    let position = 0;
+    /* CU19-H1: los objetivos que el servidor rechace (403/422/red) se
+       acumulan para avisar al usuario con su texto, en vez de descartarlos
+       en silencio. */
+    const failed = [];
     for (const row of rows) {
         const content = row.querySelector(".objective-input")?.value.trim();
         if (!content) continue;
+        position++;
 
         const objectiveId = row.dataset.objectiveId;
         const payload = { seedbed_id: seedbedId, content, order };
@@ -422,8 +540,22 @@ async onSaved(response, isEdit, editId) {
             }
         } catch (err) {
             console.warn("[Semilleros] No se pudo guardar un objetivo:", err.message);
+            failed.push({ position, content, message: err.message || "Error desconocido" });
         }
         order++;
+    }
+
+    if (failed.length) {
+        await Swal.fire({
+            icon: "warning",
+            title: "El semillero se guardó, pero no todos los objetivos",
+            width: 650,
+            html: `<div style="text-align:left;font-size:0.9rem">
+                <p>Estos objetivos no se guardaron. Copia el texto y agrégalo de nuevo editando el semillero:</p>
+                <ul>${failed.map(f => `<li><strong>Objetivo ${f.position}:</strong> ${escapeHtml(f.message)}<br>
+                    <em>${escapeHtml(f.content)}</em></li>`).join("")}</ul>
+            </div>`,
+        });
     }
 }
 
@@ -445,7 +577,7 @@ document.addEventListener("click", async function(e) {
 /* =========================================================
    CU16 paso 5/6: VER — vista consolidada de solo lectura
    (datos generales, misión/visión, justificación, objetivos, integrantes).
-   Resultados aún no está vinculado a este módulo (pendiente, ver CU16.md).
+   Incluye la sección de solo lectura «Resultados» (CU16 paso 6 / CU20).
    ========================================================= */
 
 document.addEventListener("click", async function(e) {
@@ -454,13 +586,26 @@ document.addEventListener("click", async function(e) {
 
     const id = btn.dataset.id;
     try {
-        const [seedbedData, objectivesData] = await Promise.all([
+        const [seedbedData, objectivesData, resultsData] = await Promise.all([
             apiFetch(`/seedbeds/${id}`),
             apiFetch("/objectives"),
+            /* CU16 paso 6 / CU20: resultados del semillero. GET /results no
+               admite filtro por semillero, se filtra aquí. Si el rol no puede
+               listarlos (403) o falla, la sección queda vacía sin romper el Ver. */
+            apiFetch("/results").catch(() => null),
         ]);
         const s = seedbedData.seedbed;
         const objectives = (objectivesData.objectives || []).filter(o => o.seedbed_id == id);
-        const members = s.users || [];
+        const results = (resultsData?.results || [])
+            .filter(r => r.seedbed_id == id)
+            .sort((a, b) => String(b.result_date || "").localeCompare(String(a.result_date || "")));
+        /* CU20 disparador: la gestión (agregar/editar/inactivar) vive en /results;
+           el atajo es solo para quien puede escribir (Líder/Admin; RN06 lo valida el servidor). */
+        const canManageResults = ["LIDER_SEMILLERO", "ADMIN_SISTEMA"].includes(getUser()?.role);
+        /* CU16-H2: integrantes reales (seedbed_members activos) — nombre,
+           programa y nivel, sin correo ni teléfono; el líder va aparte. */
+        const members = s.active_members || [];
+        const LEVELS = { PR: "Pregrado", PG: "Posgrado" };
 
         Swal.fire({
             title: escapeHtml(s.name),
@@ -472,6 +617,7 @@ document.addEventListener("click", async function(e) {
                     <p><strong>Facultad:</strong> ${escapeHtml(s.faculty_names || "—")}</p>
                     <p><strong>Programas:</strong> ${escapeHtml((s.programs || []).map(p => p.name).join(", ") || "—")}</p>
                     <p><strong>Áreas:</strong> ${escapeHtml((s.areas || []).map(a => a.name).join(", ") || "—")}</p>
+                    <p><strong>Líder responsable:</strong> ${escapeHtml(s.leader_name || "—")}</p>
                     <p><strong>Estado:</strong> ${escapeHtml(s.status)}</p>
                     <p><strong>Objetivo general:</strong> ${escapeHtml(s.objetivo_general || "—")}</p>
 
@@ -487,13 +633,25 @@ document.addEventListener("click", async function(e) {
                         ? `<ul>${objectives.map(o => `<li>${escapeHtml(o.content)}</li>`).join("")}</ul>`
                         : "<p>Sin objetivos registrados.</p>"}
 
+                    <h4>Resultados</h4>
+                    ${results.length
+                        ? `<ul>${results.map(r => `<li>${escapeHtml(r.content)}
+                            <small style="color:var(--color-text-2)">(${escapeHtml(r.result_date || "sin fecha")}${r.status === "INACTIVO" ? " · inactivo" : ""})</small></li>`).join("")}</ul>`
+                        : "<p>Sin resultados registrados.</p>"}
+
                     <h4>Integrantes (${members.length})</h4>
                     ${members.length
-                        ? `<ul>${members.map(m => `<li>${escapeHtml(m.name)} (${escapeHtml(m.pivot?.role || "")})</li>`).join("")}</ul>`
+                        ? `<ul>${members.map(m => `<li>${escapeHtml(m.name)} — ${escapeHtml(m.program_name || "—")} · ${escapeHtml(LEVELS[m.level] || m.level || "—")}</li>`).join("")}</ul>`
                         : "<p>Sin integrantes registrados.</p>"}
                 </div>
             `,
-        });
+            /* Siempre hay un botón para cerrar: quien puede gestionar resultados ve
+               «Gestionar resultados» + «Cerrar»; el resto (Administrativo) solo «Cerrar». */
+            showConfirmButton: true,
+            confirmButtonText: canManageResults ? "Gestionar resultados" : "Cerrar",
+            showCancelButton: canManageResults,
+            cancelButtonText: "Cerrar",
+        }).then(r => { if (r.isConfirmed && canManageResults) navigateTo("/results"); });
     } catch (err) {
         Swal.fire({ icon: "error", title: "No se pudo cargar el detalle", text: err.message });
     }

@@ -17,6 +17,8 @@ const ROLE_LABELS = {
     ESTUDIANTE:      { label: "Estudiante",       color: "#7c3aed" },
 };
 
+const PHOTO_MAX_BYTES = 2 * 1024 * 1024;
+
 export const pwaProfileModule = {
     async init() {
         renderProfile(getUser());
@@ -133,27 +135,24 @@ function renderProfile(user) {
                         font-weight:600;color:var(--color-text)">
                 <i class="fas fa-user-edit"
                    style="color:var(--color-primary);margin-right:6px"></i>
-                Editar información
+                Mi información
             </h3>
 
             <form id="profileForm">
 
+                <!-- CU05: nombre y correo son de solo lectura; los cambia el
+                     administrador del sistema (CU06). -->
                 <div class="pwa-form-group">
-                    <label class="pwa-label" for="prof-name">
-                        Nombre completo <span style="color:var(--color-error)">*</span>
-                    </label>
-                    <input class="pwa-input" id="prof-name" name="name"
-                           type="text" value="${escapeHtml(user?.name)}" required>
-                    <span class="pwa-field-error" id="err-name"></span>
+                    <span class="pwa-label">Nombre completo</span>
+                    <div id="prof-name" style="padding:10px 0;color:var(--color-text)">${escapeHtml(user?.name)}</div>
                 </div>
 
                 <div class="pwa-form-group">
-                    <label class="pwa-label" for="prof-email">
-                        Correo electrónico <span style="color:var(--color-error)">*</span>
-                    </label>
-                    <input class="pwa-input" id="prof-email" name="email"
-                           type="email" value="${escapeHtml(user?.email)}" required>
-                    <span class="pwa-field-error" id="err-email"></span>
+                    <span class="pwa-label">Correo electrónico</span>
+                    <div id="prof-email" style="padding:10px 0;color:var(--color-text);word-break:break-all">${escapeHtml(user?.email)}</div>
+                    <span style="display:block;font-size:12px;color:var(--color-text-faint)">
+                        Para cambiar tu nombre o correo, solicítalo al administrador del sistema.
+                    </span>
                 </div>
 
                 <div class="pwa-form-group">
@@ -270,6 +269,13 @@ function bindEvents() {
         try {
             const base64 = await compressImage(file, 400, 0.82);
 
+            /* Mismo límite que el servidor: 2 MB de imagen (base64 ≈ 4/3) */
+            if (base64.length * 3 / 4 > PHOTO_MAX_BYTES) {
+                showBanner("error",
+                    '<i class="fas fa-exclamation-circle"></i> La imagen es demasiado grande. Máximo 2 MB.');
+                return;
+            }
+
             /* Preview inmediato */
             updateAvatarPreview(base64);
 
@@ -339,8 +345,6 @@ function bindEvents() {
         e.preventDefault();
 
         const btn  = document.getElementById("saveProfileBtn");
-        const name = document.getElementById("prof-name").value.trim();
-        const email= document.getElementById("prof-email").value.trim();
         const phone= document.getElementById("prof-phone").value.trim();
         const curPass = document.getElementById("prof-current-pass").value;
         const pass = document.getElementById("prof-pass").value;
@@ -349,10 +353,6 @@ function bindEvents() {
         clearErrors();
         let hasError = false;
 
-        if (!name) { showError("name", "El nombre es obligatorio"); hasError = true; }
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showError("email", "Ingresa un correo válido"); hasError = true;
-        }
         /* E1: entre 7 y 15 dígitos (opcional: no todos los usuarios lo llenan) */
         if (phone && !/^\+?[0-9]{7,15}$/.test(phone)) {
             showError("phone", "El teléfono debe tener entre 7 y 15 dígitos"); hasError = true;
@@ -369,7 +369,7 @@ function bindEvents() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
-        const payload = { name, email, phone: phone || null };
+        const payload = { phone: phone || null };
         if (pass) { payload.current_password = curPass; payload.password = pass; payload.password_confirmation = conf; }
 
         try {

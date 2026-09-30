@@ -14,11 +14,23 @@ import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
 import { escapeHtml }      from "../../core/escape.js";
 
+/* CU26 paso 3: la spec nombra los estados Recibida, Viable y Archivada. La API los
+   entrega en `status_label`; este mapa es el respaldo y define el color y si la
+   propuesta aún se puede editar (extensión existente: solo mientras está Recibida). */
 const STATUS_MAP = {
-    PENDIENTE: { label: "Pendiente",  cls: "badge-pwa-warning", editable: true  },
-    APROBADA:  { label: "Aprobada",   cls: "badge-pwa-success", editable: false },
-    RECHAZADA: { label: "Rechazada",  cls: "badge-pwa-error",   editable: false },
+    PENDIENTE: { label: "Recibida",   cls: "badge-pwa-warning", editable: true  },
+    APROBADA:  { label: "Viable",     cls: "badge-pwa-success", editable: false },
+    RECHAZADA: { label: "Archivada",  cls: "badge-pwa-error",   editable: false },
 };
+
+const statusOf = (p) => {
+    const base = STATUS_MAP[p.status] || { label: p.status, cls: "badge-pwa-neutral", editable: false };
+    return { ...base, label: p.status_label || base.label };
+};
+
+const fmtDate = (iso) => iso
+    ? new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })
+    : "";
 
 let proposalsCache = [];
 let areasCache = null;
@@ -100,14 +112,15 @@ function renderList(proposals) {
     const cards = proposals.length === 0
         ? `<div class="empty-state">
                <div class="empty-state-icon"><i class="fas fa-lightbulb"></i></div>
-               <h3>Sin propuestas</h3>
-               <p>Aún no has creado ninguna propuesta de investigación.</p>
+               <h3>Aún no has registrado propuestas</h3>
+               <p>Cuéntanos tu idea de investigación y sigue aquí su estado.</p>
+               <button class="pwa-btn-primary" id="emptyNewProposalBtn" style="margin-top:var(--space-3)">
+                   <i class="fas fa-plus"></i> Registrar una propuesta
+               </button>
            </div>`
         : proposals.map(p => {
-            const st = STATUS_MAP[p.status] || { label: escapeHtml(p.status), cls: "badge-pwa-neutral", editable: false };
-            const date = p.created_at
-                ? new Date(p.created_at).toLocaleDateString("es-CO", { day:"2-digit", month:"short", year:"numeric" })
-                : "";
+            const st = statusOf(p);
+            const date = fmtDate(p.created_at);
             const editBtn = st.editable
                 ? `<button class="btn btn-sm btn-secondary editProposalBtn"
                            data-id="${escapeHtml(p.id)}" style="margin-top:var(--space-2)">
@@ -118,7 +131,9 @@ function renderList(proposals) {
                    </p>`;
 
             return `
-            <div class="pwa-card" style="flex-direction:column;align-items:flex-start;gap:var(--space-2)">
+            <div class="pwa-card proposalCard" data-id="${escapeHtml(p.id)}" tabindex="0" role="button"
+                 aria-label="Ver detalle de la propuesta ${escapeHtml(p.title)}"
+                 style="flex-direction:column;align-items:flex-start;gap:var(--space-2);cursor:pointer">
                 <div style="display:flex;align-items:center;gap:var(--space-3);width:100%">
                     <div class="card-avatar avatar-purple">
                         <i class="fas fa-lightbulb"></i>
@@ -126,11 +141,12 @@ function renderList(proposals) {
                     <div class="card-body">
                         <div class="card-title">${escapeHtml(p.title)}</div>
                         <div class="card-subtitle">
-                            <span class="badge-pwa ${st.cls}">${st.label}</span>
+                            <span class="badge-pwa ${st.cls}">${escapeHtml(st.label)}</span>
                             ${(p.areas || []).map(a => `<span class="badge-pwa badge-pwa-neutral">${escapeHtml(a.name)}</span>`).join("")}
                         </div>
                         <div class="card-meta">
-                            <i class="fas fa-calendar-alt" style="margin-right:4px"></i>${date}
+                            <i class="fas fa-calendar-alt" style="margin-right:4px"></i>${escapeHtml(date)}
+                            ${p.program?.name ? ` · <i class="fas fa-graduation-cap" style="margin:0 4px"></i>${escapeHtml(p.program.name)}` : ""}
                         </div>
                     </div>
                 </div>
@@ -138,6 +154,11 @@ function renderList(proposals) {
                     padding:0 var(--space-2);margin:0;line-height:1.5;
                     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
                     ${escapeHtml(p.description)}</p>` : ""}
+                ${p.review_note ? `<p style="font-size:var(--text-sm);color:var(--color-text-2);
+                    padding:var(--space-2);margin:0;width:100%;box-sizing:border-box;
+                    background:var(--color-surface-2);border-radius:var(--radius-btn)">
+                    <i class="fas fa-comment-dots" style="margin-right:6px"></i><strong>Observación:</strong>
+                    ${escapeHtml(p.review_note)}</p>` : ""}
                 <div style="padding:0 var(--space-2)">${editBtn}</div>
             </div>`;
         }).join("");
@@ -148,7 +169,7 @@ function renderList(proposals) {
                  border-radius:var(--radius-btn);padding:var(--space-3) var(--space-4);
                  margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--color-warning-text)">
                <i class="fas fa-info-circle"></i>
-               Puedes editar tus propuestas mientras estén en estado <strong>Pendiente</strong>.
+               Puedes editar tus propuestas mientras estén en estado <strong>Recibida</strong>.
            </div>`
         : "";
 
@@ -241,7 +262,7 @@ function renderList(proposals) {
                              border-radius:var(--radius-btn);padding:var(--space-3) var(--space-4);
                              margin-bottom:var(--space-5);font-size:var(--text-sm);color:var(--color-text-muted)">
                     <i class="fas fa-info-circle" style="margin-right:6px"></i>
-                    Las nuevas propuestas se crean en estado <strong>Pendiente</strong> para revisión.
+                    Las nuevas propuestas se registran en estado <strong>Recibida</strong> para su revisión.
                 </div>
 
                 <button type="submit" class="pwa-btn-primary" id="saveProposalBtn">
@@ -275,18 +296,36 @@ function bindListEvents() {
     const closeBtn = document.getElementById("closeProposalSheet");
     const form     = document.getElementById("proposalForm");
 
-    /* Abrir para crear */
+    /* Abrir para crear (botón «+» o el acceso de la lista vacía, CU26-A1 → CU25) */
     document.getElementById("newProposalBtn")?.addEventListener("click", () => {
         openSheet(null);
     });
+    document.getElementById("emptyNewProposalBtn")?.addEventListener("click", () => {
+        openSheet(null);
+    });
 
-    /* Abrir para editar */
-    document.addEventListener("click", e => {
-        const btn = e.target.closest(".editProposalBtn");
-        if (!btn) return;
-        const id   = parseInt(btn.dataset.id);
-        const prop = proposalsCache.find(p => p.id === id);
-        if (prop) openSheet(prop);
+    /* Editar o ver el detalle. El listener va en la lista (que se vuelve a crear en
+       cada carga), no en `document`: antes se acumulaba uno nuevo tras cada guardado. */
+    const list = document.getElementById("proposalsList");
+    const onListActivate = e => {
+        const editBtn = e.target.closest(".editProposalBtn");
+        if (editBtn) {
+            const prop = proposalsCache.find(p => p.id === parseInt(editBtn.dataset.id));
+            if (prop) openSheet(prop);
+            return;
+        }
+        const card = e.target.closest(".proposalCard");
+        if (card) {
+            const prop = proposalsCache.find(p => p.id === parseInt(card.dataset.id));
+            if (prop) showProposalDetail(prop);
+        }
+    };
+    list?.addEventListener("click", onListActivate);
+    list?.addEventListener("keydown", e => {
+        if ((e.key === "Enter" || e.key === " ") && e.target.classList?.contains("proposalCard")) {
+            e.preventDefault();
+            onListActivate(e);
+        }
     });
 
     closeBtn?.addEventListener("click", () => closeSheet());
@@ -343,7 +382,7 @@ function bindListEvents() {
                 title:            isEdit ? "Propuesta actualizada" : "Propuesta creada",
                 text:             isEdit
                     ? "Tu propuesta fue actualizada correctamente."
-                    : "Tu propuesta fue enviada y está en estado Pendiente.",
+                    : "Tu propuesta fue registrada y está en estado Recibida.",
                 timer:            2000,
                 showConfirmButton: false,
             });
@@ -358,6 +397,30 @@ function bindListEvents() {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check"></i> <span id="saveBtnText">Guardar</span>';
         }
+    });
+}
+
+/* CU26 pasos 4-5: al tocar una propuesta se muestra la descripción completa y la
+   respuesta (observación) del evaluador. Solo lectura. */
+function showProposalDetail(p) {
+    const st = statusOf(p);
+    const areas = (p.areas || []).map(a => escapeHtml(a.name)).join(", ") || "—";
+    const note = p.review_note
+        ? escapeHtml(p.review_note)
+        : `<em>${p.status === "PENDIENTE" ? "Aún sin respuesta del evaluador." : "Sin observación registrada."}</em>`;
+
+    Swal.fire({
+        title: escapeHtml(p.title),
+        html: `
+            <div style="text-align:left;line-height:1.5;font-size:.95em">
+                <p><span class="badge-pwa ${st.cls}">${escapeHtml(st.label)}</span>
+                   · ${escapeHtml(fmtDate(p.created_at))}</p>
+                <p><b>Programa:</b> ${escapeHtml(p.program?.name || "—")}<br>
+                   <b>Áreas:</b> ${areas}</p>
+                <p><b>Descripción:</b><br>${escapeHtml(p.description || "—").replace(/\n/g, "<br>")}</p>
+                <p><b>Respuesta del evaluador:</b><br>${note}</p>
+            </div>`,
+        confirmButtonText: "Cerrar",
     });
 }
 

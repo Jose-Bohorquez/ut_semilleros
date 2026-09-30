@@ -101,10 +101,23 @@ export function hasValidSession() {
 
 /* =========================================================
    RNF02 — copias sin conexión (ver api.service.js). CU03 paso 3: al cerrar
-   sesión se CONSERVAN (son el listado público de semilleros y sus
-   objetivos, guardado por usuario); solo se borran al rechazar la
+   sesión se CONSERVAN las copias públicas (listado de semilleros y sus
+   objetivos, guardado por usuario); solo se borran todas al rechazar la
    autorización de datos.
+   Las copias PERSONALES (mis solicitudes y mis propuestas: teléfono, mensaje y
+   respuesta del evaluador) sí se borran al cerrar o vencer la sesión — CU03 paso
+   3 pide borrar los datos personales guardados en el dispositivo.
    ========================================================= */
+
+const PERSONAL_OFFLINE_SUFFIXES = ["/requests/my", "/proposals/my"];
+
+export function clearPersonalOfflineCache() {
+    try {
+        Object.keys(localStorage)
+            .filter(k => k.startsWith("offline:") && PERSONAL_OFFLINE_SUFFIXES.some(s => k.endsWith(s)))
+            .forEach(k => localStorage.removeItem(k));
+    } catch {}
+}
 
 export function clearOfflineCache() {
     try {
@@ -130,10 +143,12 @@ export const SESSION_EXPIRED_MSG = "Su sesión expiró. Inicie sesión de nuevo.
    el dispositivo después (paso 3). */
 const SIA_KEYS = ["sia_token", "sia_log", "sia_open", "sia_must_rate"];
 
-/* Paso 3: borra el token y los datos personales guardados en el dispositivo.
+/* Paso 3: borra el token y los datos personales guardados en el dispositivo
+   (incluidas las copias sin conexión de mis solicitudes y propuestas).
    Conserva la caché pública de semilleros y las preferencias (tema). */
 export function clearLocalSession() {
     removeToken(); removeUser(); setTokenExpiry(null);
+    clearPersonalOfflineCache();
     try { SIA_KEYS.forEach(k => sessionStorage.removeItem(k)); } catch {}
 }
 

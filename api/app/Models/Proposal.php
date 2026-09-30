@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Proposal extends Model
 {
 
+    /* Vocabulario de la especificación (RF11, CU25 paso 5, CU26 paso 3) sobre los
+       valores internos del enum. Migrar el enum es decisión de CU27; mientras tanto
+       la API y la PWA muestran estas etiquetas (puente reversible). */
+    public const STATUS_LABELS = [
+        'PENDIENTE' => 'Recibida',
+        'APROBADA'  => 'Viable',
+        'RECHAZADA' => 'Archivada',
+    ];
+
+    protected $appends = ['status_label'];
+
     protected $fillable = [
         'user_id',
         'program_id',
@@ -23,6 +34,11 @@ class Proposal extends Model
         return [
             'phone' => 'encrypted',
         ];
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::STATUS_LABELS[$this->status] ?? (string) $this->status;
     }
 
     public function user()

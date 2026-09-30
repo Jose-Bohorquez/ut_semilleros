@@ -21,9 +21,19 @@ class ObjectiveController extends Controller
     public function index()
     {
 
-        $objectives = Objective::with([
+        $query = Objective::with([
             'seedbed:id,name'
-        ])->orderBy('seedbed_id')->orderBy('order')->get();
+        ])->orderBy('seedbed_id')->orderBy('order');
+
+        /* CU18 paso 4 / CU19-A2 (T1, CU18-H1): la PWA solo muestra objetivos
+           ACTIVOS de semilleros ACTIVOS; se filtra en el servidor, no en el
+           cliente. */
+        if (auth()->user()?->role === 'ESTUDIANTE') {
+            $query->where('status', 'ACTIVO')
+                  ->whereHas('seedbed', fn ($q) => $q->where('status', 'ACTIVO'));
+        }
+
+        $objectives = $query->get();
 
         return response()->json([
             "objectives"=>$objectives

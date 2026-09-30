@@ -12,6 +12,13 @@ entity:"areas",
 
 title:"Gestión de Áreas",
 
+/* CU07-CU10 A5: Líder y Administrativo solo consultan (la API ya responde 403 a
+   sus escrituras); sin botones de crear, editar ni inactivar. Se usan
+   noCreateFor/noEditFor y no readonlyFor para conservar la acción «Ver». */
+noCreateFor: ["ADMINISTRATIVO", "LIDER_SEMILLERO"],
+
+noEditFor: ["ADMINISTRATIVO", "LIDER_SEMILLERO"],
+
 fields:[
 
  {name:"id",label:"ID"},

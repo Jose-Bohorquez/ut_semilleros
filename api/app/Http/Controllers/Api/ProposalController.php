@@ -7,6 +7,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use App\Models\Proposal;
 use App\Models\Program;
+use App\Http\Resources\ProposalResource;
+use Illuminate\Support\Facades\DB;
 
 class ProposalController extends Controller
 {
@@ -50,7 +52,7 @@ class ProposalController extends Controller
             "program_id"=>["required", "integer", $this->activeProgramRule()],
 
             "areas"=>"required|array|min:1",
-            "areas.*"=>["integer", $this->activeAreaItemRule()],
+            "areas.*"=>["integer", "distinct", $this->activeAreaItemRule()],
 
             "title"=>"required|string|max:255",
 
@@ -74,8 +76,13 @@ class ProposalController extends Controller
         $areas = $validated['areas'];
         unset($validated['areas']);
 
-        $proposal = Proposal::create($validated);
-        $proposal->areas()->attach($areas);
+        /* CU25-H1: propuesta y áreas en una sola transacción — si el attach
+           falla no puede quedar una propuesta sin áreas. */
+        $proposal = DB::transaction(function () use ($validated, $areas) {
+            $p = Proposal::create($validated);
+            $p->areas()->attach($areas);
+            return $p;
+        });
         $proposal->load(['user:id,name', 'areas', 'program:id,name']);
 
         return response()->json([
@@ -111,7 +118,7 @@ class ProposalController extends Controller
             "program_id"=>["required", "integer", $this->activeProgramRule($proposal)],
 
             "areas"=>"required|array|min:1",
-            "areas.*"=>["integer", $this->activeAreaItemRule($proposal)],
+            "areas.*"=>["integer", "distinct", $this->activeAreaItemRule($proposal)],
 
             "title"=>"required|string|max:255",
 
@@ -135,8 +142,10 @@ class ProposalController extends Controller
         $areas = $validated['areas'];
         unset($validated['areas']);
 
-        $proposal->update($validated);
-        $proposal->areas()->sync($areas);
+        DB::transaction(function () use ($proposal, $validated, $areas) {
+            $proposal->update($validated);
+            $proposal->areas()->sync($areas);
+        });
         $proposal->load(['user:id,name', 'areas', 'program:id,name']);
 
         return response()->json([
@@ -150,7 +159,13 @@ class ProposalController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validated = $request->validate([
-            'status' => 'required|in:PENDIENTE,APROBADA,RECHAZADA',
+            'status'      => 'required|in:PENDIENTE,APROBADA,RECHAZADA',
+            /* CU26: observación del evaluador, la que ve el estudiante. Opcional aquí;
+               que archivar la exija (CU27-E1) se implementa con CU27. */
+            'review_note' => 'nullable|string|min:5|max:1000',
+        ], [
+            'review_note.min' => 'La observación debe tener al menos 5 caracteres.',
+            'review_note.max' => 'La observación no puede superar los 1000 caracteres.',
         ]);
 
         if (auth()->user()->role === 'ESTUDIANTE') {
@@ -158,11 +173,13 @@ class ProposalController extends Controller
         }
 
         $proposal = Proposal::findOrFail($id);
-        $proposal->update([
+        /* forceFill: reviewed_by/reviewed_at no son asignables en masa (los fija
+           el sistema, no el cliente); con update() se descartaban en silencio. */
+        $proposal->forceFill([
             'status'      => $validated['status'],
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
-        ]);
+        ] + (array_key_exists('review_note', $validated) ? ['review_note' => $validated['review_note']] : []))->save();
 
         return response()->json([
             'message'  => 'Estado actualizado a ' . $validated['status'],
@@ -170,15 +187,23 @@ class ProposalController extends Controller
         ]);
     }
 
+    /**
+     * CU26 «Mis propuestas»: solo las del estudiante autenticado (RN13; se filtra
+     * por el dueño en el servidor, nunca por un parámetro), de la más reciente a la
+     * más antigua. Devuelve fecha, áreas, programa, estado (con su etiqueta
+     * Recibida/Viable/Archivada) y la observación del evaluador; la descripción
+     * completa viaja en la misma respuesta para el detalle (paso 5).
+     */
     public function myProposals()
     {
-        $user = auth()->user();
-        $proposals = Proposal::with(['user:id,name', 'areas', 'program:id,name'])
-            ->where('user_id', $user->id)
+        $proposals = Proposal::with(['areas:id,name', 'program:id,name'])
+            ->where('user_id', auth()->id())
             ->latest()
             ->get();
 
-        return response()->json(['proposals' => $proposals]);
+        return response()->json([
+            'proposals' => ProposalResource::collection($proposals)->resolve(),
+        ]);
     }
 
     public function destroy($id)

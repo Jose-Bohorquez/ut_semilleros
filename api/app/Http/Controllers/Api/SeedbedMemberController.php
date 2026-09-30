@@ -110,6 +110,9 @@ class SeedbedMemberController extends Controller
             ]);
             $member->inactivation_reason = $request->input('reason');
         } else {
+            /* CU21-H1 / E1: al reactivar rige la misma unicidad que al crear:
+               no puede haber dos ACTIVOS con el mismo código en el semillero. */
+            $this->guardCodeNotActiveInSeedbed($member->seedbed_id, $member->student_code, $member->id);
             $member->inactivation_reason = null;
         }
 

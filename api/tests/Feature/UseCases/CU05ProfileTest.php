@@ -109,11 +109,11 @@ class CU05ProfileTest extends TestCase
     }
 
     /* Sin cambiar contraseña, no se tocan las demás sesiones */
-    public function test_updating_name_only_does_not_revoke_other_sessions(): void
+    public function test_updating_phone_only_does_not_revoke_other_sessions(): void
     {
         $u = User::factory()->create();
         $tokenA = $this->login($u); $tokenB = $this->login($u);
-        $this->withToken($tokenA)->putJson('/api/profile', ['name' => 'Nuevo Nombre', 'email' => $u->email])->assertOk();
+        $this->withToken($tokenA)->putJson('/api/profile', ['phone' => '3001234567'])->assertOk();
         $this->assertSame(2, $u->tokens()->count());
     }
 }

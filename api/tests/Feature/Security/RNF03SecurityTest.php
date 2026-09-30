@@ -21,7 +21,7 @@ class RNF03SecurityTest extends TestCase
 
     /* Rutas públicas a propósito (login, recuperación, Google, SIA, salud) */
     private const PUBLIC = [
-        'POST api/register', 'POST api/login', 'POST api/forgot-password', 'POST api/reset-password',
+        'POST api/login', 'POST api/forgot-password', 'POST api/reset-password',
         'GET api/auth/config', 'POST api/auth/google', 'POST api/sia/chat', 'POST api/sia/close',
     ];
 

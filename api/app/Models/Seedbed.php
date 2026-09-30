@@ -27,6 +27,10 @@ class Seedbed extends Model
     /* CU16: campos calculados que se agregan al JSON del listado. */
     protected $appends = ['faculty_names', 'leader_name', 'members_count'];
 
+    /* El conteo precalculado (withCount) es interno: se expone como
+       `members_count` mediante el accessor. */
+    protected $hidden = ['active_members_count'];
+
     /**
      * Programas del semillero (CU13 Ronda B: selección múltiple, antes FK simple).
      */
@@ -77,6 +81,15 @@ class Seedbed extends Model
 
 
     /**
+     * Integrantes reales del semillero (CU21, tabla seedbed_members). No
+     * confundir con users(), que solo guarda al líder responsable.
+     */
+    public function members()
+    {
+        return $this->hasMany(SeedbedMember::class);
+    }
+
+    /**
  * Proyectos del semillero
  */
 public function projects()
@@ -111,7 +124,12 @@ public function projects()
 
     public function getMembersCountAttribute(): int
     {
-        return $this->relationLoaded('users') ? $this->users->count() : 0;
+        /* CU16-H2 / T2: los integrantes son los seedbed_members ACTIVOS (CU21),
+           no las filas de seedbed_user (que solo contienen al líder). */
+        if (array_key_exists('active_members_count', $this->attributes)) {
+            return (int) $this->attributes['active_members_count'];
+        }
+        return $this->exists ? $this->members()->where('status', 'ACTIVO')->count() : 0;
     }
 
 

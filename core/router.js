@@ -118,8 +118,9 @@ export const routes = {
     "/admin/faculties": async () => {
 
         if (!requireAuth()) return;
+        /* CU07-CU10 A5: Líder y Administrativo consultan los catálogos (solo lectura en el módulo). */
 
-        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO"])) return;
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO","LIDER_SEMILLERO"])) return;
 
         const module = await import("../modules/faculties/faculties.module.js");
 
@@ -133,7 +134,7 @@ export const routes = {
 
         if (!requireAuth()) return;
 
-        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO"])) return;
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO","LIDER_SEMILLERO"])) return;
 
         const module = await import("../modules/programs/programs.module.js");
 
@@ -202,7 +203,7 @@ export const routes = {
 
         if (!requireAuth()) return;
 
-        if (!requireRole(["ADMIN_SISTEMA"])) return;
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO","LIDER_SEMILLERO"])) return;
 
         const module = await import("../modules/cats/cats.module.js");
 
@@ -215,7 +216,7 @@ export const routes = {
 
         if (!requireAuth()) return;
 
-        if (!requireRole(["ADMIN_SISTEMA"])) return;
+        if (!requireRole(["ADMIN_SISTEMA","ADMINISTRATIVO","LIDER_SEMILLERO"])) return;
 
         const module = await import("../modules/areas/areas.module.js");
 

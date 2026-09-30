@@ -31,7 +31,9 @@ use App\Http\Controllers\Api\RbacController;
 |--------------------------------------------------------------------------
 */
 
-Route::post('/register',         [AuthController::class, 'register']);
+/* CU01-H1: se quitó POST /register — apuntaba a un método inexistente y
+   respondía 500. Las cuentas las crea el ADMIN_SISTEMA (CU06) o el alta con
+   Google (CU02); no hay autorregistro. */
 Route::post('/login',            [AuthController::class, 'login']);
 Route::post('/forgot-password',  [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password',   [AuthController::class, 'resetPassword']);
@@ -89,7 +91,7 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     /*
     |----------------------------------------------------------------------
     | USUARIOS (RF01 / CU01)
-    |   GET list      → A, L, ADM
+    |   GET list      → A (completo); L, ADM (mínimo: id, nombre, rol, estado — para selectores)
     |   GET show      → A
     |   POST/PUT/TOGGLE → A
     |----------------------------------------------------------------------

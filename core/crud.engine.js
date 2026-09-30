@@ -102,6 +102,14 @@ export function createCrudModule(config) {
        RENDER TABLA
     ===================================================== */
 
+    function filterOptions(f, records) {
+        return typeof f.options === "function" ? (f.options(records) || []) : (f.options || []);
+    }
+
+    /* Predicados de filtro (`test`) registrados en DataTables para esta tabla;
+       se retiran antes de cada render para no acumularlos. */
+    let predicateSearches = [];
+
     function renderTable(records) {
 
         /* ── Role-based access control ─────────────────────────────────── */
@@ -126,6 +134,14 @@ export function createCrudModule(config) {
         /* ────────────────────────────────────────────────────────────────── */
 
         const headers = tableFields.map(f => `<th>${f.label}</th>`).join("");
+
+        /* Filtros (config.filters). Extensiones opcionales y retrocompatibles
+           (CU16 paso 2/3, A1): `options` puede ser una función (registros) =>
+           opciones (catálogo dinámico); `roles` limita el filtro a ciertos
+           roles; `allLabel` cambia el texto de «Todos»; `test(registro, valor)`
+           filtra por predicado en vez de por texto de columna; `defaultValue()`
+           devuelve el valor preseleccionado. Sin estas claves todo funciona igual. */
+        const activeFilters = (config.filters || []).filter(f => !f.roles || f.roles.includes(userRole));
 
         /* Empty state */
         if (records.length === 0) {
@@ -252,14 +268,14 @@ export function createCrudModule(config) {
             </div>` : ""}
         </div>
 
-        ${config.filters?.length ? `
+        ${activeFilters.length ? `
         <div class="crud-filters" role="group" aria-label="Filtrar registros">
-            ${config.filters.map(f => `
+            ${activeFilters.map(f => `
                 <label class="crud-filter">
                     ${escapeHtml(f.label)}
                     <select data-crud-filter="${escapeHtml(f.field)}">
-                        <option value="">Todos</option>
-                        ${f.options.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join("")}
+                        <option value="">${escapeHtml(f.allLabel || "Todos")}</option>
+                        ${filterOptions(f, records).map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join("")}
                     </select>
                 </label>`).join("")}
         </div>` : ""}
@@ -288,6 +304,11 @@ export function createCrudModule(config) {
             if ($.fn.DataTable.isDataTable(tableId)) {
                 $(tableId).DataTable().destroy();
             }
+            predicateSearches.forEach(fn => {
+                const i = $.fn.dataTable.ext.search.indexOf(fn);
+                if (i !== -1) $.fn.dataTable.ext.search.splice(i, 1);
+            });
+            predicateSearches = [];
             const table = $(tableId).DataTable({
                 pageLength: config.pageLength ?? 10,
                 dom: "Bfrtip",
@@ -302,7 +323,7 @@ export function createCrudModule(config) {
                     lengthMenu:  "Mostrar _MENU_ registros",
                     info:        "Mostrando _START_ a _END_ de _TOTAL_ registros",
                     infoEmpty:   "Sin registros",
-                    zeroRecords: "No se encontraron resultados",
+                    zeroRecords: config.emptyFilterMessage || "No se encontraron resultados",
                     paginate: { next: "Siguiente", previous: "Anterior" }
                 }
             });
@@ -310,13 +331,36 @@ export function createCrudModule(config) {
             /* Filtros por columna (config.filters), ej. rol/estado en Usuarios
                (CU06 / RF01): coincidencia exacta sobre el texto de la celda,
                no una búsqueda parcial como el buscador general de DataTables. */
-            config.filters?.forEach(f => {
-                const colIndex = tableFields.findIndex(tf => tf.name === f.field);
-                if (colIndex === -1) return;
-                document.querySelector(`[data-crud-filter="${f.field}"]`)?.addEventListener("change", e => {
-                    const val = e.target.value;
-                    table.column(colIndex).search(val ? `^${val}$` : "", true, false).draw();
-                });
+            activeFilters.forEach(f => {
+                const sel = document.querySelector(`[data-crud-filter="${f.field}"]`);
+                if (!sel) return;
+
+                if (typeof f.test === "function") {
+                    /* Filtro por predicado sobre el registro completo (la fila
+                       i del DOM corresponde a records[i]). Se combina con el
+                       buscador y con la exportación, que solo ven filas filtradas. */
+                    const fn = (settings, _data, dataIndex) => {
+                        if (settings.nTable.id !== `datatable-${entity}` || !sel.isConnected || !sel.value) return true;
+                        const rec = records[dataIndex];
+                        return rec ? !!f.test(rec, sel.value) : true;
+                    };
+                    $.fn.dataTable.ext.search.push(fn);
+                    predicateSearches.push(fn);
+                    sel.addEventListener("change", () => table.draw());
+                } else {
+                    const colIndex = tableFields.findIndex(tf => tf.name === f.field);
+                    if (colIndex === -1) return;
+                    sel.addEventListener("change", e => {
+                        const val = e.target.value;
+                        table.column(colIndex).search(val ? `^${val}$` : "", true, false).draw();
+                    });
+                }
+
+                const def = typeof f.defaultValue === "function" ? f.defaultValue() : null;
+                if (def && Array.from(sel.options).some(o => o.value === String(def))) {
+                    sel.value = String(def);
+                    sel.dispatchEvent(new Event("change"));
+                }
             });
         }, 100);
     }

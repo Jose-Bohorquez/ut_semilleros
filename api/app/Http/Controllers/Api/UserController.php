@@ -30,17 +30,16 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        $users = User::select(
+        /* CU06 es solo del Administrador. Líder y Administrativo conservan un
+           listado MÍNIMO (id, nombre, rol y estado) porque lo usan los
+           selectores de destinatario de notificaciones y de miembros de
+           proyecto; sin correo ni referencia de autorización (RN02), que son
+           datos personales/administrativos de todos los usuarios. */
+        $columns = auth()->user()?->role === 'ADMIN_SISTEMA'
+            ? ['id', 'name', 'email', 'role', 'status', 'authorization_reference', 'created_at']
+            : ['id', 'name', 'role', 'status'];
 
-            'id',
-            'name',
-            'email',
-            'role',
-            'status',
-            'authorization_reference',
-            'created_at'
-
-        )->get();
+        $users = User::select($columns)->get();
 
         return response()->json([
 
@@ -263,6 +262,12 @@ class UserController extends Controller
             $this->guardAgainstLockout($user);
         }
 
+        /* CU06-E3 (H2): degradar el rol de un ADMIN_SISTEMA tiene el mismo
+           efecto que inactivarlo — no a sí mismo ni al último admin activo. */
+        if ($user->role === 'ADMIN_SISTEMA' && $validated['role'] !== 'ADMIN_SISTEMA') {
+            $this->guardAgainstLockout($user, 'role');
+        }
+
         $user->name = $validated['name'];
 
         $user->email = $validated['email'];
@@ -345,15 +350,21 @@ class UserController extends Controller
      * CU06-E3: impide inactivar al propio admin autenticado o al último
      * ADMIN_SISTEMA activo del sistema.
      */
-    private function guardAgainstLockout(User $user): void
+    private function guardAgainstLockout(User $user, string $field = 'status'): void
     {
+        $mensaje = $field === 'role'
+            ? 'No es posible cambiar el rol de este usuario.'
+            : 'No es posible inactivar este usuario.';
+
         if ($user->id === auth()->id()) {
             throw \Illuminate\Validation\ValidationException::withMessages([
-                'status' => ['No es posible inactivar este usuario.'],
+                $field => [$mensaje],
             ]);
         }
 
-        if ($user->role === 'ADMIN_SISTEMA') {
+        /* Un admin ya inactivo no cuenta como «activo»: cambiarle el rol no
+           deja al sistema con menos administradores operativos. */
+        if ($user->role === 'ADMIN_SISTEMA' && $user->status === 'ACTIVO') {
             $otrosAdminsActivos = User::where('role', 'ADMIN_SISTEMA')
                 ->where('status', 'ACTIVO')
                 ->where('id', '!=', $user->id)
@@ -361,7 +372,7 @@ class UserController extends Controller
 
             if (!$otrosAdminsActivos) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'status' => ['No es posible inactivar este usuario.'],
+                    $field => [$mensaje],
                 ]);
             }
         }
@@ -375,8 +386,22 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $token = Password::broker('activations')->createToken($user);
-        $user->notify(new AccountActivationNotification($token));
+        /* CU06-H3: con el SMTP caído esto lanzaba una excepción sin capturar
+           (500 genérico). Ahora es un 503 controlado con mensaje claro; el
+           detalle técnico va al log sin correo ni token. */
+        try {
+            $token = Password::broker('activations')->createToken($user);
+            $user->notify(new AccountActivationNotification($token));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error(
+                '[CU06] No se pudo reenviar el correo de activación',
+                ['user_id' => $user->id, 'error' => $e->getMessage()]
+            );
+
+            return response()->json([
+                'message' => 'No se pudo enviar el correo de activación. Intenta de nuevo más tarde.',
+            ], 503);
+        }
 
         return response()->json([
             'message' => 'Correo de activación reenviado.',

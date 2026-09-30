@@ -68,11 +68,11 @@ class RequestCrudTest extends TestCase
         ]);
     }
 
-    public function test_request_create_requires_user_seedbed_and_status(): void
+    public function test_request_create_requires_user_and_seedbed(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
         $response = $this->postJson('/api/requests', []);
-        $response->assertStatus(422)->assertJsonValidationErrors(['user_id', 'seedbed_id', 'status']);
+        $response->assertStatus(422)->assertJsonValidationErrors(['user_id', 'seedbed_id']);
     }
 
     public function test_request_status_must_be_valid_value(): void
