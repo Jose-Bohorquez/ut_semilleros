@@ -1220,10 +1220,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .sia-fab span { display: none; }
   .sia-fab { width: 48px; padding: 0; }
 }
-/* Escritorio: abajo a la derecha (ahí no hay «+» de la PWA; a la izquierda está el menú lateral) */
+/* Escritorio: abajo a la derecha (ahí no hay «+» de la PWA; a la izquierda está el menú lateral).
+   El botón de "mostrar botones" (colapsado) es un elemento aparte — sin este
+   mismo cambio de lado saltaba a la izquierda al ocultar y volvía a la
+   derecha al mostrar (hallazgo real, 2026-09-30). */
 @media (min-width: 1024px) {
   .sia-fabs { left: auto; right: var(--space-6); align-items: flex-end; }
   .sia-panel { left: auto; right: var(--space-6); }
+  .sia-fab-expand { left: auto; right: var(--space-6); }
 }
 @media (prefers-reduced-motion: reduce) { .sia-typing span { animation: none; } .sia-fab { transition: none; } }
 /* Panel de SIA (/admin/sia) */

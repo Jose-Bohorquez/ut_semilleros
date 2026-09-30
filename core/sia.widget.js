@@ -112,12 +112,18 @@ export function mountSia() {
         root.classList.toggle("sia--with-nav", withNav);
         $("sia-wa").href = whatsappUrl();
 
-        const modalOpen = !!document.querySelector(
-            "#crudModal, .swal2-container, [role='dialog']:not(#sia-panel), " +
-            "#seedbedDetail:not([style*='display: none']), " +
-            "#proposalSheet:not([style*='display: none']), " +
-            "#newRequestModal:not([style*='display: none'])"
-        );
+        /* Con getComputedStyle en vez de mirar el texto del atributo style:
+           "display:none" (como lo escribe el HTML fuente) y "display: none"
+           (como lo deja el navegador tras un cambio por JS) no son el mismo
+           string — un selector de atributos que buscara uno de los dos
+           formatos fallaba con el otro y dejaba el panel "atascado" oculto
+           en páginas donde ese sheet nunca se había abierto (hallazgo real,
+           2026-09-30). */
+        const isVisible = el => el && getComputedStyle(el).display !== "none";
+        const modalOpen = !!document.querySelector("#crudModal, .swal2-container, [role='dialog']:not(#sia-panel)")
+            || isVisible(document.getElementById("seedbedDetail"))
+            || isVisible(document.getElementById("proposalSheet"))
+            || isVisible(document.getElementById("newRequestModal"));
         root.classList.toggle("sia--modal-open", modalOpen);
     };
     new MutationObserver(syncOffset).observe(document.body, { childList: true, subtree: true });

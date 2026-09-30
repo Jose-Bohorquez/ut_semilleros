@@ -72,6 +72,29 @@ Validado en vivo con cuenta estudiante real en viewport de escritorio: enlace «
 visible y funcional; botón «+» visible en `/proposals`; al abrir «Nueva Propuesta» el formulario
 completo queda visible sin que SIA/WhatsApp lo tapen.
 
+## Ronda 3 (mismo día): 2 bugs introducidos por los fixes de la Ronda 1/2
+
+Jose detectó: al ocultar SIA/WhatsApp, el botón "Mostrar botones" aparecía del lado contrario
+(izquierda) en vez de quedarse a la derecha en escritorio ancho. Al investigar se encontraron
+2 bugs reales, ambos regresiones de mis propios cambios anteriores:
+
+1. **`.sia-fab-expand` sin override de escritorio**: el `@media (min-width: 1024px)` que mueve
+   `.sia-fabs` al lado derecho (para no chocar con el menú lateral) nunca incluyó al botón
+   `.sia-fab-expand` (el que aparece solo cuando está colapsado, es un elemento aparte fuera de
+   `.sia-fabs`). Corregido agregándolo al mismo bloque de medios.
+2. **Detección de modal abierto rota por un espacio en el texto**: el selector CSS
+   `[style*='display: none']` (con espacio) usado para saber si `#proposalSheet`/
+   `#newRequestModal`/`#seedbedDetail` estaban visibles NUNCA coincidía con el HTML fuente real,
+   que los escribe como `style="display:none;..."` (sin espacio). Resultado: en cualquier página
+   con uno de esos sheets en el DOM (aunque nunca se hubiera abierto), `#sia-root` quedaba con
+   la clase `sia--modal-open` pegada para siempre — SIA y WhatsApp desaparecían permanentemente
+   en `/proposals` y `/requests`, sin relación con si había o no un modal realmente abierto.
+   Corregido reemplazando el matching de texto por `getComputedStyle(el).display !== "none"`,
+   que no depende de cómo esté escrito el atributo `style` en el HTML.
+
+Validado en vivo: `#sia-root.className` vacío (no atascado) en `/proposals` con estudiante real;
+al colapsar en `/dashboard`, el botón "Mostrar botones" aparece correctamente a la derecha.
+
 ## Pendiente (alcance — no se revisó todo el sistema en esta ronda)
 
 Esta fue una auditoría dirigida a los síntomas más señalados por Jose (FABs tapando contenido),
