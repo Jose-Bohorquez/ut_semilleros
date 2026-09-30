@@ -37,6 +37,41 @@ botones" en su lugar; funciona correctamente.
   se desborda: el problema real era exclusivamente el z-index de los FABs por encima, ya
   corregido arriba.
 
+## Ronda 2 (mismo día): ESTUDIANTE en web no podía gestionar nada
+
+Jose reportó: en la vista **web** (no PWA/móvil), el rol ESTUDIANTE ve Solicitudes y Propuestas
+en el menú pero "no me deja ver los semilleros, no me permite hacer propuestas, no me deja ver
+mis solicitudes". Se investigó en vivo con Chrome DevTools en viewport de escritorio (no fue
+"así es el caso de uso" ni RBAC del backend — 2 bugs reales de frontend):
+
+1. **Sidebar de escritorio sin enlace «Semilleros»** — `layout/layout.view.js` tenía el enlace
+   en el `BOTTOM_NAV` (usado solo en móvil) pero **no** en el menú lateral de escritorio para
+   `ESTUDIANTE`. El estudiante literalmente no tenía cómo llegar a `/seedbeds` desde el panel
+   web. Agregado el enlace faltante.
+2. **`.pwa-fab` (botón «+» para crear) oculto en escritorio por diseño** — `css/pwa.css` tenía
+   `@media (min-width: 769px) { .pwa-fab { display: none; } }`, pensado para un FAB tipo app
+   móvil. Pero el router **no distingue ancho de pantalla para ESTUDIANTE**: siempre usa los
+   módulos PWA (`pwa-proposals`, `pwa-requests`), incluso en escritorio — es el diseño de
+   CU17/CU18/CU25 (el actor Estudiante siempre usa "la PWA", según la spec, sin importar el
+   dispositivo). Ocultar el único botón de creación en escritorio dejaba al estudiante sin
+   forma de crear una propuesta o una solicitud ahí. Corregido: el FAB se mantiene visible
+   siempre; en pantallas ≥1024px se sube por encima del grupo SIA/WhatsApp (que en ese ancho
+   también pasa al lado derecho) para no superponerse.
+3. **Bottom-sheets de creación (`#proposalSheet`, `#newRequestModal`) tampoco ocultaban
+   SIA/WhatsApp** — el fix de la Ronda 1 solo cubría `#crudModal`, `.swal2-container` y
+   `#seedbedDetail`. Al abrir "Nueva Propuesta" los botones de SIA/WhatsApp seguían flotando
+   encima. Agregados ambos selectores a la misma lista de `sia.widget.js`.
+
+**Nota de manejo de credenciales**: durante el diagnóstico, un comando mal escrito imprimió en
+la salida la contraseña de la cuenta de prueba ESTUDIANTE (el archivo
+`credenciales_prueba.txt` cambió de formato — antes 3 columnas por línea, ahora una línea por
+campo — y el script asumía el formato viejo). Se corrigió el parser para no volver a exponerla;
+se recomienda rotar esa contraseña de prueba.
+
+Validado en vivo con cuenta estudiante real en viewport de escritorio: enlace «Semilleros»
+visible y funcional; botón «+» visible en `/proposals`; al abrir «Nueva Propuesta» el formulario
+completo queda visible sin que SIA/WhatsApp lo tapen.
+
 ## Pendiente (alcance — no se revisó todo el sistema en esta ronda)
 
 Esta fue una auditoría dirigida a los síntomas más señalados por Jose (FABs tapando contenido),

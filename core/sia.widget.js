@@ -113,7 +113,10 @@ export function mountSia() {
         $("sia-wa").href = whatsappUrl();
 
         const modalOpen = !!document.querySelector(
-            "#crudModal, .swal2-container, #seedbedDetail:not([style*='display: none']), [role='dialog']:not(#sia-panel)"
+            "#crudModal, .swal2-container, [role='dialog']:not(#sia-panel), " +
+            "#seedbedDetail:not([style*='display: none']), " +
+            "#proposalSheet:not([style*='display: none']), " +
+            "#newRequestModal:not([style*='display: none'])"
         );
         root.classList.toggle("sia--modal-open", modalOpen);
     };

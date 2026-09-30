@@ -434,9 +434,15 @@
   box-shadow: 0 2px 8px rgba(239,68,68,0.3);
 }
 
-/* Ocultar FAB en desktop */
-@media (min-width: 769px) {
-  .pwa-fab { display: none; }
+/* Hallazgo real (2026-09-30): este FAB es el ÚNICO botón para crear una
+   propuesta o una solicitud — el estudiante siempre usa las pantallas PWA
+   (CU17/CU18/CU25), incluso en escritorio (el router no distingue ancho de
+   pantalla, solo rol). Ocultarlo en desktop dejaba al estudiante sin forma
+   de crear nada ahí. Se mantiene visible; en pantallas anchas (≥1024px,
+   donde SIA/WhatsApp también pasan al lado derecho) se sube por encima de
+   ese grupo para no superponerse. */
+@media (min-width: 1024px) {
+  .pwa-fab { bottom: calc(190px + var(--space-4)); }
 }
 
 

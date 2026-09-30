@@ -107,6 +107,7 @@ export function LayoutView(content = "") {
 
     if (role === "ESTUDIANTE") {
         menu += `
+        <a href="/seedbeds"         data-link><i class="fas fa-seedling"></i>        Semilleros</a>
         <a href="/requests"         data-link><i class="fas fa-paper-plane"></i>     Solicitudes</a>
         <a href="/proposals"        data-link><i class="fas fa-lightbulb"></i>       Propuestas</a>
         `;
