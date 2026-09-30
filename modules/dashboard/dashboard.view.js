@@ -53,6 +53,7 @@ export function DashboardView() {
 
     <!-- ── WELCOME ─────────────────────────────────── -->
     <div class="dashboard-welcome">
+        <div class="dashboard-welcome-glow" aria-hidden="true"></div>
         <p class="dashboard-date">${today.charAt(0).toUpperCase() + today.slice(1)}</p>
         <h1>${greeting}, ${escapeHtml(user?.name?.split(" ")[0] || "usuario")} 👋</h1>
         <p>Sistema de Semilleros de Investigación — Universidad del Tolima, IDEAD</p>
@@ -224,6 +225,17 @@ export function DashboardView() {
     </h3>
     <div class="quick-links-grid">
         ${quickLinks}
+    </div>
+
+    <!-- ── ACTIVIDAD RECIENTE ──────────────────────── -->
+    <h3 class="section-title" style="margin-top:var(--space-8)">
+        <i class="fas fa-clock-rotate-left" style="color:var(--color-primary);margin-right:6px"></i>
+        Actividad reciente
+    </h3>
+    <div class="recent-activity-list" id="recentActivity">
+        <div class="skeleton skeleton-row" style="width:100%;height:56px;margin-bottom:var(--space-2)"></div>
+        <div class="skeleton skeleton-row" style="width:100%;height:56px;margin-bottom:var(--space-2)"></div>
+        <div class="skeleton skeleton-row" style="width:100%;height:56px"></div>
     </div>
     `;
 }

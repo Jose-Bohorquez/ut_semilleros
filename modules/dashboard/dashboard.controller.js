@@ -138,6 +138,71 @@ async function loadKPIs(role) {
                 pending > 0 ? "down" : "up");
         }
     }
+
+    renderRecentActivity(proposalsData?.proposals || [], requestsData?.requests || []);
+}
+
+/* ─── Actividad reciente ─────────────────────────────
+   Reutiliza los datos de propuestas/solicitudes ya cargados por loadKPIs
+   (sin llamadas extra a la API). Combina ambos en una sola línea de tiempo
+   ordenada por fecha, para que el dashboard no quede vacío en los roles
+   sin gráficas (hallazgo de diseño real, 2026-09-30: Líder/Estudiante
+   tenían una zona en blanco enorme debajo de "Acceso rápido"). */
+const STATUS_META = {
+    PENDIENTE:  { cls: "is-warn", label: "Pendiente" },
+    APROBADA:   { cls: "is-ok",   label: "Aprobada"  },
+    RECHAZADA:  { cls: "is-err",  label: "Rechazada" },
+};
+
+function timeAgo(dateStr) {
+    const diffMs = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) return "hace un momento";
+    if (mins < 60) return `hace ${mins} min`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `hace ${hours} h`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `hace ${days} d`;
+    return new Date(dateStr).toLocaleDateString("es-CO", { day: "numeric", month: "short" });
+}
+
+function renderRecentActivity(proposals, requests) {
+    const container = document.getElementById("recentActivity");
+    if (!container) return;
+
+    const items = [
+        ...proposals.map(p => ({ type: "proposal", icon: "fa-lightbulb", title: p.title || "Propuesta", status: p.status, date: p.created_at })),
+        ...requests.map(r => ({ type: "request", icon: "fa-paper-plane", title: r.seedbed?.name ? `Solicitud a ${r.seedbed.name}` : "Solicitud de ingreso", status: r.status, date: r.created_at })),
+    ]
+        .filter(i => i.date)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 6);
+
+    if (!items.length) {
+        container.innerHTML = `
+            <div class="empty-state" style="margin-top:0;">
+                <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
+                <p>Aún no hay actividad para mostrar aquí.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = items.map(i => {
+        const meta = STATUS_META[i.status] || { cls: "", label: i.status || "—" };
+        return `
+        <div class="activity-row">
+            <span class="activity-icon"><i class="fas ${i.icon}"></i></span>
+            <div class="activity-body">
+                <span class="activity-title">${escapeAttr(i.title)}</span>
+                <span class="activity-time">${timeAgo(i.date)}</span>
+            </div>
+            <span class="sys-card-badge ${meta.cls}">${meta.label}</span>
+        </div>`;
+    }).join("");
+}
+
+function escapeAttr(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
 function setKPI(id, value, trendLabel, direction) {
@@ -354,15 +419,18 @@ async function loadCharts() {
     }
 }
 
-/* Agrupa semilleros por facultad a través del programa */
+/* Agrupa semilleros por facultad a través de sus programas (relación
+   múltiple desde CU13 Ronda B: seedbed.programs[], ya no seedbed.program_id).
+   Un semillero con programas de varias facultades cuenta una vez por cada
+   facultad distinta a la que pertenece. */
 function buildSeedbedsByFaculty(seedbeds, programs, faculties) {
     const progFaculty = {};
     programs.forEach(p => { progFaculty[p.id] = p.faculty_id; });
 
     const facCount = {};
     seedbeds.forEach(s => {
-        const facId = progFaculty[s.program_id];
-        if (facId) facCount[facId] = (facCount[facId] || 0) + 1;
+        const facIds = new Set((s.programs || []).map(p => progFaculty[p.id]).filter(Boolean));
+        facIds.forEach(facId => { facCount[facId] = (facCount[facId] || 0) + 1; });
     });
 
     const labels = [], values = [];

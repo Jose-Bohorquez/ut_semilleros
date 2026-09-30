@@ -1,5 +1,5 @@
 /* #archivo: /frontend/app.js */
-import { renderRoute } from './core/router.js?v=2';
+import { renderRoute } from './core/router.js?v=3';
 import { mountSia }    from './core/sia.widget.js';
 import { flushPendingRevokes } from './services/api.service.js';
 import { setLoginFlash } from './services/storage.service.js';
