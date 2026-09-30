@@ -251,15 +251,19 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | INTEGRANTES SEMILLEROS (RF12 / CU12)
-    |   Todos → L
+    | INTEGRANTES SEMILLEROS (RF12 / CU21)
+    |   GET → L, ADM, ADMINISTRATIVO (solo consulta)
+    |   POST/PUT/TOGGLE → L, ADM
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:LIDER_SEMILLERO')->group(function () {
-        Route::get('/seedbeds/{id}/members',                      [SeedbedMemberController::class, 'index']);
-        Route::post('/seedbeds/{id}/members',                     [SeedbedMemberController::class, 'store']);
-        Route::delete('/seedbeds/{seedbedId}/members/{userId}',   [SeedbedMemberController::class, 'destroy']);
+    Route::middleware('role:LIDER_SEMILLERO,ADMIN_SISTEMA,ADMINISTRATIVO')
+         ->get('/seedbeds/{id}/members', [SeedbedMemberController::class, 'index']);
+
+    Route::middleware('role:LIDER_SEMILLERO,ADMIN_SISTEMA')->group(function () {
+        Route::post('/seedbeds/{id}/members',                          [SeedbedMemberController::class, 'store']);
+        Route::put('/seedbeds/{seedbedId}/members/{id}',                [SeedbedMemberController::class, 'update']);
+        Route::put('/seedbeds/{seedbedId}/members/{id}/toggle-status', [SeedbedMemberController::class, 'toggleStatus']);
     });
 
     /*

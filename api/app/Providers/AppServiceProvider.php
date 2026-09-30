@@ -34,6 +34,7 @@ use App\Models\Objective;
 use App\Models\Result;
 use App\Models\MembershipRequest;
 use App\Models\Proposal;
+use App\Models\SeedbedMember;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -117,6 +118,8 @@ class AppServiceProvider extends ServiceProvider
         Result::observe(AuditObserver::class);
 
         Proposal::observe(AuditObserver::class);
+
+        SeedbedMember::observe(AuditObserver::class);
 
         /*
         |--------------------------------------------------------------------------
