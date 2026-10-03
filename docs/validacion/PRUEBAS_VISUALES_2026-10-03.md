@@ -38,3 +38,11 @@ Paginadores deshabilitados con una sola página; validación nativa del navegado
 - Descargas Excel/PDF de DataTables: se verifica que se genera la descarga, no el contenido del archivo.
 - Escape no cierra las hojas inferiores de la PWA (solo su «×»): mejora de accesibilidad pendiente.
 - Contraste de colores y lectores de pantalla (no se midió).
+
+## Despliegue
+
+Desplegado en producción el 2026-10-03 (paquete de 16 archivos sobre `367fb35`, **sin migraciones**; respaldo `~/backups/ut-edu.online/2026-10-03_pre_ui`; PHP 8.2 sin errores de sintaxis; diff 0 contra el repo).
+Validación en vivo con una cuenta `qa_temp_*` (borrada): 5 rondas de **12 peticiones paralelas** (lo que lanza el Dashboard) → 60 de 60 en 200, límite 120/min activo en la cabecera, el límite de login (RN14) sigue bloqueando el 6.º intento (429) y los 8 archivos de frontend publicados con el contenido nuevo.
+
+- **Límite de conexiones del hosting**: con una ráfaga artificial de **24 peticiones simultáneas** de un mismo usuario Hostinger rechazó conexiones a MySQL (`SQLSTATE[2002] Operation not permitted`, 500). No es el deadlock ni el limitador: es el tope de conexiones/procesos del plan compartido. Con 12 simultáneas no ocurre. Conviene tenerlo presente si un día se concentran muchos usuarios a la vez (candidatos: reducir las peticiones del Dashboard o consolidarlas en un solo endpoint).
+- **Hueco del script de despliegue**: `scripts/build-deploy-bundle.sh` no listaba `style.css`, así que cualquier cambio de la hoja de estilos raíz no viajaba en el paquete. Corregido (y `index.html` pasa a `style.css?v=20`).
