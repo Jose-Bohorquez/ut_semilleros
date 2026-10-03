@@ -237,7 +237,7 @@ operación). **El LOGIN sigue siendo estricto** (sin auditoría no se emite toke
 hora de America/Bogota. **Comprobado en vivo:** el hosting entrega la IP real del cliente en `REMOTE_ADDR` (181.x desde casa), no hace falta `trustProxies`. La pantalla de
 Auditoría aún no muestra los valores: es CU30.
 
-**CU30 consultar auditoría (2026-10-03, en local, pendiente de desplegar):** acta `docs/validacion/CU30.md`, 543 tests en verde.
+**CU30 consultar auditoría (2026-10-03, desplegado en producción con diff 0; API 18/18 en vivo):** acta `docs/validacion/CU30.md`, 543 tests en verde.
 `GET /audits` paginado por el servidor (25, máx. 100) con filtros usuario/colección/acción/fechas (los días son de **America/Bogota**,
 convertidos a UTC), `/audits/{id}` con la comparación campo a campo, `/audits/export` (CSV UTF-8 con BOM, máx. 20.000 filas,
 **neutraliza inyección de fórmulas**), `/audits/options` y `/audits/summary` (el panel principal ya no descarga toda la tabla). E1 con
