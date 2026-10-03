@@ -70,6 +70,8 @@ class SiaKnowledgeRetrievalTest extends TestCase
             'grupo'                 => ['cómo creo un grupo de investigación', 'Crear un grupo de investigación'],
             'coordinador'           => ['cómo registro un coordinador', 'coordinador o editarlo'],
             'auditoria'             => ['dónde consulto la auditoría', 'Consultar la Auditoría'],
+            'filtrar auditoria'     => ['cómo filtro el registro de auditoría por usuario y fechas', 'Consultar la Auditoría'],
+            'exportar auditoria'    => ['cómo exporto la auditoría a CSV', 'Consultar la Auditoría'],
             'rbac'                  => ['para qué sirven los permisos RBAC', 'Permisos por módulo'],
             'reportes'              => ['dónde están los reportes', 'Reportes y estadísticas'],
             'exportar'              => ['cómo exporto una tabla a Excel', 'Buscar, paginar y exportar'],

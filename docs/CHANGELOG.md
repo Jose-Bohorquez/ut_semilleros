@@ -1,3 +1,9 @@
+# Sesión 2026-10-03 — CU30 consultar auditoría
+
+Pantalla de Auditoría con filtros (usuario, colección, acción, fechas en hora de Bogotá), paginación de servidor, «Ver» con la comparación de valores anteriores y nuevos, exportación a CSV (con protección contra inyección de fórmulas) y E1/E2. El panel principal usa `/audits/summary`. Sin migraciones. 543 tests. Ver `docs/validacion/CU30.md`.
+
+---
+
 # Sesión 2026-10-03 — CU29 registrar auditoría
 
 La auditoría guarda valores anteriores y nuevos, IP y `STATUS_CHANGE`; registra pivotes y límites de SIA; es inmutable a nivel de modelo; ante una falla escribe en el log y alerta al Administrador sin revertir la operación (el LOGIN sigue estricto). Migración `2026_10_03_000001`. 523 tests. Ver `docs/validacion/CU29.md`.

@@ -237,6 +237,13 @@ operación). **El LOGIN sigue siendo estricto** (sin auditoría no se emite toke
 hora de America/Bogota. **Comprobado en vivo:** el hosting entrega la IP real del cliente en `REMOTE_ADDR` (181.x desde casa), no hace falta `trustProxies`. La pantalla de
 Auditoría aún no muestra los valores: es CU30.
 
+**CU30 consultar auditoría (2026-10-03, en local, pendiente de desplegar):** acta `docs/validacion/CU30.md`, 543 tests en verde.
+`GET /audits` paginado por el servidor (25, máx. 100) con filtros usuario/colección/acción/fechas (los días son de **America/Bogota**,
+convertidos a UTC), `/audits/{id}` con la comparación campo a campo, `/audits/export` (CSV UTF-8 con BOM, máx. 20.000 filas,
+**neutraliza inyección de fórmulas**), `/audits/options` y `/audits/summary` (el panel principal ya no descarga toda la tabla). E1 con
+el texto exacto y E2 (403) probado en cada endpoint. Pantalla reescrita (`modules/audits/audits.module.js`); `apiDownload` nuevo en
+`services/api.service.js`; `CACHE_NAME` v24. **Falta probar el frontend en navegador.** Pendiente: retención de la tabla `audits`.
+
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
 es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda
 cuenta conectada por SSH desde una VM Windows, mismo filesystem/repo/servidor de producción que
