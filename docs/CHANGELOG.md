@@ -1,3 +1,9 @@
+# Sesión 2026-10-03 — CU29 registrar auditoría
+
+La auditoría guarda valores anteriores y nuevos, IP y `STATUS_CHANGE`; registra pivotes y límites de SIA; es inmutable a nivel de modelo; ante una falla escribe en el log y alerta al Administrador sin revertir la operación (el LOGIN sigue estricto). Migración `2026_10_03_000001`. 523 tests. Ver `docs/validacion/CU29.md`.
+
+---
+
 # Sesión 2026-09-30 — Auditoría integral de CU01–CU25 y cierre de CU26
 
 Informe completo: `docs/validacion/AUDITORIA_CU01-CU25_2026-09-30.md`. 506 tests en verde (antes 434).

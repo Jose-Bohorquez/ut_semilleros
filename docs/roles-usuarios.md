@@ -34,7 +34,7 @@ Leyenda: **E** = escribe (crea/edita/activa-inactiva) · **C** = solo consulta �
 | Productos | E | E | — en el menú² | — | |
 | **Solicitudes** | E (resuelve) | C | E (solo las de sus semilleros) | Crea y ve las suyas | Nacen siempre `PENDIENTE`; aprobar/rechazar solo por CU24. Rechazar exige motivo; una solicitud resuelta no se reabre. |
 | **Propuestas** | C | E³ | E³ | Crea, ve y (mientras esté Recibida) edita las suyas | Estados internos `PENDIENTE/APROBADA/RECHAZADA`, mostrados al estudiante como Recibida/Viable/Archivada. |
-| Auditoría | C | — | — | — | Solo lectura. No guarda valores anteriores/nuevos (CU29 pendiente). |
+| Auditoría | C | — | — | — | Solo lectura; los registros no se pueden modificar ni eliminar. Guarda valor anterior y nuevo e IP (CU29); la pantalla aún no los muestra (CU30). |
 | SIA (panel), Permisos (RBAC) | E | — | — | — | El acceso real lo define el rol; `permission:` aún no se aplica a las rutas. |
 
 ¹ Solo lectura de lo necesario para sus formularios. ² La API lo permite pero el menú del Líder no lo incluye.
@@ -60,7 +60,7 @@ Leyenda: **E** = escribe (crea/edita/activa-inactiva) · **C** = solo consulta �
 
 - **Evaluación de propuestas (CU27)**: la spec dice que evalúa el Administrativo y que el Líder solo consulta las de las áreas de sus semilleros. El código permite evaluar al Líder y al Administrativo, y el Líder ve todas. El Administrador ve «Editar» pero la API responde 403. Se corrige con CU27.
 - **Vocabulario de propuestas**: spec Recibida/Viable/Archivada frente a `PENDIENTE/APROBADA/RECHAZADA` internos (puente reversible en CU26).
-- **Auditoría (CU29)**: falta guardar valores anteriores/nuevos, IP e inmutabilidad; varios CU (CU07–CU14) lo exigen en su alterno A2.
+- **Auditoría (CU29)**: implementada el 2026-10-03 (valores anteriores/nuevos, IP, inmutabilidad). Falta mostrarlos en la pantalla (CU30).
 - **Reportes (CU28)**: no existe el módulo.
 - Menú lateral de escritorio: «Solicitudes» y «Propuestas» solo están en la barra inferior (móvil); en escritorio se llega por `/requests` y `/proposals`.
 

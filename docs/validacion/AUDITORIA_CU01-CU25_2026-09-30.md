@@ -230,3 +230,14 @@ diferencias** contra producción y no solo con un rango de commits.
 
 **Aún no probado:** el frontend en navegador (pasos manuales en §7 y en `CU26.md`), el flujo real con Google y las respuestas de
 SIA con la base nueva (la base y `SiaAssistant` ya están en producción: probar preguntas reales en el chat).
+
+---
+
+## Actualización 2026-10-03 — T-AUD cerrado
+
+El único hallazgo ALTO que quedaba abierto (**T-AUD**: la auditoría no guardaba valores anteriores/nuevos) se **cerró con CU29**
+(acta `docs/validacion/CU29.md`, 17 tests, suite en 523): valores anteriores y nuevos sin contraseñas ni tokens y con lo cifrado
+enmascarado, IP, `STATUS_CHANGE` como acción propia, auditoría de las tablas pivote (áreas, programas, líder, integrantes de
+proyecto, grupos RBAC) y de los límites de SIA, registros no modificables y E1 (log técnico + alerta al Administrador sin revertir
+la operación; el LOGIN sigue siendo estricto por decisión de CU01). Con esto, el alterno A2 de CU07–CU14 queda cubierto en el
+backend; **la pantalla de Auditoría todavía no muestra los valores** (CU30). Ya no queda ningún CRÍTICO ni ALTO abierto de CU01–CU25.
