@@ -1,3 +1,9 @@
+# Sesión 2026-10-03 — CU28 reportes y estadísticas
+
+Nueva pantalla «Reportes» (Administrador, Administrativo y Líder con alcance propio, A1): semilleros activos por facultad, solicitudes por semillero y estado, 10 áreas con más propuestas e integrantes activos por programa y nivel; filtros por fechas (hora de Bogotá) y CAT; «Exportar CSV» por reporte (BOM, fila de total, anti-inyección de fórmulas con `App\Support\Csv`, compartido con CU30); E1 «Sin datos para el periodo»; E2 corte a 10 s con 503. Acta `docs/validacion/CU28.md`, 22 tests propios, suite en 600. SIA actualizada. `CACHE_NAME` v26. Falta la prueba visual en navegador.
+
+---
+
 # Sesión 2026-10-03 — CU27 evaluar propuestas
 
 Solo el Administrativo evalúa (Marcar viable / Archivar, con observación obligatoria al archivar); el Líder consulta las propuestas de las áreas de sus semilleros; filtros por área, programa, estado y fechas; contacto del estudiante solo en el detalle del Administrativo; `POST`/`PUT /proposals` solo para el Estudiante; menú lateral con Solicitudes y Propuestas. 578 tests. Ver `docs/validacion/CU27.md`.

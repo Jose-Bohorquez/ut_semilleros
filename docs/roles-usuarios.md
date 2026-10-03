@@ -58,6 +58,7 @@ Leyenda: **E** = escribe (crea/edita/activa-inactiva) · **C** = solo consulta �
 ## Diferencias con la especificación (para decidir)
 
 - **Evaluación de propuestas (CU27)**: implementada el 2026-10-03 según la spec: solo el Administrativo evalúa («Marcar viable» / «Archivar», con observación obligatoria al archivar); el Líder consulta las de las áreas de sus semilleros; el Administrador consulta; el contacto del estudiante solo lo ve el Administrativo. **El Líder dejó de poder evaluar.**
+- **Reportes (CU28)**: implementados el 2026-10-03: Administrador del sistema, Administrativo y Líder (este solo con los datos de sus semilleros) los consultan en «Reportes»; el Estudiante no tiene acceso. Son de solo lectura.
 - **Vocabulario de propuestas**: spec Recibida/Viable/Archivada frente a `PENDIENTE/APROBADA/RECHAZADA` internos (puente reversible en CU26).
 - **Auditoría (CU29)**: implementada el 2026-10-03 (valores anteriores/nuevos, IP, inmutabilidad). Se consultan en la pantalla de Auditoría (CU30, 2026-10-03).
 - **Reportes (CU28)**: no existe el módulo.
