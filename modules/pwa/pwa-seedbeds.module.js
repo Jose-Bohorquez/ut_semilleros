@@ -410,19 +410,23 @@ function openDetail(seedbed) {
 
         <div id="membershipSection"></div>`;
 
-    document.getElementById("detailTabPanes").addEventListener("click", e => {
+    /* El listener va en #detailContent (contiene los botones Y los paneles). Antes estaba en #detailTabPanes, que solo
+       envuelve los paneles: los botones Misión/Visión/Objetivos quedan fuera y nunca recibían el clic. Se asigna con
+       onclick para no acumular un listener nuevo cada vez que se abre un semillero. */
+    document.getElementById("detailContent").onclick = e => {
         const btn = e.target.closest(".detail-tab-btn");
         if (!btn) return;
         document.querySelectorAll(".detail-tab-btn").forEach(b => {
             const active = b === btn;
             b.classList.toggle("active", active);
+            b.setAttribute("aria-selected", active ? "true" : "false");
             b.style.borderBottomColor = active ? "var(--color-primary)" : "transparent";
             b.style.color = active ? "var(--color-primary)" : "var(--color-text-muted)";
         });
         document.querySelectorAll("[data-tab-pane]").forEach(p => {
             p.style.display = p.dataset.tabPane === btn.dataset.tab ? "" : "none";
         });
-    });
+    };
 
     sheet.style.display = "flex";
     renderMembershipSection(seedbed);
