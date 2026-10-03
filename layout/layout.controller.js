@@ -17,6 +17,7 @@ const PAGE_TITLES = {
     "/groups":         "Grupos",
     "/coordinators":   "Coordinadores",
     "/audits":         "Auditoría",
+    "/reports":        "Reportes",
     "/projects":       "Proyectos",
     "/products":       "Productos",
     "/results":        "Resultados",

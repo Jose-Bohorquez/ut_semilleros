@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\RequestController;
 use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\AuditController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\NotificacionController;
 use App\Http\Controllers\Api\PushSubscriptionController;
 use App\Http\Controllers\Api\RbacController;
@@ -413,6 +414,19 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
         Route::get('/audits/options',  [AuditController::class, 'options']);
         Route::get('/audits/export',   [AuditController::class, 'export']);
         Route::get('/audits/{id}',     [AuditController::class, 'show'])->whereNumber('id');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | REPORTES Y ESTADÍSTICAS (RF15 / CU28) — A, ADM y L (el Líder solo ve sus semilleros, RN06)
+    |   El Estudiante no tiene acceso (403).
+    |----------------------------------------------------------------------
+    */
+
+    Route::middleware('role:ADMIN_SISTEMA,ADMINISTRATIVO,LIDER_SEMILLERO')->group(function () {
+        Route::get('/reports',         [ReportController::class, 'index']);
+        Route::get('/reports/options', [ReportController::class, 'options']);
+        Route::get('/reports/export',  [ReportController::class, 'export']);
     });
 
     /*

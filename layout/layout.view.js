@@ -77,6 +77,7 @@ export function LayoutView(content = "") {
         <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
         <a href="/requests"         data-link><i class="fas fa-paper-plane"></i>     Solicitudes</a>
         <a href="/proposals"        data-link><i class="fas fa-lightbulb"></i>       Propuestas</a>
+        <a href="/reports"          data-link><i class="fas fa-chart-pie"></i>       Reportes</a>
         `;
     }
 
@@ -106,6 +107,7 @@ export function LayoutView(content = "") {
         <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
         <a href="/requests"         data-link><i class="fas fa-paper-plane"></i>     Solicitudes</a>
         <a href="/proposals"        data-link><i class="fas fa-lightbulb"></i>       Propuestas</a>
+        <a href="/reports"          data-link><i class="fas fa-chart-pie"></i>       Reportes</a>
         `;
     }
 

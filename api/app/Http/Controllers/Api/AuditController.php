@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Audit;
 use App\Models\User;
+use App\Support\Csv;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -95,10 +96,10 @@ class AuditController extends Controller
 
         return response()->streamDownload(function () use ($query) {
             $out = fopen('php://output', 'w');
-            fwrite($out, "\xEF\xBB\xBF");
+            fwrite($out, Csv::bom());
             fputcsv($out, ['ID', 'Fecha (hora de Bogotá)', 'Usuario', 'Acción', 'Colección', 'Documento', 'IP', 'Valores anteriores', 'Valores nuevos']);
             foreach ($query->cursor() as $a) {
-                fputcsv($out, array_map([$this, 'csvCell'], [
+                fputcsv($out, array_map([Csv::class, 'cell'], [
                     $a->id,
                     $this->local($a),
                     $a->user?->name ?? '',
@@ -169,18 +170,5 @@ class AuditController extends Controller
             $out[] = ['field' => $field, 'old' => $old[$field] ?? null, 'new' => $new[$field] ?? null];
         }
         return $out;
-    }
-
-    /**
-     * Neutraliza la inyección de fórmulas en CSV: una celda que empiece por = + - @ (o tabulador/
-     * retorno de carro) se interpretaría como fórmula al abrirla en Excel/Calc. Se antepone una
-     * comilla simple. Los nombres de usuario y los valores guardados vienen de entradas de usuarios.
-     */
-    private function csvCell($value)
-    {
-        if (is_string($value) && preg_match('/^[=+\-@\t\r]/', $value)) {
-            return "'" . $value;
-        }
-        return $value;
     }
 }

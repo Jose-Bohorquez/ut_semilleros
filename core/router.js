@@ -351,6 +351,13 @@ export const routes = {
         await module.rbacModule.init();
     },
 
+    "/reports": async () => {
+        if (!requireAuth()) return;
+        if (!requireRole(["ADMIN_SISTEMA", "ADMINISTRATIVO", "LIDER_SEMILLERO"])) return;
+        const module = await import("../modules/reports/reports.module.js");
+        await module.reportsModule.init();
+    },
+
     "/audits": async () => {
 
         if (!requireAuth()) return;
