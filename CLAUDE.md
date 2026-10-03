@@ -258,6 +258,7 @@ de la spec; antes podía). `POST`/`PUT /proposals` quedan solo para el Estudiant
 avisos push (un `App\Jobs\DeliverPushNotification` por dispositivo, vía `PushSender::queue()`) y correo de activación
 (`AccountActivationNotification`, ahora `ShouldQueue`) van por la cola con 3 intentos, igual que el de CU04; `afterCommit`
 en todos. `PushSender::send()` (entrega inmediata) queda solo para `POST /push-subscriptions/test`. 641 tests en verde.
+**Desplegado en producción con diff 0** (acta `docs/validacion/ENVIOS_ASINCRONOS_2026-10-03.md`, `semilleros-v28`).
 **Producción sigue en `QUEUE_CONNECTION=sync` hasta que Jose agregue el cron en hPanel** (comando exacto y orden en
 `docs/manuales/manual_tecnico.md` §5); con `sync` todo funciona igual que antes (en el acto, sin reintentos).
 
