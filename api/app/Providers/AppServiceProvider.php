@@ -142,5 +142,17 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\UserPermission::observe(AuditObserver::class);
 
         \App\Models\PermissionGroup::observe(AuditObserver::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Configuración de SIA (CU29, RN07: «toda modificación»)
+        |--------------------------------------------------------------------------
+        | Las respuestas corregidas las administra el Administrador desde /admin/sia.
+        | Los límites (SiaSetting, clave de texto) se auditan con un evento explícito en
+        | SiaController::settingsUpdate. Las conversaciones y mensajes (uso, no
+        | configuración) y las notificaciones no se auditan.
+        */
+
+        \App\Models\SiaKnowledge::observe(AuditObserver::class);
     }
 }

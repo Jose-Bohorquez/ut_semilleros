@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use App\Models\Proposal;
 use App\Models\Program;
 use App\Http\Resources\ProposalResource;
+use App\Support\AuditTrail;
 use Illuminate\Support\Facades\DB;
 
 class ProposalController extends Controller
@@ -81,6 +82,7 @@ class ProposalController extends Controller
         $proposal = DB::transaction(function () use ($validated, $areas) {
             $p = Proposal::create($validated);
             $p->areas()->attach($areas);
+            AuditTrail::pivot($p, 'areas', [], $areas);   // CU29: las áreas no van en el CREATE del modelo
             return $p;
         });
         $proposal->load(['user:id,name', 'areas', 'program:id,name']);
@@ -143,8 +145,10 @@ class ProposalController extends Controller
         unset($validated['areas']);
 
         DB::transaction(function () use ($proposal, $validated, $areas) {
+            $beforeAreas = $proposal->areas()->pluck('areas.id')->all();
             $proposal->update($validated);
             $proposal->areas()->sync($areas);
+            AuditTrail::pivot($proposal, 'areas', $beforeAreas, $areas);   // CU29
         });
         $proposal->load(['user:id,name', 'areas', 'program:id,name']);
 

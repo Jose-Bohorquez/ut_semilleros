@@ -11,6 +11,7 @@ use App\Services\Sia\GroqKeyPool;
 use App\Services\Sia\SiaAssistant;
 use App\Services\Sia\SiaLocalResponder;
 use App\Services\Sia\SiaUnavailableException;
+use App\Support\AuditTrail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -286,8 +287,21 @@ class SiaController extends Controller
             $rules[$k] = $k === 'enabled' ? 'sometimes|boolean' : 'sometimes|integer|min:1|max:' . ($k === 'global_tokens_per_day' ? 5000000 : 5000);
         }
         $data = $request->validate($rules);
+        $before = SiaSetting::all_values();
         foreach ($data as $k => $v) {
             SiaSetting::updateOrCreate(['key' => $k], ['value' => (string) (int) $v]);
+        }
+        /* CU29: los límites son configuración del sistema. SiaSetting usa una clave de texto como
+           llave primaria y `audits.record_id` es numérico, así que no se observa el modelo: se
+           registra un evento explícito con solo los límites que cambiaron. */
+        $after   = SiaSetting::all_values();
+        $changed = array_keys(array_filter($data, fn ($v, $k) => (string) ($before[$k] ?? '') !== (string) $after[$k], ARRAY_FILTER_USE_BOTH));
+        if ($changed) {
+            AuditTrail::record(
+                'UPDATE', 'sia_settings', 0,
+                array_intersect_key($before, array_flip($changed)),
+                array_intersect_key($after, array_flip($changed))
+            );
         }
         return response()->json(['message' => 'Límites actualizados', 'settings' => SiaSetting::all_values()]);
     }

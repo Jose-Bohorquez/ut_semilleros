@@ -317,6 +317,6 @@ class Audit2_SeedbedFixTest extends TestCase
             $this->assertDatabaseHas('requests', ['id' => $id, 'status' => 'RECHAZADA', 'reason' => 'Semillero inactivo', 'reviewed_by' => $leader->id]);
             $this->assertNotNull(MembershipRequest::find($id)->reviewed_at);
         }
-        $this->assertSame(2, Audit::where('table_name', 'requests')->where('action', 'UPDATE')->count());
+        $this->assertSame(2, Audit::where('table_name', 'requests')->where('action', 'STATUS_CHANGE')->count());
     }
 }

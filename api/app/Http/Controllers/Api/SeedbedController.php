@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Seedbed;
 use App\Models\Program;
+use App\Support\AuditTrail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -146,11 +147,15 @@ class SeedbedController extends Controller
             $seedbed = Seedbed::create($validated);
             $seedbed->programs()->attach($programs);
             $seedbed->areas()->attach($areas);
+            /* CU29: el CREATE no incluye lo que se asigna por las tablas pivote; se registra aparte. */
+            AuditTrail::pivot($seedbed, 'programs', [], $programs);
+            AuditTrail::pivot($seedbed, 'areas', [], $areas);
 
             /* CU13 paso 9: "asigna al líder como responsable". Si crea un
                Líder, es él; si crea el Admin, puede designar uno (CU14-A2). */
             if (auth()->user()->role === 'LIDER_SEMILLERO') {
                 $seedbed->users()->attach(auth()->id(), ['role' => 'LIDER']);
+                AuditTrail::pivot($seedbed, 'leader', [], [auth()->id()]);
             } elseif ($leaderId) {
                 $this->assignLeader($seedbed, (int) $leaderId);
             }
@@ -193,9 +198,15 @@ class SeedbedController extends Controller
         unset($validated['programs'], $validated['areas'], $validated['leader_id'], $validated['status']);
 
         DB::transaction(function () use ($seedbed, $validated, $programs, $areas, $leaderId) {
+            $beforePrograms = $seedbed->programs()->pluck('programs.id')->all();
+            $beforeAreas    = $seedbed->areas()->pluck('areas.id')->all();
+
             $seedbed->update($validated);
             $seedbed->programs()->sync($programs);
             $seedbed->areas()->sync($areas);
+            /* CU29: los cambios en las tablas pivote no pasan por el observer del modelo. */
+            AuditTrail::pivot($seedbed, 'programs', $beforePrograms, $programs);
+            AuditTrail::pivot($seedbed, 'areas', $beforeAreas, $areas);
 
             /* CU14-A2: solo el Admin (re)asigna al líder responsable. */
             if ($leaderId) {
@@ -228,9 +239,13 @@ class SeedbedController extends Controller
      */
     private function assignLeader(Seedbed $seedbed, int $leaderId): void
     {
+        $before = $seedbed->users()->wherePivot('role', 'LIDER')->pluck('users.id')->all();
+
         $seedbed->users()->wherePivot('role', 'LIDER')->detach();
         $seedbed->users()->detach($leaderId);
         $seedbed->users()->attach($leaderId, ['role' => 'LIDER']);
+
+        AuditTrail::pivot($seedbed, 'leader', $before, [$leaderId]);   // CU29: cambio de responsable
     }
 
 

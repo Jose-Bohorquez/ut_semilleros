@@ -217,7 +217,7 @@ class RequestManagementTest extends TestCase
 
         $this->assertTrue(Audit::where([
             'user_id'    => $leader->id,
-            'action'     => 'UPDATE',
+            'action'     => 'STATUS_CHANGE',
             'table_name' => 'requests',
             'record_id'  => $req->id,
         ])->exists());

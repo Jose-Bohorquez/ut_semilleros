@@ -2,74 +2,59 @@
 
 namespace App\Observers;
 
-use App\Models\Audit;
-
+use App\Support\AuditTrail;
 use Illuminate\Database\Eloquent\Model;
 
-use Illuminate\Support\Facades\Auth;
-
+/**
+ * CU29: registra automáticamente la creación, modificación, cambio de estado, eliminación y
+ * restauración de los modelos auditables (ver AppServiceProvider::registerAuditObservers).
+ * Toda la lógica de qué guardar, enmascarar y qué hacer ante una falla está en AuditTrail.
+ */
 class AuditObserver
 {
-    /**
-     * Registrar CREATE.
-     */
     public function created(Model $model): void
     {
-        $this->storeAudit('CREATE', $model);
+        AuditTrail::record(
+            'CREATE', $model->getTable(), $model->getKey(),
+            null, AuditTrail::sanitize($model, $model->getAttributes())
+        );
     }
 
-    /**
-     * Registrar UPDATE.
-     */
     public function updated(Model $model): void
     {
-        $this->storeAudit('UPDATE', $model);
-    }
+        $changes = $model->getChanges();
+        $keys    = array_values(array_diff(array_keys($changes), AuditTrail::NOISE));
 
-    /**
-     * Registrar DELETE.
-     */
-    public function deleted(Model $model): void
-    {
-        $this->storeAudit('DELETE', $model);
-    }
-
-    /**
-     * Registrar RESTORE.
-     */
-    public function restored(Model $model): void
-    {
-        $this->storeAudit('RESTORE', $model);
-    }
-
-    /**
-     * Persistir auditoría.
-     */
-    private function storeAudit(
-        string $action,
-        Model $model
-    ): void {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Evitar recursión infinita
-        |--------------------------------------------------------------------------
-        */
-
-        if ($model instanceof Audit) {
+        // Solo cambió last_login_at o similares: el inicio de sesión ya queda como evento LOGIN.
+        if (!$keys) {
             return;
         }
 
-        Audit::create([
+        $old = $new = [];
+        foreach ($keys as $key) {
+            $old[$key] = $model->getRawOriginal($key);
+            $new[$key] = $changes[$key];
+        }
 
-            'user_id' => Auth::id(),
+        // RN07 nombra «cambio de estado» como acción propia, distinta de «modificado».
+        $action = in_array('status', $keys, true) ? 'STATUS_CHANGE' : 'UPDATE';
 
-            'action' => $action,
+        AuditTrail::record(
+            $action, $model->getTable(), $model->getKey(),
+            AuditTrail::sanitize($model, $old), AuditTrail::sanitize($model, $new)
+        );
+    }
 
-            'table_name' => $model->getTable(),
+    public function deleted(Model $model): void
+    {
+        AuditTrail::record(
+            'DELETE', $model->getTable(), $model->getKey(),
+            AuditTrail::sanitize($model, $model->getRawOriginal()), null
+        );
+    }
 
-            'record_id' => $model->id
-
-        ]);
+    public function restored(Model $model): void
+    {
+        AuditTrail::record('RESTORE', $model->getTable(), $model->getKey());
     }
 }

@@ -9,6 +9,7 @@ use App\Models\RolePermission;
 use App\Models\User;
 use App\Models\UserPermission;
 use App\Services\Rbac\PermissionResolver;
+use App\Support\AuditTrail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -207,6 +208,7 @@ class RbacController extends Controller
 
         $before = $group->users()->pluck('users.id');
         $group->users()->sync($data['user_ids']);
+        AuditTrail::pivot($group, 'users', $before->all(), $data['user_ids']);   // CU29
 
         $before->merge($data['user_ids'])->unique()->each(
             fn ($id) => $this->resolver->forgetCache(User::find($id))
@@ -223,7 +225,9 @@ class RbacController extends Controller
             'permission_ids.*' => 'integer|exists:permissions,id',
         ]);
 
+        $beforePermissions = $group->permissions()->pluck('permissions.id')->all();
         $group->permissions()->sync($data['permission_ids']);
+        AuditTrail::pivot($group, 'permissions', $beforePermissions, $data['permission_ids']);   // CU29
         $this->resolver->forgetCacheForGroup($group);
 
         return response()->json(['message' => 'Permisos del grupo actualizados']);

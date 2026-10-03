@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
-use App\Models\Audit;
 use App\Models\User;
 use App\Services\Auth\GoogleAuthException;
 use App\Services\Auth\GoogleIdTokenVerifier;
+use App\Support\AuditTrail;
 use App\Support\PasswordPolicy;
 
 use Illuminate\Http\Request;
@@ -129,12 +129,10 @@ class AuthController extends Controller
                 $expiresAt
             )->plainTextToken;
 
-            Audit::create([
-                'user_id'    => $user->id,
-                'action'     => 'LOGIN',
-                'table_name' => 'users',
-                'record_id'  => $user->id,
-            ]);
+            /* CU29 A1: solo usuario, acción «LOGIN», IP y fecha. `strict`: si no se puede auditar,
+               no se emite el token (decisión de CU01/RN07, deliberada: es la excepción a la E1 de
+               CU29, que en el resto de eventos no revierte la operación). */
+            AuditTrail::event('LOGIN', 'users', $user->id, $user->id, strict: true);
 
             return $plain;
         });
@@ -259,12 +257,7 @@ class AuthController extends Controller
             if (!$user->data_consent_at) {
                 $user->forceFill(['data_consent_at' => now()])->save();
 
-                Audit::create([
-                    'user_id'    => $user->id,
-                    'action'     => 'CONSENT',
-                    'table_name' => 'users',
-                    'record_id'  => $user->id,
-                ]);
+                AuditTrail::event('CONSENT', 'users', $user->id, $user->id);
             }
         });
 
@@ -455,12 +448,7 @@ class AuthController extends Controller
         DB::transaction(function () use ($user) {
             $user->currentAccessToken()?->delete();
 
-            Audit::create([
-                'user_id'    => $user->id,
-                'action'     => 'LOGOUT',
-                'table_name' => 'users',
-                'record_id'  => $user->id,
-            ]);
+            AuditTrail::event('LOGOUT', 'users', $user->id, $user->id);
         });
 
         return response()->json([
@@ -595,12 +583,7 @@ class AuthController extends Controller
             if ($status === Password::PASSWORD_RESET) {
                 $resetUser->tokens()->delete();
 
-                Audit::create([
-                    'user_id'    => $resetUser->id,
-                    'action'     => 'PASSWORD_RESET',
-                    'table_name' => 'users',
-                    'record_id'  => $resetUser->id,
-                ]);
+                AuditTrail::event('PASSWORD_RESET', 'users', $resetUser->id, $resetUser->id);
             }
 
             return $status;

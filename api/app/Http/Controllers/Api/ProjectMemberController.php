@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Support\AuditTrail;
 
 class ProjectMemberController extends Controller
 {
@@ -56,6 +57,8 @@ public function store(Request $request,$projectId)
     }
 
 
+    $beforeMembers = $project->users()->pluck('users.id')->all();
+
     $project->users()->attach(
 
         $validated["user_id"],
@@ -63,6 +66,9 @@ public function store(Request $request,$projectId)
         ["role"=>$validated["role"]]
 
     );
+
+    /* CU29: la tabla pivote no tiene modelo; el cambio se registra sobre el proyecto. */
+    AuditTrail::pivot($project, 'members', $beforeMembers, array_merge($beforeMembers, [(int) $validated["user_id"]]));
 
 
     return response()->json([
@@ -81,7 +87,11 @@ public function store(Request $request,$projectId)
 
         $project = Project::findOrFail($projectId);
 
+        $beforeMembers = $project->users()->pluck('users.id')->all();
+
         $project->users()->detach($userId);
+
+        AuditTrail::pivot($project, 'members', $beforeMembers, array_diff($beforeMembers, [(int) $userId]));   // CU29
 
         return response()->json([
             "message"=>"Miembro eliminado"
