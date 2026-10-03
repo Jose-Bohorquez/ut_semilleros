@@ -244,7 +244,7 @@ convertidos a UTC), `/audits/{id}` con la comparación campo a campo, `/audits/e
 el texto exacto y E2 (403) probado en cada endpoint. Pantalla reescrita (`modules/audits/audits.module.js`); `apiDownload` nuevo en
 `services/api.service.js`; `CACHE_NAME` v24. **Falta probar el frontend en navegador.** Pendiente: retención de la tabla `audits`.
 
-**CU27 evaluar propuestas (2026-10-03, en local, pendiente de desplegar):** acta `docs/validacion/CU27.md`, 578 tests en verde. Solo el
+**CU27 evaluar propuestas (2026-10-03, desplegado en producción con diff 0; API 25/25 en vivo):** acta `docs/validacion/CU27.md`, 578 tests en verde. Solo el
 **Administrativo** evalúa («Marcar viable» / «Archivar»; archivar exige observación, E1; una propuesta evaluada no se reevalúa → 409); el
 Líder consulta las de **las áreas de sus semilleros** (A1) y el Administrador consulta; el listado **no lleva contacto** (RNF12) y el
 detalle lo muestra solo al Administrativo; filtros por área/programa/estado/fechas (Bogotá). **El Líder dejó de poder evaluar** (decisión
