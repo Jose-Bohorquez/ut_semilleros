@@ -43,7 +43,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Limitador de peticiones tolerante a deadlocks de la tabla cache (ver ResilientRateLimiter).
+        // `extend` y no `singleton`: el CacheServiceProvider del framework es diferido y pisaría un enlace propio.
+        $this->app->extend(\Illuminate\Cache\RateLimiter::class, function ($limiter, $app) {
+            return new \App\Support\ResilientRateLimiter($app->make('cache')->driver($app['config']->get('cache.limiter')));
+        });
     }
 
     /**
