@@ -76,6 +76,8 @@ class SiaKnowledgeRetrievalTest extends TestCase
             'reportes'              => ['dónde están los reportes', 'Reportes y estadísticas'],
             'exportar reporte'      => ['cómo exporto el reporte de solicitudes por semillero a CSV', 'Reportes y estadísticas'],
             'reporte lider'         => ['qué ve el líder en los reportes y estadísticas', 'Reportes y estadísticas'],
+            'activar push'          => ['cómo activo las notificaciones push en mi celular', 'Notificaciones: ver las que recibí'],
+            'aviso respuesta'       => ['me llega una notificación cuando responden mi solicitud', 'Notificaciones: ver las que recibí'],
             'exportar'              => ['cómo exporto una tabla a Excel', 'Buscar, paginar y exportar'],
             'eliminar'              => ['puedo eliminar un registro', 'Puedo eliminar'],
             'menu'                  => ['por qué no veo el menú de usuarios', 'no veo el menú'],

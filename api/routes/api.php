@@ -333,8 +333,8 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
          ->get('/requests/{id}', [RequestController::class, 'show'])
          ->whereNumber('id');
 
-    /* POST /requests — L, ADM, E (cada uno crea las suyas) */
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
+    /* POST /requests — solo ESTUDIANTE (CU22: la spec le da este caso de uso solo al estudiante; antes también L/ADM) */
+    Route::middleware('role:ESTUDIANTE')
          ->post('/requests', [RequestController::class, 'store']);
 
     /* Aprobar/rechazar — solo L y ADM (CU24-A3: Administrativo solo consulta) */
@@ -455,6 +455,7 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     Route::post('/push-subscriptions',   [PushSubscriptionController::class, 'store']);
     Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy']);
+    Route::middleware('throttle:6,1')->post('/push-subscriptions/test', [PushSubscriptionController::class, 'test']);
     /*
     |----------------------------------------------------------------------
     | SIA — panel del administrador (RF17): consumo, feedback, conocimiento

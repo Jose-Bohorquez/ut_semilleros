@@ -46,8 +46,8 @@ if ('serviceWorker' in navigator) {
             // (2026-07-28: unificado con services/push.service.js — el módulo viejo
             // modules/notifications/push.service.js tenía una VAPID key placeholder
             // sin completar y apuntaba a una ruta /push/subscribe que nunca existió.)
-            const { subscribeToPush } = await import('./services/push.service.js');
-            window.__subscribePush = subscribeToPush;
+            const { initPushOnLogin } = await import('./services/push.service.js');
+            initPushOnLogin();   // solo re-sincroniza si ya hay permiso; el permiso se pide desde el perfil con un toque
         })
         .catch(err => console.error('Error SW:', err));
 }

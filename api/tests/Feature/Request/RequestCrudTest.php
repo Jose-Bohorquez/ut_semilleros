@@ -50,43 +50,66 @@ class RequestCrudTest extends TestCase
         $response->assertStatus(200)->assertJsonStructure(['requests']);
     }
 
-    public function test_authenticated_user_can_create_request(): void
+    public function test_student_can_create_request_for_himself(): void
     {
-        $actingUser = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
-        $dataUser   = User::factory()->create(['role' => 'ESTUDIANTE']);
-        Sanctum::actingAs($actingUser);
+        $student = User::factory()->create(['role' => 'ESTUDIANTE']);
+        Sanctum::actingAs($student);
         $seedbed  = $this->seedbed();
         $response = $this->postJson('/api/requests', array_merge($this->payload($seedbed), [
-            'user_id'    => $dataUser->id,
             'seedbed_id' => $seedbed->id,
             'status'     => 'PENDIENTE',
         ]));
         $response->assertStatus(201);
         $this->assertDatabaseHas('requests', [
-            'user_id'    => $dataUser->id,
+            'user_id'    => $student->id,
             'seedbed_id' => $seedbed->id,
+            'status'     => 'PENDIENTE',
         ]);
     }
 
-    public function test_request_create_requires_user_and_seedbed(): void
+    public function test_request_create_requires_a_seedbed(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $response = $this->postJson('/api/requests', []);
-        $response->assertStatus(422)->assertJsonValidationErrors(['user_id', 'seedbed_id']);
+        $response->assertStatus(422)->assertJsonValidationErrors(['seedbed_id']);
     }
 
     public function test_request_status_must_be_valid_value(): void
     {
-        $actingUser = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
-        $dataUser   = User::factory()->create(['role' => 'ESTUDIANTE']);
-        Sanctum::actingAs($actingUser);
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $seedbed  = $this->seedbed();
         $response = $this->postJson('/api/requests', array_merge($this->payload($seedbed), [
-            'user_id'    => $dataUser->id,
             'seedbed_id' => $seedbed->id,
             'status'     => 'INVALIDO',
         ]));
         $response->assertStatus(422);
+    }
+
+    /* CU22 es solo del estudiante: ningún otro rol puede crear solicitudes (ni a nombre de un estudiante). */
+    public function test_only_students_can_create_requests(): void
+    {
+        $student = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $seedbed = $this->seedbed();
+        foreach (['LIDER_SEMILLERO', 'ADMINISTRATIVO', 'ADMIN_SISTEMA'] as $role) {
+            Sanctum::actingAs(User::factory()->create(['role' => $role]));
+            $this->postJson('/api/requests', array_merge($this->payload($seedbed), [
+                'user_id' => $student->id, 'seedbed_id' => $seedbed->id,
+            ]))->assertStatus(403);
+        }
+        $this->assertDatabaseCount('requests', 0);
+    }
+
+    public function test_a_student_cannot_create_a_request_for_someone_else(): void
+    {
+        $me    = User::factory()->create(['role' => 'ESTUDIANTE']);
+        $other = User::factory()->create(['role' => 'ESTUDIANTE']);
+        Sanctum::actingAs($me);
+        $seedbed = $this->seedbed();
+        $this->postJson('/api/requests', array_merge($this->payload($seedbed), [
+            'user_id' => $other->id, 'seedbed_id' => $seedbed->id,
+        ]))->assertStatus(201);
+        $this->assertDatabaseHas('requests', ['user_id' => $me->id]);
+        $this->assertDatabaseMissing('requests', ['user_id' => $other->id]);
     }
 
     /* CU24: el PUT genérico /requests/{id} se retiró (permitía saltarse E1-E3);

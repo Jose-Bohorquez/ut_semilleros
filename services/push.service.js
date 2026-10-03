@@ -4,7 +4,8 @@
    Requisitos para que funcione en producción:
    - HTTPS obligatorio (en localhost funciona sin HTTPS)
    - Service Worker registrado con handler 'push'
-   - iOS: solo desde Safari con app instalada en Home Screen (iOS 16.4+)
+   - iOS: solo con la app INSTALADA en la pantalla de inicio (iOS 16.4+) y el permiso pedido con un TOQUE del usuario
+   - Android/Chrome: el permiso también se pide con un toque; pedirlo solo al iniciar sesión suele bloquearse en silencio
    ────────────────────────────────────────────────────────── */
 
 import { apiFetch } from "./api.service.js";
@@ -32,8 +33,40 @@ export function isPushSupported() {
     );
 }
 
-/* ── Solicita permiso y suscribe al push ─────────────────── */
-export async function subscribeToPush() {
+/* ── Entorno: ¿app instalada? ¿iPhone/iPad? ─────────────── */
+function isStandalone() {
+    return window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone === true;
+}
+function isIOS() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+/* ── Estado para pintar el panel de ajustes ──────────────────
+   state: "unsupported" · "needs-install" (iPhone sin instalar) · "denied" · "off" · "on" */
+export async function getPushState() {
+    const ios = isIOS(), installed = isStandalone();
+
+    if (!isPushSupported()) {
+        return { state: ios && !installed ? "needs-install" : "unsupported", ios, installed, permission: "unsupported" };
+    }
+
+    const permission = Notification.permission;
+    if (permission === "denied") return { state: "denied", ios, installed, permission };
+
+    let subscribed = false;
+    try {
+        const reg = await navigator.serviceWorker.ready;
+        subscribed = !!(await reg.pushManager.getSubscription());
+    } catch { /* sin SW: se trata como apagado */ }
+
+    return { state: permission === "granted" && subscribed ? "on" : "off", ios, installed, permission };
+}
+
+/* ── Suscribe este dispositivo ───────────────────────────────
+   prompt:true  → pide el permiso (¡llamar SOLO desde un toque del usuario!)
+   prompt:false → silencioso: si ya hay permiso concedido, vuelve a registrar la suscripción en el servidor
+                  (por si el servidor la perdió); si no hay permiso, no hace nada y no molesta. */
+export async function subscribeToPush({ prompt = false } = {}) {
     if (!isPushSupported()) {
         console.info("[Push] Web Push no soportado en este navegador/dispositivo.");
         return null;
@@ -45,10 +78,11 @@ export async function subscribeToPush() {
     }
 
     try {
-        const permission = await Notification.requestPermission();
+        let permission = Notification.permission;
+        if (permission === "default" && prompt) permission = await Notification.requestPermission();
 
         if (permission !== "granted") {
-            console.info("[Push] Permiso denegado por el usuario.");
+            if (prompt) console.info("[Push] Permiso no concedido:", permission);
             return null;
         }
 
@@ -64,10 +98,8 @@ export async function subscribeToPush() {
             });
         }
 
-        /* Guardar la suscripción en el backend — la ruta real es POST /push-subscriptions
-           (PushSubscriptionController::store) y espera exactamente la forma de
-           subscription.toJSON(): {endpoint, keys:{p256dh, auth}}. /push/subscribe
-           nunca existió como ruta (404 silencioso). */
+        /* Guardar la suscripción en el backend — POST /push-subscriptions (PushSubscriptionController::store)
+           espera exactamente la forma de subscription.toJSON(): {endpoint, keys:{p256dh, auth}}. */
         await apiFetch("/push-subscriptions", {
             method: "POST",
             body:   JSON.stringify(subscription.toJSON()),
@@ -78,8 +110,14 @@ export async function subscribeToPush() {
 
     } catch (err) {
         console.warn("[Push] Error al suscribir:", err.message);
-        return null;
+        throw err;
     }
+}
+
+/* ── Push de prueba a los dispositivos del usuario ──────────
+   Devuelve la respuesta del servidor ({sent, failed, expired, errors, message}). Lanza si no se pudo entregar. */
+export async function sendTestPush() {
+    return apiFetch("/push-subscriptions/test", { method: "POST" });
 }
 
 /* ── Cancela la suscripción push ─────────────────────────── */
@@ -103,8 +141,8 @@ export async function unsubscribeFromPush() {
     }
 }
 
-/* ── Registra el suscriptor al iniciar sesión ────────────── */
-/* Expuesto como window.__subscribePush para ser llamado desde layout.controller.js */
+/* ── Al iniciar sesión: solo re-sincroniza, NUNCA pide permiso ─
+   Expuesto como window.__subscribePush para ser llamado desde layout.controller.js */
 export function initPushOnLogin() {
-    window.__subscribePush = subscribeToPush;
+    window.__subscribePush = () => subscribeToPush({ prompt: false }).catch(() => null);
 }

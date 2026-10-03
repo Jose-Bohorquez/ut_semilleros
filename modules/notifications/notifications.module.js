@@ -8,6 +8,7 @@ import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
 import { updateBellBadge }     from "./notifications.badge.js";
 import { escapeHtml, safeUrl } from "../../core/escape.js";
+import { showPushBanner }     from "../../core/push-card.js";
 
 const ROLE_CAN_SEND = ["ADMIN_SISTEMA", "ADMINISTRATIVO", "LIDER_SEMILLERO"];
 
@@ -155,6 +156,7 @@ function renderPage(received, sent, canSend, activeTab) {
     document.getElementById("app").innerHTML = LayoutView(content);
     initLayoutController();
     bindEvents(received, sent, canSend, activeTab);
+    showPushBanner().catch(() => {});
 }
 
 /* ── Card individual ───────────────────────────────────── */

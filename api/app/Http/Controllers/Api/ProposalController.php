@@ -301,6 +301,17 @@ class ProposalController extends Controller
             'reviewed_at' => now(),
         ])->save();
 
+        // Aviso al estudiante (campana + push). No puede fallar la operación.
+        $nota = trim((string) ($validated['review_note'] ?? ''));
+        \App\Support\UserNotifier::notify(
+            (int) $proposal->user_id,
+            $archives ? 'Tu propuesta fue archivada' : 'Tu propuesta fue marcada como viable',
+            '«' . \Illuminate\Support\Str::limit($proposal->title, 80) . '»'
+                . ($nota !== '' ? ': ' . \Illuminate\Support\Str::limit($nota, 160) : '.'),
+            auth()->id(),
+            '/proposals'
+        );
+
         return response()->json([
             'message'  => $archives ? 'Propuesta archivada' : 'Propuesta marcada como viable',
             'proposal' => $this->reviewRow($proposal->load(['user:id,name', 'areas:id,name', 'program:id,name'])),

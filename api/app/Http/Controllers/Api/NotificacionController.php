@@ -252,15 +252,6 @@ class NotificacionController extends Controller
 
     private function dispatchPush(Notificacion $notif, $sender): void
     {
-        $auth = [
-            'VAPID' => [
-                'subject'    => config('services.webpush.subject'),
-                'publicKey'  => config('services.webpush.public_key'),
-                'privateKey' => config('services.webpush.private_key'),
-            ],
-        ];
-        $webPush = new WebPush($auth);
-
         // Determinar qué user_ids reciben el push según target_type
         $userIds = match ($notif->target_type) {
             'ALL'     => \App\Models\User::pluck('id'),
@@ -272,36 +263,11 @@ class NotificacionController extends Controller
             default   => collect(),
         };
 
-        $subscriptions = PushSubscription::whereIn('user_id', $userIds)->get();
-        $payload = json_encode([
+        // PushSender no lanza: un fallo de push no debe devolver 500 después de crear la notificación.
+        app(\App\Support\PushSender::class)->send($userIds, [
             'title' => $notif->title,
             'body'  => $notif->message,
-            'url'   => $notif->link ?? '/',
+            'url'   => $notif->link ?? '/notifications',
         ]);
-
-        foreach ($subscriptions as $sub) {
-            $webPush->queueNotification(
-                Subscription::create([
-                    'endpoint' => $sub->endpoint,
-                    'keys'     => [
-                        'p256dh' => $sub->p256dh_key,
-                        'auth'   => $sub->auth_token,
-                    ],
-                ]),
-                $payload
-            );
-        }
-
-        foreach ($webPush->flush() as $report) {
-            if ($report->isSubscriptionExpired()) {
-                PushSubscription::where('endpoint', $report->getRequest()->getUri()->__toString())->delete();
-            }
-            if (!$report->isSuccess()) {
-                \Illuminate\Support\Facades\Log::warning('[Push] Falló el envío a una suscripción', [
-                    'endpoint' => (string) $report->getRequest()->getUri(),
-                    'reason'   => $report->getReason(),
-                ]);
-            }
-        }
     }
 }

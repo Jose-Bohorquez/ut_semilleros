@@ -84,7 +84,8 @@ class SecurityRegressionTest extends TestCase
         ])->assertStatus(409);
     }
 
-    public function test_staff_can_still_create_request_for_a_student(): void
+    /* CU22 pasó a ser solo del estudiante (2026-10-03): el personal ya no crea solicitudes a nombre de un estudiante. */
+    public function test_staff_cannot_create_a_request_for_a_student(): void
     {
         Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
         $student = User::factory()->create(['role' => 'ESTUDIANTE']);
@@ -95,8 +96,8 @@ class SecurityRegressionTest extends TestCase
             'program_id' => $seedbed->programs()->first()->id,
             'phone' => '3001234567', 'message' => 'Mensaje de prueba con longitud suficiente.',
             'status' => 'PENDIENTE',
-        ])->assertStatus(201);
-        $this->assertDatabaseHas('requests', ['user_id' => $student->id]);
+        ])->assertStatus(403);
+        $this->assertDatabaseMissing('requests', ['user_id' => $student->id]);
     }
 
     /* ── C-02: el cliente no controla user_id/status en propuestas ── */

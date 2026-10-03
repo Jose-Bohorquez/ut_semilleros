@@ -150,8 +150,6 @@ class RequestController extends Controller
 
         $validated = $request->validate([
 
-            "user_id"=>"required|exists:users,id",
-
             "seedbed_id"=>"required|exists:seedbeds,id",
 
             "program_id"=>"required|integer",
@@ -166,15 +164,10 @@ class RequestController extends Controller
 
         ], self::MESSAGES);
 
-        /* Seguridad (hallazgo C-02, 2026-09-27): un ESTUDIANTE solo puede
-           postularse a sí mismo — el user_id que mande el cliente se ignora.
-           CU22-H2: para TODOS los roles la solicitud nace PENDIENTE (CU22
-           paso 4: «queda en estado Pendiente»); la aprobación/rechazo solo
-           ocurre por PUT /requests/{id}/update-status (CU24). Antes un
-           Líder/Administrativo podía crearla ya APROBADA y saltarse CU24. */
-        if (auth()->user()->role === 'ESTUDIANTE') {
-            $validated['user_id'] = auth()->id();
-        }
+        /* CU22 es del ESTUDIANTE (la ruta lo exige con role:ESTUDIANTE; antes también podían L/ADM, 2026-10-03).
+           Seguridad (C-02): solo se postula a sí mismo — cualquier user_id que mande el cliente se ignora.
+           CU22-H2: nace PENDIENTE (paso 4); aprobar/rechazar es solo por PUT /requests/{id}/update-status (CU24). */
+        $validated['user_id'] = auth()->id();
         $validated['status'] = 'PENDIENTE';
 
         /* E4 (CU22): el semillero debe estar activo. */
@@ -267,6 +260,19 @@ class RequestController extends Controller
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
         ])->save();
+
+        // Aviso al estudiante (campana + push). No puede fallar la operación.
+        $aprobada = $validated['status'] === 'APROBADA';
+        $semillero = $req->seedbed()->value('name') ?? 'el semillero';
+        $nota = trim((string) ($validated['reason'] ?? ''));
+        \App\Support\UserNotifier::notify(
+            (int) $req->user_id,
+            $aprobada ? 'Tu solicitud fue aprobada' : 'Tu solicitud no fue aprobada',
+            ($aprobada ? "Ya eres parte de «{$semillero}»." : "Tu solicitud a «{$semillero}» no fue aprobada.")
+                . ($nota !== '' ? ' ' . \Illuminate\Support\Str::limit($nota, 160) : ''),
+            auth()->id(),
+            '/requests'
+        );
 
         return response()->json([
             'message' => $validated['status'] === 'APROBADA'

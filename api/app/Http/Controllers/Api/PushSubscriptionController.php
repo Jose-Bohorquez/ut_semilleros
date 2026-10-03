@@ -33,4 +33,32 @@ class PushSubscriptionController extends Controller
             ->delete();
         return response()->json(['message' => 'Suscripción eliminada']);
     }
+
+    /**
+     * POST /push-subscriptions/test — manda un push de prueba a los dispositivos del usuario autenticado y
+     * devuelve qué pasó con cada uno. Sirve para comprobar de extremo a extremo (suscripción → servidor →
+     * servicio de push del navegador → pantalla del teléfono) sin molestar a nadie más.
+     */
+    public function test()
+    {
+        $res = app(\App\Support\PushSender::class)->send([auth()->id()], [
+            'title' => 'Notificación de prueba',
+            'body'  => 'Si ves este aviso, las notificaciones push funcionan en este dispositivo.',
+            'url'   => '/notifications',
+        ]);
+
+        if ($res['subscriptions'] === 0) {
+            return response()->json($res + [
+                'message' => 'Este dispositivo todavía no está suscrito. Activa las notificaciones y vuelve a intentarlo.',
+            ], 409);
+        }
+
+        $ok = $res['sent'] > 0;
+
+        return response()->json($res + [
+            'message' => $ok
+                ? 'Enviamos la notificación de prueba a ' . $res['sent'] . ' dispositivo(s). Debería aparecer en unos segundos.'
+                : 'No se pudo entregar la notificación de prueba. Revisa el detalle.',
+        ], $ok ? 200 : 502);
+    }
 }

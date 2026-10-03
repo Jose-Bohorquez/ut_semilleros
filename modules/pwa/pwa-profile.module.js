@@ -9,6 +9,7 @@ import { LayoutView }          from "../../layout/layout.view.js";
 import { initLayoutController }from "../../layout/layout.controller.js";
 import { escapeHtml, safeImageSrc } from "../../core/escape.js";
 import { PASSWORD_HINT, passwordPolicyError } from "../../core/password-policy.js";
+import { renderPushCard }        from "../../core/push-card.js";
 
 const ROLE_LABELS = {
     ADMIN_SISTEMA:   { label: "Administrador",   color: "#b91c1c" },
@@ -23,6 +24,7 @@ export const pwaProfileModule = {
     async init() {
         renderProfile(getUser());
         bindEvents();
+        renderPushCard(document.getElementById("pushCard")).catch(() => {});
     }
 };
 
@@ -223,6 +225,9 @@ function renderProfile(user) {
 
             </form>
         </div>
+
+        <!-- ── Notificaciones push de este dispositivo ──── -->
+        <div id="pushCard"></div>
 
     </div>`;
 
