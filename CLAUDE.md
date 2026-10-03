@@ -203,7 +203,7 @@ guarda en `requests.reason`, que CU23 ya mostraba. Aprobar ofrece registrar al e
 integrante (CU21, ya reconstruido). ~~Hallazgo: `requests.phone` en claro~~ — **corregido en la
 ronda de auditoría (2026-09-30)**, ver abajo.
 
-**Ronda de auditoría de CU01–CU25 + CU26 (2026-09-30, en local, sin desplegar):** informe completo
+**Ronda de auditoría de CU01–CU25 + CU26 (2026-09-30; desplegada en producción el 2026-10-03, diff 0 y 9/9 comprobaciones en vivo):** informe completo
 en `docs/validacion/AUDITORIA_CU01-CU25_2026-09-30.md` (matriz por CU, hallazgos, decisiones),
 acta `docs/validacion/CU26.md` y estado de CU27–CU30 en `docs/validacion/estado_CU27-CU30_2026-09-30.md`.
 506 tests en verde (antes 434). Lo más importante: **un estudiante podía leer por API semilleros

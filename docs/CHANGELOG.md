@@ -25,6 +25,7 @@ Informe completo: `docs/validacion/AUDITORIA_CU01-CU25_2026-09-30.md`. 506 tests
 - **CU26 «Mis propuestas»:** nuevo. Etiquetas Recibida/Viable/Archivada y observación del evaluador
   (`proposals.review_note`), detalle al tocar, mensaje de lista vacía y modo sin conexión.
 - **Revisión de seguridad independiente:** `GET /seedbeds` ya no devuelve correo/teléfono de los usuarios ni el CAT completo al estudiante; las copias offline de solicitudes/propuestas se borran al cerrar sesión; la migración del teléfono aborta ante un valor cifrado con otra `APP_KEY`.
+- **Despliegue (2026-10-03):** en producción con diff 0; migraciones `2026_10_01_000001` (teléfonos de solicitudes cifrados) y `000002` aplicadas; 9/9 comprobaciones en vivo.
 - **SIA:** memoria técnica ampliada a 113 secciones y test de recuperación (57+ preguntas por rol).
 - **Abierto (documentado):** la auditoría no guarda valores anteriores/nuevos (CU29); CU27–CU30 sin
   implementar (`docs/validacion/estado_CU27-CU30_2026-09-30.md`).

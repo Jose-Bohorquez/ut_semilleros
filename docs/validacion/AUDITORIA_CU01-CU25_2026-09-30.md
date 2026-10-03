@@ -6,7 +6,7 @@
 | Alcance | Auditar CU01–CU25 contra la especificación, corregir defectos CRÍTICOS/ALTOS, cerrar CU26, documentar CU27–CU30 (sin implementarlos) |
 | Fuente normativa | `docs/especificacion/Especificacion_Requerimientos_Casos_de_Uso_SemillerosUT.md` (manda lo funcional, decisión de Jose 2026-09-28; el stack real manda sobre lo que la doc técnica diga del stack) |
 | Método | 6 auditores de solo lectura (uno por bloque de 5 CU + uno para CU26–CU30), con sondas de ejecución en SQLite en memoria; 4 correctores con archivos disjuntos; revisión del diff y suite completa por el coordinador |
-| Estado | **Implementado y probado en local. Sin desplegar.** |
+| Estado | **Desplegado en producción el 2026-10-03** (diff 0, 9/9 comprobaciones en vivo). Falta la validación visual en navegador. |
 
 ## 1. Resumen ejecutivo
 
@@ -186,7 +186,7 @@ recontaron). La regla de `CLAUDE.md` pide reextraer en hitos de ~5 CU (el últim
 secas cuando cambian documentos (esta ronda cambió varios), porque descarta nodos semánticos. El flujo permitido es la skill
 `/graphify . --update`, que no está disponible en esta sesión. Queda para el hito de CU30 o para una sesión con la skill.
 
-## 8. Lista de despliegue (no ejecutada)
+## 8. Despliegue (ejecutado el 2026-10-03)
 
 1. Respaldo de la tabla `requests` (la migración `2026_10_01_000001` **cifra los teléfonos con `APP_KEY`**: debe ser la misma
    clave que los descifrará) y de `proposals`.
@@ -201,3 +201,32 @@ secas cuando cambian documentos (esta ronda cambió varios), porque descarta nod
 ## 9. Git
 
 Ver el cierre de este informe en el resumen final de la sesión (rama, commit y push).
+
+### Resultado del despliegue (2026-10-03)
+
+| Paso | Resultado |
+|---|---|
+| Comparación previa | Producción difería en 34 archivos: los 32 de la ronda + `SiaAssistant.php` (cambiado en el commit de SIA anterior a la base, nunca desplegado) + `UserFactory.php` (solo tests) |
+| Respaldo | `~/backups/ut-edu.online/2026-10-03_pre_auditoria/`: 28 archivos existentes, `.env`, `requests.json` (2 filas) y `proposals.json` (4 filas) |
+| `.env` de producción | `APP_LOCALE=es` ya estaba (los mensajes salían como `validation.*` porque faltaba `api/lang`); `APP_FALLBACK_LOCALE=en` se dejó |
+| Lint con PHP 8.2 en el servidor | 34 archivos, 0 errores |
+| `migrate --pretend --force` | SQL esperado: `modify phone text null`, `update … phone = null where phone = ''`, `add review_note` |
+| Migraciones | `2026_10_01_000001` y `…000002` aplicadas. `requests` 2 filas y `proposals` 4, sin cambios; el teléfono de `requests` quedó cifrado (200 caracteres) |
+| Modo mantenimiento | `down` durante unos segundos y `up` al terminar (comprobado: el sitio responde 200) |
+| **Diff 0** | 233 archivos idénticos entre el repo y producción |
+| Humo | `/api/seedbeds` sin token → 401; `POST /api/register` → 404; `forgot-password` vacío → «El correo es obligatorio.»; `CACHE_NAME` = `semilleros-v23` |
+| Validación en vivo (cuentas `qa_temp_*`, ya borradas) | **9/9 PASS** (ver abajo) |
+
+Comprobaciones en vivo: el estudiante solo recibe semilleros ACTIVOS y sin `authorization_reference`, `inactivation_reason`,
+`users`, `pending_requests_count` ni datos del CAT; objetivos solo ACTIVOS; el Líder recibe `users` solo con id, nombre y pivote;
+`PUT /profile` no cambia correo ni nombre; áreas duplicadas → 422 y no se crea la propuesta; propuesta válida → 201 con
+`status_label` «Recibida», `review_note` y sin `user_id` ni `reviewed_by`; teléfono de la propuesta cifrado en BD; una solicitud
+enviada con `status:"APROBADA"` queda `PENDIENTE` con el teléfono cifrado y legible por el modelo. Al terminar: `qa_temp` = 0 y
+conteos reales intactos.
+
+**Lecciones del despliegue** (ya reflejadas en `docs/despliegue/RONDA_AUDITORIA_2026-10-02.md`): `migrate --pretend` en producción
+exige `--force` además (si no, pide confirmación interactiva y se cancela); el paquete debe armarse con la **lista real de
+diferencias** contra producción y no solo con un rango de commits.
+
+**Aún no probado:** el frontend en navegador (pasos manuales en §7 y en `CU26.md`), el flujo real con Google y las respuestas de
+SIA con la base nueva (la base y `SiaAssistant` ya están en producción: probar preguntas reales en el chat).

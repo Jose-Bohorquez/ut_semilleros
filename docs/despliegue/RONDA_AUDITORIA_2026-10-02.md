@@ -126,3 +126,20 @@ tar -xzf $B/files.tgz                                # restaura los archivos que
 php api/artisan config:clear && php api/artisan route:clear && php api/artisan up
 ```
 Los JSON de `$B` son la copia de seguridad de los datos de `requests` y `proposals`.
+
+---
+
+## Ejecución (2026-10-03) — notas para la próxima vez
+
+Ejecutado desde `pcjose` en la red de casa (`192.168.80.16`); desde la red de la empresa el firewall bloquea Hostinger y GitHub.
+Resultado completo en `docs/validacion/AUDITORIA_CU01-CU25_2026-09-30.md` §8.
+
+- **`migrate --pretend` en producción necesita `--force`** (`php artisan migrate --pretend --force`); sin él pide confirmación
+  interactiva y se cancela sin hacer nada.
+- **Arma el paquete con la lista real de diferencias**, no solo con un rango de commits: se comparan las huellas MD5 de repo y
+  producción (paso 5.1) y se empaqueta lo que difiere. Esta vez el rango `0a636ce..HEAD` daba 32 archivos y la diferencia real eran
+  34 (`SiaAssistant.php` venía de un commit anterior a la base).
+- Un script de validación en vivo (cuentas `qa_temp_*` que se crean y se borran solas, sin imprimir tokens) está descrito en el
+  paso 5.4; la ejecución de esta vez dio 9/9.
+- Las tablas respaldadas en JSON (`requests`, `proposals`) contienen teléfonos en claro: el directorio del respaldo es `chmod 700`
+  y los JSON `chmod 600`.
