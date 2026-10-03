@@ -17,7 +17,7 @@ cd "$(dirname "$0")/.."
 # Solo código de la aplicación. Quedan fuera tests, docs, vendor, storage, .env, SGAA, db, graphify.
 DEPLOY_DIRS=(api/app api/routes api/database api/config api/bootstrap api/resources api/lang
              api/public/index.php modules core layout services css
-             index.html app.js service-worker.js manifest.json .htaccess)
+             index.html app.js style.css service-worker.js manifest.json .htaccess)
 
 if [ -n "$(git status --porcelain)" ]; then
   echo "ERROR: el árbol de trabajo tiene cambios sin commitear. Commitea o descarta antes de armar el paquete." >&2
