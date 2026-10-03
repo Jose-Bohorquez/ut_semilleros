@@ -74,6 +74,8 @@ class SiaKnowledgeRetrievalTest extends TestCase
             'exportar auditoria'    => ['cómo exporto la auditoría a CSV', 'Consultar la Auditoría'],
             'rbac'                  => ['para qué sirven los permisos RBAC', 'Permisos por módulo'],
             'reportes'              => ['dónde están los reportes', 'Reportes y estadísticas'],
+            'exportar reporte'      => ['cómo exporto el reporte de solicitudes por semillero a CSV', 'Reportes y estadísticas'],
+            'reporte lider'         => ['qué ve el líder en los reportes y estadísticas', 'Reportes y estadísticas'],
             'exportar'              => ['cómo exporto una tabla a Excel', 'Buscar, paginar y exportar'],
             'eliminar'              => ['puedo eliminar un registro', 'Puedo eliminar'],
             'menu'                  => ['por qué no veo el menú de usuarios', 'no veo el menú'],
