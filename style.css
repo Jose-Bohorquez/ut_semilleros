@@ -623,8 +623,13 @@ tbody tr:hover { background: var(--color-surface-2); }
 }
 
 .modal-actions {
-  display: flex; gap: var(--space-2);
+  display: flex; gap: var(--space-2); flex-wrap: wrap;
   margin-top: var(--space-5); justify-content: flex-end;
+}
+/* Móvil: con «Cancelar · Guardar borrador · Guardar» la fila no cabía y «Cancelar» quedaba cortado fuera de la
+   pantalla (no se podía tocar). Los botones se reparten el ancho y bajan de línea si hace falta. */
+@media (max-width: 520px) {
+  .modal-actions .btn { flex: 1 1 calc(50% - var(--space-2)); justify-content: center; }
 }
 
 
@@ -1302,7 +1307,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 640px) {
   .sia-panel { left: 0; right: 0; bottom: 0; width: 100%; height: min(85vh, 640px); border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
   .sia-fab span { display: none; }
-  .sia-fab { width: 48px; padding: 0; }
+  .sia-fab:not(.sia-fab-toggle) { width: 48px; padding: 0; }
 }
 /* Escritorio: abajo a la derecha (ahí no hay «+» de la PWA; a la izquierda está el menú lateral).
    El botón de "mostrar botones" (colapsado) es un elemento aparte — sin este
@@ -1312,6 +1317,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .sia-fabs { left: auto; right: var(--space-6); align-items: flex-end; }
   .sia-panel { left: auto; right: var(--space-6); }
   .sia-fab-expand { left: auto; right: var(--space-6); }
+  /* Compactos (solo icono, como en el móvil): con la etiqueta «Reportar bug» ocupaban ~150 px y tapaban los
+     botones de acción del borde derecho (p. ej. «Guardar límites», «Ver»). El título/aria-label sigue siendo el texto. */
+  .sia-fab > span:not(.sia-fab-dot):not(.sr-only) { display: none; }
+  .sia-fab:not(.sia-fab-toggle) { width: 48px; padding: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .sia-typing span { animation: none; } .sia-fab { transition: none; } }
 /* Panel de SIA (/admin/sia) */
@@ -1427,3 +1436,25 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .rbac-member-list { max-height: 260px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius-btn); padding: var(--space-2) var(--space-3); }
 .rbac-section-gap { margin-top: var(--space-4); }
 .rbac-empty { color: var(--color-text-muted); font-size: var(--text-sm); }
+
+
+/* ─── BARRA DE FILTROS (Solicitudes, Propuestas, Auditoría, Reportes) ───────── */
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end;
+  margin-bottom: var(--space-4); padding: var(--space-4);
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card, 12px);
+}
+.filter-bar label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 0.8125rem; font-weight: 600; color: var(--color-text-muted);
+}
+.filter-bar input, .filter-bar select {
+  min-height: 38px; padding: 6px 10px; font: inherit; font-weight: 400;
+  color: var(--color-text); background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius-input, 8px);
+}
+.filter-bar .btn { align-self: flex-end; }
+@media (max-width: 600px) {
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-bar .btn { width: 100%; }
+}

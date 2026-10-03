@@ -168,10 +168,19 @@ export async function apiFetch(endpoint, options = {}) {
             }
         }
 
-        const serverMessage =
+        /* Validación (422): se listan TODOS los errores. El «message» de Laravel resume con
+           «(and 1 more error)» en inglés cuando hay más de uno. */
+        const fieldErrors = response.status === 422 && data && typeof data === "object" && data.errors && typeof data.errors === "object"
+            ? [...new Set(Object.values(data.errors).flat())].join(" ")
+            : "";
+        const rawMessage = fieldErrors ||
             (typeof data === "object" && data?.message) ||
             (typeof data === "string" && data) ||
             `Error HTTP ${response.status}`;
+        /* El límite de peticiones responde en inglés («Too Many Attempts.»): se muestra en español. */
+        const serverMessage = response.status === 429 && /too many/i.test(rawMessage)
+            ? "Demasiadas solicitudes en poco tiempo. Espere unos segundos e intente de nuevo."
+            : rawMessage;
 
         console.error("[apiFetch] Error backend:", {
             url,

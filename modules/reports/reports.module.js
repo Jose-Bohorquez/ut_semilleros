@@ -56,7 +56,7 @@ function renderShell(cats) {
         El filtro por CAT no aplica a las propuestas, que no pertenecen a un CAT.
     </p>
 
-    <form id="reportFilters" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;margin-bottom:1rem">
+    <form id="reportFilters" class="filter-bar">
         <label>Desde<br><input type="date" name="from"></label>
         <label>Hasta<br><input type="date" name="to"></label>
         <label>CAT<br>
@@ -65,8 +65,8 @@ function renderShell(cats) {
                 ${cats.map(c => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`).join("")}
             </select>
         </label>
-        <button type="submit">Consultar</button>
-        <button type="button" id="reportClear">Limpiar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Consultar</button>
+        <button type="button" id="reportClear" class="btn btn-secondary btn-sm">Limpiar</button>
     </form>
 
     <div id="reportError" role="alert" style="color:#c0392b;font-size:.9em;margin-bottom:.5rem"></div>
@@ -123,7 +123,7 @@ function section(def, report) {
     const head = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap">
         <h3 style="margin:.5rem 0">${escapeHtml(def.title)}</h3>
-        <button type="button" data-export="${def.key}">Exportar CSV</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-export="${def.key}">Exportar CSV</button>
     </div>`;
 
     if (!rows.length) {

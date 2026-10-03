@@ -269,6 +269,15 @@ function hideKPI(id) {
 /* Cuando no hay datos aún, el canvas se reemplaza por un estado vacío en vez
    de quedar en blanco sin ninguna explicación (bug real detectado en revisión
    de diseño, 2026-07-28: las 3 tarjetas con datos en 0 no mostraban nada). */
+/* Devuelve el canvas listo para dibujar: si ya había una gráfica en él (la pantalla se dibujó dos veces
+   o una carga anterior terminó tarde) la destruye; Chart.js se negaba con «Canvas is already in use». */
+function freshCanvas(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    const previous = canvas && window.Chart?.getChart?.(canvas);
+    if (previous) previous.destroy();
+    return canvas;
+}
+
 function emptyChart(canvasId, message) {
     const canvas = document.getElementById(canvasId);
     const wrapper = canvas?.closest(".chart-wrapper");
@@ -317,7 +326,7 @@ async function loadCharts() {
     if (seedbedList.length && document.getElementById("chartSeedbedStatus")) {
         const activo   = seedbedList.filter(s => s.status === "ACTIVO").length;
         const inactivo = seedbedList.filter(s => s.status === "INACTIVO").length;
-        new Chart(document.getElementById("chartSeedbedStatus"), {
+        new Chart(freshCanvas("chartSeedbedStatus"), {
             type: "doughnut",
             data: {
                 labels: ["Activo", "Inactivo"],
@@ -354,7 +363,7 @@ async function loadCharts() {
             APROBADA:  proposalList.filter(p => p.status === "APROBADA").length,
             RECHAZADA: proposalList.filter(p => p.status === "RECHAZADA").length,
         };
-        new Chart(document.getElementById("chartProposalStatus"), {
+        new Chart(freshCanvas("chartProposalStatus"), {
             type: "bar",
             data: {
                 labels: ["Pendientes", "Aprobadas", "Rechazadas"],
@@ -391,7 +400,7 @@ async function loadCharts() {
         faculties?.faculties || []
     );
     if (seedbedsByFaculty.labels.length && document.getElementById("chartSeedbedFaculty")) {
-        new Chart(document.getElementById("chartSeedbedFaculty"), {
+        new Chart(freshCanvas("chartSeedbedFaculty"), {
             type: "bar",
             data: {
                 labels: seedbedsByFaculty.labels,
@@ -433,7 +442,7 @@ async function loadCharts() {
         const roles = ["ADMIN_SISTEMA", "ADMINISTRATIVO", "LIDER_SEMILLERO", "ESTUDIANTE"];
         const roleCounts = roles.map(r => userList.filter(u => u.role === r).length);
         const roleLabels = ["Admin", "Administrativo", "Líder Semillero", "Estudiante"];
-        new Chart(document.getElementById("chartUserRoles"), {
+        new Chart(freshCanvas("chartUserRoles"), {
             type: "doughnut",
             data: {
                 labels: roleLabels,

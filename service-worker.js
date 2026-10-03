@@ -3,7 +3,7 @@
    Service Worker de la PWA del Sistema de Semilleros
    ========================================================= */
 
-const CACHE_NAME = "semilleros-v26";
+const CACHE_NAME = "semilleros-v27";
 
 /* Archivos del shell (raramente cambian → cache first) */
 const SHELL_URLS = [
@@ -19,6 +19,27 @@ const SHELL_URLS = [
     "/apple-touch-icon-152.png",
     "/apple-touch-icon-167.png",
     "/apple-touch-icon-180.png"
+];
+
+/* Librerías de CDN que la app necesita para verse y funcionar. Se guardan al INSTALAR el SW: si solo se
+   guardaran cuando se piden, una persona que abre la app, la instala y la reabre sin red (su primera
+   recarga) vería la pantalla en blanco, porque esas peticiones se hicieron antes de que el SW tomara el control. */
+const CDN_PRECACHE = [
+    "https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css",
+    "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js",
+    "https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css",
+    "https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js",
+    "https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js",
+    "https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js",
+    "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+    "https://cdn.jsdelivr.net/npm/sweetalert2@11",
+    "https://cdn.tailwindcss.com/",
+    "https://code.jquery.com/jquery-3.7.1.min.js",
+    "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
 ];
 
 /* Extensiones de JS/módulos → network first (cambian con cada deploy) */
@@ -61,16 +82,23 @@ self.addEventListener("install", event => {
             console.log("[SW] Cacheando shell inicial");
             /* Fix #2: manejo de errores individuales — un archivo inaccesible
                no impide la instalación del SW */
-            return Promise.allSettled(
+            return Promise.allSettled([
                 /* cache:"reload" salta la caché HTTP/CDN: sin esto el SW nuevo podía
                    quedarse con un theme.css o index.html viejo fijado en cache-first
                    hasta la siguiente versión (review 2026-09-28). */
-                SHELL_URLS.map(url =>
+                ...SHELL_URLS.map(url =>
                     cache.add(new Request(url, { cache: "reload" })).catch(e =>
                         console.warn("[SW] No se pudo cachear:", url, e)
                     )
-                )
-            );
+                ),
+                /* CDN: respuestas «opaque» (no-cors); cache.add las rechaza, por eso fetch + put. */
+                ...CDN_PRECACHE.map(url => {
+                    const req = new Request(url, { mode: "no-cors" });
+                    return fetch(req).then(res => cache.put(req, res)).catch(e =>
+                        console.warn("[SW] No se pudo precachear CDN:", url, e)
+                    );
+                })
+            ]);
         })
     );
 });
@@ -163,9 +191,10 @@ self.addEventListener("fetch", event => {
                     }
                     return response;
                 })
-                .catch(() =>
-                    /* Sin red → fallback al cache */
-                    caches.match(request)
+                .catch(async () =>
+                    /* Sin red → fallback al cache. ignoreSearch: los módulos se piden con «?v=N» (app.js?v=5)
+                       pero el shell se guardó como /app.js; sin esto no coincidían y la app quedaba en blanco. */
+                    (await caches.match(request)) || (await caches.match(request, { ignoreSearch: true })) || Response.error()
                 )
         );
         return;
@@ -184,6 +213,23 @@ self.addEventListener("fetch", event => {
                 return response;
             });
         })
+    );
+});
+
+
+/* ── MESSAGE ──────────────────────────────────────────── */
+
+/* La app envía las URLs que ya cargó (ver app.js) para dejarlas disponibles sin conexión. Solo mismo origen. */
+self.addEventListener("message", event => {
+    if (event.data?.type !== "CACHE_URLS" || !Array.isArray(event.data.urls)) return;
+    event.waitUntil(
+        caches.open(CACHE_NAME).then(cache =>
+            Promise.allSettled(
+                event.data.urls
+                    .filter(u => typeof u === "string" && u.startsWith(self.location.origin))
+                    .map(u => cache.match(u).then(hit => hit || cache.add(u)))
+            )
+        )
     );
 });
 

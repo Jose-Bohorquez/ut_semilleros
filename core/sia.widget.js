@@ -123,10 +123,14 @@ export function mountSia() {
         const modalOpen = !!document.querySelector("#crudModal, .swal2-container, [role='dialog']:not(#sia-panel)")
             || isVisible(document.getElementById("seedbedDetail"))
             || isVisible(document.getElementById("proposalSheet"))
-            || isVisible(document.getElementById("newRequestModal"));
+            || isVisible(document.getElementById("newRequestModal"))
+            || isVisible(document.getElementById("notifSheet"))
+            || isVisible(document.getElementById("requestDetailSheet"));
         root.classList.toggle("sia--modal-open", modalOpen);
     };
-    new MutationObserver(syncOffset).observe(document.body, { childList: true, subtree: true });
+    /* attributes/style: las hojas inferiores (notifSheet, proposalSheet…) se abren cambiando style.display, no insertando nodos;
+       sin esto los botones flotantes quedaban encima del formulario (hallazgo de la prueba móvil, 2026-10-03). */
+    new MutationObserver(syncOffset).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
     window.addEventListener("popstate", syncOffset);
     syncOffset();
 

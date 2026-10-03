@@ -14,6 +14,11 @@ export function createCrudModule(config) {
 
     const entity  = config.entity;
     const title   = config.title;
+    /* Nombre en singular y plural para los textos («Crear semillero», «No hay registros de proyectos»). */
+    const SINGULAR = { seedbeds: "semillero", objectives: "objetivo", projects: "proyecto", products: "producto", results: "resultado",
+        groups: "grupo", coordinators: "coordinador", faculties: "facultad", programs: "programa", areas: "área", cats: "CAT", users: "usuario" };
+    const singular = config.singular || SINGULAR[entity] || title.split(" ").pop().toLowerCase();
+    const plural   = title.replace(/^Gestión de /, "").toLowerCase();
     const fields  = config.fields;
 
     /* Los campos de contraseña son solo de formulario — nunca deben verse en una
@@ -27,9 +32,11 @@ export function createCrudModule(config) {
     let submitting    = false;
 
     /* Auto-detect toggle-status support:
-       entity supports it when it has a status field with ACTIVO/INACTIVO options */
+       entity supports it when it has a status field with ACTIVO *and* INACTIVO options. Proyectos tiene
+       ACTIVO/FINALIZADO/SUSPENDIDO: no hay «inactivar» (la ruta toggle-status no existe y daba 404); su
+       estado se cambia al editar. */
     const hasToggle = !config.readonly && fields.some(f =>
-        f.name === "status" && f.options?.some(o => o.value === "ACTIVO")
+        f.name === "status" && f.options?.some(o => o.value === "ACTIVO") && f.options?.some(o => o.value === "INACTIVO")
     );
 
 
@@ -152,7 +159,7 @@ export function createCrudModule(config) {
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
                     <button class="btn btn-primary" id="createBtn-${entity}">
                         <i class="fas fa-plus"></i>
-                        Crear ${title.split(" ").pop()}
+                        Crear ${singular}
                     </button>
                     ${config.toolbarExtraHtml ? config.toolbarExtraHtml() : ""}
                 </div>` : ""}
@@ -162,7 +169,7 @@ export function createCrudModule(config) {
                     <i class="fas fa-inbox"></i>
                 </div>
                 <h3>Sin registros</h3>
-                <p>No hay ${title.toLowerCase()} registrados. Crea el primero para comenzar.</p>
+                <p>No hay registros de ${plural}. Crea el primero para comenzar.</p>
                 ${!noCreate ? `
                 <button class="btn btn-primary" id="createBtn-${entity}-empty">
                     <i class="fas fa-plus"></i>
@@ -262,7 +269,7 @@ export function createCrudModule(config) {
             <div style="display:flex;gap:8px;flex-wrap:wrap">
                 <button class="btn btn-primary" id="createBtn-${entity}">
                     <i class="fas fa-plus"></i>
-                    Crear ${title.split(" ").pop()}
+                    Crear ${singular}
                 </button>
                 ${config.toolbarExtraHtml ? config.toolbarExtraHtml() : ""}
             </div>` : ""}
@@ -396,7 +403,7 @@ export function createCrudModule(config) {
             showFieldError(input, msgEl, "Este campo es obligatorio");
             return false;
         }
-        if (type === "email" && !isValidEmail(value)) {
+        if ((type === "email" || input.name === "email") && !isValidEmail(value)) {
             showFieldError(input, msgEl, "Ingrese un correo electrónico válido");
             return false;
         }
@@ -505,7 +512,9 @@ export function createCrudModule(config) {
 
             /* SELECT */
             if (f.type === "select") {
-                const options = f.options.map(opt => {
+                /* placeholder: al CREAR obliga a elegir (p. ej. el rol de un usuario no debe quedar en el primero de la lista). */
+                const optionList = (f.placeholder && !record) ? [{ value: "", label: f.placeholder }, ...f.options] : f.options;
+                const options = optionList.map(opt => {
                     const selected = record && record[f.name] === opt.value ? "selected" : "";
                     return `<option value="${escapeHtml(opt.value)}" ${selected}>${escapeHtml(opt.label)}</option>`;
                 }).join("");
@@ -728,7 +737,7 @@ export function createCrudModule(config) {
                 <form id="crudForm-${entity}" novalidate>
                     <h3 id="crudModalTitle">
                         <i class="fas fa-${record ? "pencil-alt" : "plus-circle"}" style="color:var(--color-primary);margin-right:8px"></i>
-                        ${record ? "Editar" : "Crear"} ${title}
+                        ${record ? "Editar" : "Crear"} ${singular}
                     </h3>
 
                     <p class="form-legend">

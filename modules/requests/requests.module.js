@@ -71,7 +71,7 @@ function renderRequests(requests, seedbeds){
             <td data-label="Fecha" data-order="${escapeHtml(r.created_at || "")}">${escapeHtml(fmtDate(r.created_at))}</td>
             <td data-label="Estado">${statusBadge(r.status)}</td>
             <td data-label="Acciones">
-                <button class="viewRequestBtn" data-request="${escapeHtml(r.id)}">Ver</button>
+                <button class="viewRequestBtn btn btn-ghost btn-sm" data-request="${escapeHtml(r.id)}">Ver</button>
             </td>
         </tr>
     `).join("");
@@ -97,7 +97,7 @@ function renderRequests(requests, seedbeds){
 
     ${readOnlyNote}
 
-    <form id="requestFilters" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;margin-bottom:1rem">
+    <form id="requestFilters" class="filter-bar">
 
         <label>Semillero<br>
             <select name="seedbed_id">
@@ -118,8 +118,8 @@ function renderRequests(requests, seedbeds){
             <input type="date" name="to" value="${escapeHtml(filters.to)}">
         </label>
 
-        <button type="submit">Filtrar</button>
-        <button type="button" id="clearRequestFilters">Limpiar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <button type="button" id="clearRequestFilters" class="btn btn-secondary btn-sm">Limpiar</button>
 
     </form>
 

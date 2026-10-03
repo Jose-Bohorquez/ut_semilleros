@@ -287,6 +287,7 @@ fields: [
   name:"role",
   label:"Rol",
   type:"select",
+  placeholder:"Seleccione un rol",
   options:[
    { value:"ADMIN_SISTEMA", label:"ADMIN_SISTEMA"},
    { value:"ADMINISTRATIVO", label:"ADMINISTRATIVO"},

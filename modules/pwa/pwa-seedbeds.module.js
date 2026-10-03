@@ -170,12 +170,12 @@ function renderFacultySeedbeds(facultyId) {
 }
 
 /* nombre, grupo y CAT (paso 5) */
-function seedbedCardsHtml(seedbeds) {
+function seedbedCardsHtml(seedbeds, emptyText = "Esta facultad no tiene semilleros activos.") {
     if (seedbeds.length === 0) {
         return `<div class="empty-state">
             <div class="empty-state-icon"><i class="fas fa-seedling"></i></div>
             <h3>Sin semilleros</h3>
-            <p>Esta facultad no tiene semilleros activos.</p>
+            <p>${emptyText}</p>
         </div>`;
     }
     return seedbeds.map(s => {
@@ -223,7 +223,7 @@ function renderSearchResults(query) {
         s.name.toLowerCase().includes(q) || (s.objetivo_general || "").toLowerCase().includes(q));
     listEl.style.display = "none";
     resultsEl.style.display = "";
-    resultsEl.innerHTML = seedbedCardsHtml(matches);
+    resultsEl.innerHTML = seedbedCardsHtml(matches, "No encontramos semilleros que coincidan con tu búsqueda.");
     bindSeedbedCardClicks(matches);
 }
 

@@ -72,7 +72,7 @@ function renderShell(options) {
         Las fechas están en hora de Bogotá.
     </p>
 
-    <form id="auditFilters" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;margin-bottom:1rem">
+    <form id="auditFilters" class="filter-bar">
 
         <label>Usuario<br>
             <select name="user_id">
@@ -98,9 +98,9 @@ function renderShell(options) {
         <label>Desde<br><input type="date" name="from"></label>
         <label>Hasta<br><input type="date" name="to"></label>
 
-        <button type="submit">Filtrar</button>
-        <button type="button" id="auditClear">Limpiar</button>
-        <button type="button" id="auditExport">Exportar CSV</button>
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <button type="button" id="auditClear" class="btn btn-secondary btn-sm">Limpiar</button>
+        <button type="button" id="auditExport" class="btn btn-secondary btn-sm">Exportar CSV</button>
 
     </form>
 
@@ -192,7 +192,7 @@ async function loadPage() {
             <td data-label="Colección">${escapeHtml(a.table_name)}</td>
             <td data-label="Documento">${escapeHtml(a.record_id)}</td>
             <td data-label="IP">${escapeHtml(a.ip_address || "—")}</td>
-            <td data-label="Acciones"><button type="button" class="auditViewBtn" data-id="${escapeHtml(a.id)}">Ver</button></td>
+            <td data-label="Acciones"><button type="button" class="auditViewBtn btn btn-ghost btn-sm" data-id="${escapeHtml(a.id)}">Ver</button></td>
         </tr>
     `).join("");
 
@@ -211,9 +211,9 @@ async function loadPage() {
         </table>
 
         <nav aria-label="Paginación de la auditoría" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-top:1rem">
-            <button type="button" data-audit-page="${meta.current_page - 1}" ${meta.current_page <= 1 ? "disabled" : ""}>Anterior</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-audit-page="${meta.current_page - 1}" ${meta.current_page <= 1 ? "disabled" : ""}>Anterior</button>
             <span>Mostrando ${from} a ${to} de ${meta.total} registros · Página ${meta.current_page} de ${meta.last_page}</span>
-            <button type="button" data-audit-page="${meta.current_page + 1}" ${meta.current_page >= meta.last_page ? "disabled" : ""}>Siguiente</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-audit-page="${meta.current_page + 1}" ${meta.current_page >= meta.last_page ? "disabled" : ""}>Siguiente</button>
         </nav>
     `;
 }

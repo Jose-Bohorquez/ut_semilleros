@@ -31,6 +31,16 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
         .then(async () => {
             console.log('Service Worker registrado');
+            // Pide al SW que guarde lo que la página ya cargó (módulos JS, CSS, imágenes). En la primera visita esas
+            // peticiones ocurren antes de que el SW controle la página y no quedarían en caché: sin esto, reabrir
+            // la app sin conexión justo después de instalarla dejaba la pantalla en blanco.
+            try {
+                const ready = await navigator.serviceWorker.ready;
+                const urls = performance.getEntriesByType('resource')
+                    .map(e => e.name)
+                    .filter(u => u.startsWith(location.origin) && /\.(js|css|png|svg|json)(\?|$)/.test(u) && !u.includes('/api/') && !u.endsWith('/service-worker.js'));
+                ready.active?.postMessage({ type: 'CACHE_URLS', urls: [...new Set(urls)] });
+            } catch { /* sin SW activo: nada que guardar */ }
             // Solicitar permiso y suscribir al push (solo si el usuario está autenticado).
             // Se expone en window para que layout.controller.js lo llame después del login.
             // (2026-07-28: unificado con services/push.service.js — el módulo viejo

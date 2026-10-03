@@ -71,7 +71,7 @@ function renderShell(areas, programs) {
 
     ${note}
 
-    <form id="proposalFilters" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;margin-bottom:1rem">
+    <form id="proposalFilters" class="filter-bar">
 
         <label>Área<br>
             <select name="area_id"><option value="">Todas</option>${areas.map(a => optionHtml(a.id, a.name)).join("")}</select>
@@ -93,8 +93,8 @@ function renderShell(areas, programs) {
         <label>Desde<br><input type="date" name="from"></label>
         <label>Hasta<br><input type="date" name="to"></label>
 
-        <button type="submit">Filtrar</button>
-        <button type="button" id="proposalClear">Limpiar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <button type="button" id="proposalClear" class="btn btn-secondary btn-sm">Limpiar</button>
 
     </form>
 
@@ -173,7 +173,7 @@ async function loadList() {
                     <td data-label="Áreas">${escapeHtml((p.areas || []).map(a => a.name).join(", ") || "—")}</td>
                     <td data-label="Título">${escapeHtml(p.title)}</td>
                     <td data-label="Estado">${badge(p)}</td>
-                    <td data-label="Acciones"><button type="button" class="proposalViewBtn" data-id="${escapeHtml(p.id)}">Ver</button></td>
+                    <td data-label="Acciones"><button type="button" class="proposalViewBtn btn btn-ghost btn-sm" data-id="${escapeHtml(p.id)}">Ver</button></td>
                 </tr>`).join("")}
             </tbody>
         </table>
