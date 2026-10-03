@@ -254,6 +254,13 @@ de la spec; antes podía). `POST`/`PUT /proposals` quedan solo para el Estudiant
 «Solicitudes» y «Propuestas» para Líder, Administrativo y Administrador. Estados: sigue el puente de CU26. `CACHE_NAME` v25.
 **Falta probar el frontend en navegador.** Pendiente: A2 «Ver por área» (CU28).
 
+**Envíos asíncronos (2026-10-03, decisión de Jose: «todo debería ser asíncrono», opción cola real con reintentos):**
+avisos push (un `App\Jobs\DeliverPushNotification` por dispositivo, vía `PushSender::queue()`) y correo de activación
+(`AccountActivationNotification`, ahora `ShouldQueue`) van por la cola con 3 intentos, igual que el de CU04; `afterCommit`
+en todos. `PushSender::send()` (entrega inmediata) queda solo para `POST /push-subscriptions/test`. 641 tests en verde.
+**Producción sigue en `QUEUE_CONNECTION=sync` hasta que Jose agregue el cron en hPanel** (comando exacto y orden en
+`docs/manuales/manual_tecnico.md` §5); con `sync` todo funciona igual que antes (en el acto, sin reintentos).
+
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
 es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda
 cuenta conectada por SSH desde una VM Windows, mismo filesystem/repo/servidor de producción que

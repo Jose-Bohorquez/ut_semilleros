@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Jobs\DeliverPushNotification;
 use App\Models\PushSubscription;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -11,12 +12,61 @@ use Minishlink\WebPush\WebPush;
 /**
  * Envío de notificaciones push (Web Push) a todos los dispositivos suscritos de un conjunto de usuarios.
  *
+ * - `queue()`: lo normal. Encola un DeliverPushNotification por dispositivo; la petición no espera a la red.
+ * - `send()`: entrega en el acto y devuelve un resumen. Solo para diagnosticar (`POST /push-subscriptions/test`).
+ *
  * Nunca lanza: un fallo de push no debe tumbar la operación que lo originó (aprobar una solicitud, enviar
- * un anuncio…). Devuelve un resumen para poder diagnosticar (`POST /push-subscriptions/test`).
- * Las suscripciones que el servicio de push declara caducadas (410/404) se borran solas.
+ * un anuncio…). Las suscripciones que el servicio de push declara caducadas (410/404) se borran solas.
  */
 class PushSender
 {
+    /**
+     * Encola un trabajo por dispositivo suscrito. Con QUEUE_CONNECTION=sync se entrega en el acto: los errores
+     * se registran y no se propagan, igual que con la cola real.
+     *
+     * @return int dispositivos encolados
+     */
+    public function queue(iterable $userIds, array $payload): int
+    {
+        $ids = collect($userIds)->filter()->unique()->values();
+        if ($ids->isEmpty()) {
+            return 0;
+        }
+
+        $queued = 0;
+        foreach (PushSubscription::whereIn('user_id', $ids)->pluck('id') as $id) {
+            try {
+                DeliverPushNotification::dispatch((int) $id, $payload);
+                $queued++;
+            } catch (\Throwable $e) {
+                Log::warning('[Push] No se pudo encolar o entregar a una suscripción', ['subscription_id' => $id, 'error' => $e->getMessage()]);
+            }
+        }
+
+        return $queued;
+    }
+
+    /**
+     * Entrega a UN dispositivo (lo usa DeliverPushNotification). Devuelve null si faltan las claves VAPID:
+     * reintentar no lo arreglaría.
+     *
+     * @return array{endpoint:string,success:bool,expired:bool,reason:string}|null
+     */
+    public function deliverTo(PushSubscription $sub, array $payload): ?array
+    {
+        if (! config('services.webpush.public_key') || ! config('services.webpush.private_key')) {
+            Log::warning('[Push] Claves VAPID sin configurar: no se envía.');
+
+            return null;
+        }
+
+        foreach ($this->deliver(collect([$sub]), json_encode($payload, JSON_UNESCAPED_UNICODE)) as $r) {
+            return $r;
+        }
+
+        return ['endpoint' => $sub->endpoint, 'success' => false, 'expired' => false, 'reason' => 'El servicio de push no devolvió respuesta.'];
+    }
+
     /** @return array{subscriptions:int,sent:int,failed:int,expired:int,errors:string[]} */
     public function send(iterable $userIds, array $payload): array
     {

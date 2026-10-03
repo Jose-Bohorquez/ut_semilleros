@@ -263,8 +263,9 @@ class NotificacionController extends Controller
             default   => collect(),
         };
 
-        // PushSender no lanza: un fallo de push no debe devolver 500 después de crear la notificación.
-        app(\App\Support\PushSender::class)->send($userIds, [
+        // Encolado (un trabajo por dispositivo) y sin lanzar: un fallo de push no debe devolver 500 después de crear
+        // la notificación, y un anuncio a «Todos» no debe hacer esperar al remitente.
+        app(\App\Support\PushSender::class)->queue($userIds, [
             'title' => $notif->title,
             'body'  => $notif->message,
             'url'   => $notif->link ?? '/notifications',

@@ -69,17 +69,35 @@ ejemplo corto.
 - **Auditoría (RN07):** vía `AuditObserver` en los modelos, más entradas manuales para eventos que
   no son cambios de modelo (`LOGIN`, `LOGOUT`, `PASSWORD_RESET`, `CONSENT`).
 
-## 5. Colas (para CU04 E4 y otros correos)
+## 5. Colas (envíos asíncronos: correos y avisos push)
 
-Las notificaciones que dependen del servidor SMTP (`CustomResetPasswordNotification`) implementan
-`ShouldQueue` con 3 reintentos. En producción esto requiere un cron que procese la cola:
+Todo lo que depende de un servicio externo se envía por la cola, fuera de la petición del usuario, con
+3 intentos (espera de 30 s y 2 min entre ellos):
+
+| Envío | Clase | Si falla |
+|---|---|---|
+| Recuperar contraseña (CU04 E4) | `CustomResetPasswordNotification` | Reintenta; luego `failed_jobs` |
+| Activación de cuenta (CU06, carga masiva) | `AccountActivationNotification` | Reintenta; luego `failed_jobs` |
+| Aviso push, un trabajo por dispositivo (anuncios, CU24, CU27) | `App\Jobs\DeliverPushNotification` | Reintenta; suscripción caducada se borra; sin claves VAPID no reintenta |
+
+La notificación de la campana se guarda en el acto; solo el push va a la cola. La notificación de
+prueba (`POST /push-subscriptions/test`) se entrega en el acto a propósito, para diagnosticar.
+
+En producción la cola es `database` y la procesa un cron cada minuto. **Hostinger no permite
+`crontab` por SSH:** se agrega en hPanel → Avanzado → Tareas Cron → «Personalizado», frecuencia
+«cada minuto» (`* * * * *`), con este comando:
 
 ```
-* * * * * cd /home/USUARIO/domains/ut-edu.online/public_html/api && php artisan queue:work --stop-when-empty --tries=3 --max-time=50 >> /dev/null 2>&1
+/usr/bin/php /home/u682531786/domains/ut-edu.online/public_html/api/artisan queue:work --stop-when-empty --tries=3 --max-time=50
 ```
 
-Sin este cron, los correos de recuperación de contraseña quedan encolados sin enviarse. En Docker
-local, `QUEUE_CONNECTION=sync` hace que se procesen al instante, sin necesitar cron.
+Orden obligatorio: **primero el cron, después `QUEUE_CONNECTION=database` en `api/.env`** (y
+`php artisan config:clear`). Al revés, los envíos se quedan en la tabla `jobs` sin salir. Para volver
+atrás basta `QUEUE_CONNECTION=sync`: todo se envía en el acto, sin reintentos, y un fallo de push no
+rompe la operación. En Docker local y en las pruebas se usa `sync`.
+
+Revisar que la cola avanza: `php artisan tinker --execute="echo DB::table('jobs')->count();"` debe
+volver a 0 en menos de un minuto.
 
 Si un job agota sus 3 intentos, cae a la tabla `failed_jobs` (no se pierde): se puede reintentar con
 `php artisan queue:retry all`.

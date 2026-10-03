@@ -24,7 +24,8 @@ class UserNotifier
                 'target_value' => (string) $userId,
             ]);
 
-            app(PushSender::class)->send([$userId], ['title' => $title, 'body' => $message, 'url' => $pushUrl]);
+            // Encolado: la operación que avisa (aprobar, evaluar) no espera la entrega del push.
+            app(PushSender::class)->queue([$userId], ['title' => $title, 'body' => $message, 'url' => $pushUrl]);
         } catch (\Throwable $e) {
             try {
                 Log::warning('[Notificación] No se pudo avisar al usuario', ['user_id' => $userId, 'error' => $e->getMessage()]);

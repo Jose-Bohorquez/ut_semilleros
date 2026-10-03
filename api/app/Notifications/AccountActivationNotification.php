@@ -9,14 +9,21 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Services\Auth\GoogleIdTokenVerifier;
 use App\Support\MailBrand;
 
-class AccountActivationNotification extends Notification
+class AccountActivationNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    /* Encolado con reintentos, igual que CustomResetPasswordNotification (CU04 E4): crear un usuario (o
+       importar estudiantes en lote) no espera al servidor de correo, y si el SMTP falla se reintenta. */
+    public int $tries = 3;
+
+    public array $backoff = [30, 120];
 
     private const ROLES = [
         'ESTUDIANTE'      => 'Estudiante',
@@ -48,7 +55,9 @@ class AccountActivationNotification extends Notification
 
     public function __construct(
         protected string $token
-    ) {}
+    ) {
+        $this->afterCommit();
+    }
 
     public function via($notifiable): array
     {
