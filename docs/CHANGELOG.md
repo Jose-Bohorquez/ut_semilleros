@@ -1,3 +1,9 @@
+# Sesión 2026-10-03 — Primera prueba visual con navegador real
+
+Chrome + Playwright sobre el entorno local: todas las pantallas por rol en escritorio/tablet/móvil, ~300 botones y modales, flujos de extremo a extremo, CRUD de 12 catálogos y PWA. Acta: `docs/validacion/PRUEBAS_VISUALES_2026-10-03.md`; herramientas: `scripts/ui-tests/`. Corregido: PWA en blanco sin conexión (SW), 500 aleatorio por deadlock en la caché del limitador (`ResilientRateLimiter`), «Cancelar» cortado en móvil, «Inactivar» de Proyectos (404), rol ADMIN preseleccionado al crear usuario, errores 422/429 en inglés, botones/filtros sin estilo, botones flotantes que tapaban acciones, textos de catálogos y gráficas del Dashboard. `CACHE_NAME` v27. 607 tests.
+
+---
+
 # Sesión 2026-10-03 — CU28 reportes y estadísticas
 
 Nueva pantalla «Reportes» (Administrador, Administrativo y Líder con alcance propio, A1): semilleros activos por facultad, solicitudes por semillero y estado, 10 áreas con más propuestas e integrantes activos por programa y nivel; filtros por fechas (hora de Bogotá) y CAT; «Exportar CSV» por reporte (BOM, fila de total, anti-inyección de fórmulas con `App\Support\Csv`, compartido con CU30); E1 «Sin datos para el periodo»; E2 corte a 10 s con 503. Acta `docs/validacion/CU28.md`, 22 tests propios, suite en 600. SIA actualizada. `CACHE_NAME` v26. Falta la prueba visual en navegador.
