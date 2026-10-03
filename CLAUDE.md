@@ -229,12 +229,12 @@ Estudiante. **No verificado:** navegador (el puerto 8080 sigue inaccesible), pro
 (`migrate:status`, `.env`), Google real y las respuestas de SIA con la base nueva. **Graphify no se
 refrescó** (regla: hitos de ~5 CU; el flujo `/graphify . --update` no estaba disponible).
 
-**CU29 registrar auditoría (2026-10-03, en local, pendiente de desplegar):** acta `docs/validacion/CU29.md`, 523 tests en verde.
+**CU29 registrar auditoría (2026-10-03, desplegado en producción con diff 0):** acta `docs/validacion/CU29.md`, 523 tests en verde.
 `audits` guarda ahora `old_values`/`new_values` (json) e `ip_address` (migración `2026_10_03_000001`), todo vía `App\Support\AuditTrail`:
 sin contraseñas ni tokens, campos cifrados enmascarados como `[cifrado]`, `STATUS_CHANGE` como acción propia, pivotes y límites de SIA
 auditados, `Audit` inmutable a nivel de modelo (`update`/`delete` lanzan), y E1 (falla → log + alerta al Administrador, sin revertir la
 operación). **El LOGIN sigue siendo estricto** (sin auditoría no se emite token: decisión de CU01). Se guarda en UTC; CU30 mostrará la
-hora de America/Bogota. **Por comprobar tras desplegar:** qué IP se registra detrás del hosting (no hay `trustProxies`). La pantalla de
+hora de America/Bogota. **Comprobado en vivo:** el hosting entrega la IP real del cliente en `REMOTE_ADDR` (181.x desde casa), no hace falta `trustProxies`. La pantalla de
 Auditoría aún no muestra los valores: es CU30.
 
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
