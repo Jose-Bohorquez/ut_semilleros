@@ -103,14 +103,13 @@ class RF05AreaTest extends TestCase
     }
 
     /* Criterio: toda propuesta tiene al menos un área */
-    /* POST /proposals no admite ADMIN_SISTEMA (regla existente): se actúa
-       como LIDER_SEMILLERO para probar la validación de area_id. */
+    /* CU25: solo el ESTUDIANTE registra propuestas (el personal ya no puede, CU25-H4). */
     public function test_proposal_requires_an_active_area(): void
     {
         $u = User::factory()->create(['role' => 'ESTUDIANTE']);
         $faculty = Faculty::create(['name' => 'F', 'status' => 'ACTIVO']);
         $program = Program::create(['name' => 'P', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs($u);
         $this->postJson('/api/proposals', ['user_id' => $u->id, 'program_id' => $program->id, 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'PENDIENTE'])
             ->assertStatus(422)->assertJsonValidationErrors(['areas']);
 
@@ -128,7 +127,7 @@ class RF05AreaTest extends TestCase
         $p = Proposal::create(['user_id' => $u->id, 'program_id' => $program->id, 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'PENDIENTE']);
         $p->areas()->attach($area->id);
         $area->update(['status' => 'INACTIVO']);
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs($u);
         $this->putJson("/api/proposals/{$p->id}", ['user_id' => $u->id, 'program_id' => $program->id, 'areas' => [$area->id], 'title' => 'T2', 'description' => 'Descripción actualizada con longitud suficiente.', 'status' => 'PENDIENTE'])
             ->assertOk();
     }

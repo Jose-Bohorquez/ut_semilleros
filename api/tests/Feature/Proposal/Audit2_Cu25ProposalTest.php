@@ -69,9 +69,8 @@ class Audit2_Cu25ProposalTest extends TestCase
 
     public function test_duplicate_areas_are_rejected_on_update(): void
     {
-        $leader  = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
         $student = $this->student();
-        Sanctum::actingAs($leader);
+        Sanctum::actingAs($student);   // CU27: el personal ya no edita propuestas; las edita su dueño
         $area = $this->area();
         $program = $this->programActivo();
         $proposal = Proposal::create([
@@ -191,20 +190,20 @@ class Audit2_Cu25ProposalTest extends TestCase
 
     public function test_update_status_records_reviewer(): void
     {
-        $leader  = User::factory()->create(['role' => 'LIDER_SEMILLERO']);
+        $evaluator = User::factory()->create(['role' => 'ADMINISTRATIVO']);   // CU27: solo el Administrativo evalúa
         $student = $this->student();
         $proposal = Proposal::create([
             'user_id' => $student->id, 'program_id' => $this->programActivo()->id, 'title' => 'T',
             'description' => 'Descripción original con longitud suficiente.', 'status' => 'PENDIENTE',
         ]);
 
-        Sanctum::actingAs($leader);
+        Sanctum::actingAs($evaluator);
         $this->putJson("/api/proposals/{$proposal->id}/update-status", ['status' => 'APROBADA'])
             ->assertStatus(200);
 
         $fresh = DB::table('proposals')->where('id', $proposal->id)->first();
         $this->assertSame('APROBADA', $fresh->status);
-        $this->assertSame($leader->id, (int) $fresh->reviewed_by);
+        $this->assertSame($evaluator->id, (int) $fresh->reviewed_by);
         $this->assertNotNull($fresh->reviewed_at);
     }
 }

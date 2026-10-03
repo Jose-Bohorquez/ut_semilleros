@@ -342,34 +342,36 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | PROPUESTAS (RF11 / CU11)
-    |   GET list  → A, L, ADM
-    |   POST/PUT  → L, ADM
-    |   update-status → L, ADM
-    |   GET /my   → E
-    |   POST      → E
+    | PROPUESTAS (RF11 / CU25, CU26, CU27)
+    |   GET list, GET {id} → A, L (solo las de las áreas de sus semilleros, A1), ADM
+    |   POST   → E (CU25: registra la suya)
+    |   PUT    → E (edita la suya mientras esté Recibida; extensión de CU25/CU26)
+    |   update-status → ADM (CU27: Marcar viable / Archivar; E2: 403 al resto)
+    |   GET /my → E (CU26)
     |----------------------------------------------------------------------
     */
 
     Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
          ->get('/proposals', [ProposalController::class, 'index']);
 
-    /* POST /proposals — L, ADM, E (cada uno crea las suyas) */
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
-         ->post('/proposals', [ProposalController::class, 'store']);
-
-    /* PUT /proposals/{id} — L, ADM (cualquier propuesta) + ESTUDIANTE (solo la
-       suya, y solo si sigue PENDIENTE — validado dentro del controlador).
-       update-status (aprobar/rechazar) sigue siendo exclusivo de L, ADM. */
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO,ESTUDIANTE')
-         ->put('/proposals/{id}', [ProposalController::class, 'update']);
-
-    Route::middleware('role:LIDER_SEMILLERO,ADMINISTRATIVO')
-         ->put('/proposals/{id}/update-status', [ProposalController::class, 'updateStatus']);
-
-    /* GET propias — solo E */
+    /* GET /proposals/my va antes que /proposals/{id}; {id} es numérico. */
     Route::middleware('role:ESTUDIANTE')
          ->get('/proposals/my', [ProposalController::class, 'myProposals']);
+
+    Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
+         ->get('/proposals/{id}', [ProposalController::class, 'show'])
+         ->whereNumber('id');
+
+    /* CU25: solo el estudiante registra propuestas (antes también L y ADM a nombre de otro, CU25-H4). */
+    Route::middleware('role:ESTUDIANTE')
+         ->post('/proposals', [ProposalController::class, 'store']);
+
+    Route::middleware('role:ESTUDIANTE')
+         ->put('/proposals/{id}', [ProposalController::class, 'update']);
+
+    /* CU27: solo el Administrativo evalúa (spec); el Líder solo consulta y el Administrador del sistema no es actor. */
+    Route::middleware('role:ADMINISTRATIVO')
+         ->put('/proposals/{id}/update-status', [ProposalController::class, 'updateStatus']);
 
     /*
     |----------------------------------------------------------------------

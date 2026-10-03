@@ -221,7 +221,7 @@ return [
             'objectives'    => ['view', 'create', 'update', 'toggle_status', 'delete'],
             'results'       => ['view', 'create', 'update', 'toggle_status'],
             'requests'      => ['view', 'create', 'update', 'review'],
-            'proposals'     => ['view', 'create', 'update', 'review'],
+            'proposals'     => ['view', 'review'],   // CU27: solo el Administrativo evalúa
             'projects'      => ['view', 'create', 'update', 'manage_members'],
             'products'      => ['view', 'create', 'update'],
             'notifications' => ['send'],
@@ -239,7 +239,7 @@ return [
             'objectives'    => ['view', 'create', 'update', 'toggle_status', 'delete'],
             'results'       => ['view', 'create', 'update', 'toggle_status'],
             'requests'      => ['view', 'create', 'update', 'review'],
-            'proposals'     => ['view', 'create', 'update', 'review'],
+            'proposals'     => ['view'],   // CU27-A1: el Líder solo consulta (las de las áreas de sus semilleros)
             'projects'      => ['view', 'create', 'update', 'manage_members'],
             'products'      => ['view', 'create', 'update'],
             'notifications' => ['send'],

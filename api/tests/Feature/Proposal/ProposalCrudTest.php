@@ -57,7 +57,7 @@ class ProposalCrudTest extends TestCase
 
     public function test_authenticated_user_can_create_proposal(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $response = $this->postJson('/api/proposals', $this->payload());
         $response->assertStatus(201);
         $this->assertDatabaseHas('proposals', ['title' => 'Investigación sobre IA']);
@@ -65,7 +65,7 @@ class ProposalCrudTest extends TestCase
 
     public function test_proposal_can_have_multiple_areas(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $areaA = $this->area();
         $areaB = $this->area();
         $response = $this->postJson('/api/proposals', $this->payload(['areas' => [$areaA->id, $areaB->id]]));
@@ -76,22 +76,24 @@ class ProposalCrudTest extends TestCase
 
     public function test_proposal_create_requires_all_fields(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $response = $this->postJson('/api/proposals', []);
-        $response->assertStatus(422)->assertJsonValidationErrors(['user_id', 'program_id', 'areas', 'title', 'description', 'status']);
+        // `user_id` y `status` ya no se exigen: los fija el servidor (la propuesta es del estudiante autenticado y nace Recibida).
+        $response->assertStatus(422)->assertJsonValidationErrors(['program_id', 'areas', 'title', 'description']);
+        $response->assertJsonMissingValidationErrors(['user_id', 'status']);
     }
 
     /* E1 / paso 4: descripción entre 20 y 2000 caracteres */
     public function test_proposal_description_requires_minimum_length(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $response = $this->postJson('/api/proposals', $this->payload(['description' => 'muy corta']));
         $response->assertStatus(422)->assertJsonValidationErrors(['description']);
     }
 
     public function test_proposal_rejects_inactive_program(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $faculty  = Faculty::create(['name' => 'F', 'status' => 'ACTIVO']);
         $inactive = Program::create(['name' => 'P inactivo', 'faculty_id' => $faculty->id, 'status' => 'INACTIVO']);
         $response = $this->postJson('/api/proposals', $this->payload(['program_id' => $inactive->id]));
@@ -100,7 +102,7 @@ class ProposalCrudTest extends TestCase
 
     public function test_proposal_rejects_inactive_area(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $inactive = Area::create(['name' => 'A inactiva', 'code' => 'AI-' . uniqid(), 'status' => 'INACTIVO']);
         $response = $this->postJson('/api/proposals', $this->payload(['areas' => [$inactive->id]]));
         $response->assertStatus(422)->assertJsonValidationErrors(['areas.0']);
@@ -121,17 +123,17 @@ class ProposalCrudTest extends TestCase
 
     public function test_proposal_status_must_be_valid_value(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $response = $this->postJson('/api/proposals', $this->payload(['status' => 'INVALIDO']));
         $response->assertStatus(422);
     }
 
     public function test_authenticated_user_can_update_proposal(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
         $program  = $this->programActivo();
         $area     = $this->area();
         $user     = User::factory()->create(['role' => 'ESTUDIANTE']);
+        Sanctum::actingAs($user);   // el estudiante edita SU propuesta (el personal ya no puede: CU27)
         $proposal = Proposal::create([
             'user_id'     => $user->id,
             'program_id'  => $program->id,
@@ -146,20 +148,24 @@ class ProposalCrudTest extends TestCase
             'title' => 'Actualizada', 'status' => 'APROBADA',
         ]));
         $response->assertStatus(200);
-        $this->assertDatabaseHas('proposals', ['id' => $proposal->id, 'status' => 'APROBADA']);
+        // El título cambia, pero el estado NO: solo lo cambia la evaluación (CU27, update-status del Administrativo).
+        $this->assertDatabaseHas('proposals', ['id' => $proposal->id, 'title' => 'Actualizada', 'status' => 'PENDIENTE']);
     }
 
     public function test_proposal_update_returns_404_for_missing(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
+        Sanctum::actingAs(User::factory()->create(['role' => 'ESTUDIANTE']));
         $response = $this->putJson('/api/proposals/9999', $this->payload());
         $response->assertStatus(404);
     }
 
-    public function test_proposal_create_rejects_nonexistent_user(): void
+    /* CU25: la propuesta es del usuario autenticado; el `user_id` que mande el cliente se ignora
+       (antes se validaba que existiera, porque el personal podía crearlas a nombre de otro). */
+    public function test_proposal_create_ignores_a_client_supplied_user_id(): void
     {
-        Sanctum::actingAs(User::factory()->create(['role' => 'LIDER_SEMILLERO']));
-        $response = $this->postJson('/api/proposals', $this->payload(['user_id' => 9999]));
-        $response->assertStatus(422);
+        $student = User::factory()->create(['role' => 'ESTUDIANTE']);
+        Sanctum::actingAs($student);
+        $this->postJson('/api/proposals', $this->payload(['user_id' => 9999]))->assertStatus(201);
+        $this->assertDatabaseHas('proposals', ['title' => 'Investigación sobre IA', 'user_id' => $student->id]);
     }
 }

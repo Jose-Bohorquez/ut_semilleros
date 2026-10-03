@@ -75,6 +75,8 @@ export function LayoutView(content = "") {
         <a href="/results"          data-link><i class="fas fa-chart-bar"></i>       Resultados</a>
         <a href="/groups"           data-link><i class="fas fa-object-group"></i>    Grupos</a>
         <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
+        <a href="/requests"         data-link><i class="fas fa-paper-plane"></i>     Solicitudes</a>
+        <a href="/proposals"        data-link><i class="fas fa-lightbulb"></i>       Propuestas</a>
         `;
     }
 
@@ -102,6 +104,8 @@ export function LayoutView(content = "") {
         <a href="/projects"         data-link><i class="fas fa-project-diagram"></i> Proyectos</a>
         <a href="/groups"           data-link><i class="fas fa-object-group"></i>    Grupos</a>
         <a href="/coordinators"     data-link><i class="fas fa-user-tie"></i>        Coordinadores</a>
+        <a href="/requests"         data-link><i class="fas fa-paper-plane"></i>     Solicitudes</a>
+        <a href="/proposals"        data-link><i class="fas fa-lightbulb"></i>       Propuestas</a>
         `;
     }
 

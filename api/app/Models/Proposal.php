@@ -59,4 +59,10 @@ class Proposal extends Model
         return $this->belongsToMany(Area::class, 'proposal_area');
     }
 
+    /** Quien evaluó la propuesta (CU27); `reviewed_by` es un id sin llave foránea. */
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
 }
