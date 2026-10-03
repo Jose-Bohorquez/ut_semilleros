@@ -11,7 +11,7 @@
 |---|---|
 | `ADMIN_SISTEMA` | Control total: usuarios, catálogos, semilleros, auditoría, SIA y permisos. Resuelve solicitudes. En Propuestas solo consulta. |
 | `ADMINISTRATIVO` | **Solo consulta** en semilleros, objetivos, resultados, integrantes, grupos, coordinadores, catálogos y solicitudes. Crea y edita Proyectos y Productos. Evalúa propuestas. |
-| `LIDER_SEMILLERO` | Gestiona **solo los semilleros de los que es responsable** (RN06): su información, objetivos, resultados, integrantes y solicitudes recibidas. Crea grupos y proyectos. Consulta el resto. |
+| `LIDER_SEMILLERO` | Gestiona **solo los semilleros de los que es responsable** (RN06): su información, objetivos, resultados, integrantes y solicitudes recibidas. Crea grupos y proyectos. Consulta el resto, incluidas las propuestas de las áreas de sus semilleros (no las evalúa). |
 | `ESTUDIANTE` | Usa la PWA: explora semilleros **activos**, envía solicitudes, registra propuestas y consulta las suyas. |
 
 ## Matriz de acceso por módulo (contra el backend real, 2026-09-30)
@@ -33,12 +33,11 @@ Leyenda: **E** = escribe (crea/edita/activa-inactiva) · **C** = solo consulta �
 | Proyectos | E | E | E | — | Sin RN06 (hallazgo abierto). |
 | Productos | E | E | — en el menú² | — | |
 | **Solicitudes** | E (resuelve) | C | E (solo las de sus semilleros) | Crea y ve las suyas | Nacen siempre `PENDIENTE`; aprobar/rechazar solo por CU24. Rechazar exige motivo; una solicitud resuelta no se reabre. |
-| **Propuestas** | C | E³ | E³ | Crea, ve y (mientras esté Recibida) edita las suyas | Estados internos `PENDIENTE/APROBADA/RECHAZADA`, mostrados al estudiante como Recibida/Viable/Archivada. |
+| **Propuestas** | C | E (evalúa) | C (solo las de las áreas de sus semilleros) | Crea, ve y (mientras esté Recibida) edita las suyas | Estados internos `PENDIENTE/APROBADA/RECHAZADA`, mostrados al estudiante como Recibida/Viable/Archivada. |
 | Auditoría | C | — | — | — | Solo lectura; los registros no se pueden modificar ni eliminar. Guarda valor anterior y nuevo e IP (CU29). Pantalla con filtros por usuario, colección, acción y fechas, paginación, «Ver» con la comparación y exportación a CSV (CU30). |
 | SIA (panel), Permisos (RBAC) | E | — | — | — | El acceso real lo define el rol; `permission:` aún no se aplica a las rutas. |
 
 ¹ Solo lectura de lo necesario para sus formularios. ² La API lo permite pero el menú del Líder no lo incluye.
-³ Ver "Diferencias con la especificación".
 
 ## Reglas de negocio vigentes
 
@@ -58,11 +57,11 @@ Leyenda: **E** = escribe (crea/edita/activa-inactiva) · **C** = solo consulta �
 
 ## Diferencias con la especificación (para decidir)
 
-- **Evaluación de propuestas (CU27)**: la spec dice que evalúa el Administrativo y que el Líder solo consulta las de las áreas de sus semilleros. El código permite evaluar al Líder y al Administrativo, y el Líder ve todas. El Administrador ve «Editar» pero la API responde 403. Se corrige con CU27.
+- **Evaluación de propuestas (CU27)**: implementada el 2026-10-03 según la spec: solo el Administrativo evalúa («Marcar viable» / «Archivar», con observación obligatoria al archivar); el Líder consulta las de las áreas de sus semilleros; el Administrador consulta; el contacto del estudiante solo lo ve el Administrativo. **El Líder dejó de poder evaluar.**
 - **Vocabulario de propuestas**: spec Recibida/Viable/Archivada frente a `PENDIENTE/APROBADA/RECHAZADA` internos (puente reversible en CU26).
 - **Auditoría (CU29)**: implementada el 2026-10-03 (valores anteriores/nuevos, IP, inmutabilidad). Se consultan en la pantalla de Auditoría (CU30, 2026-10-03).
 - **Reportes (CU28)**: no existe el módulo.
-- Menú lateral de escritorio: «Solicitudes» y «Propuestas» solo están en la barra inferior (móvil); en escritorio se llega por `/requests` y `/proposals`.
+- Menú lateral de escritorio: «Solicitudes» y «Propuestas» agregados el 2026-10-03 para Líder, Administrativo y Administrador (antes solo estaban en la barra inferior del celular).
 
 ## Pendiente (no bloqueante)
 

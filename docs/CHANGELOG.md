@@ -1,3 +1,9 @@
+# Sesión 2026-10-03 — CU27 evaluar propuestas
+
+Solo el Administrativo evalúa (Marcar viable / Archivar, con observación obligatoria al archivar); el Líder consulta las propuestas de las áreas de sus semilleros; filtros por área, programa, estado y fechas; contacto del estudiante solo en el detalle del Administrativo; `POST`/`PUT /proposals` solo para el Estudiante; menú lateral con Solicitudes y Propuestas. 578 tests. Ver `docs/validacion/CU27.md`.
+
+---
+
 # Sesión 2026-10-03 — CU30 consultar auditoría
 
 Pantalla de Auditoría con filtros (usuario, colección, acción, fechas en hora de Bogotá), paginación de servidor, «Ver» con la comparación de valores anteriores y nuevos, exportación a CSV (con protección contra inyección de fórmulas) y E1/E2. El panel principal usa `/audits/summary`. Sin migraciones. 543 tests. Ver `docs/validacion/CU30.md`.

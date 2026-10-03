@@ -244,6 +244,14 @@ convertidos a UTC), `/audits/{id}` con la comparación campo a campo, `/audits/e
 el texto exacto y E2 (403) probado en cada endpoint. Pantalla reescrita (`modules/audits/audits.module.js`); `apiDownload` nuevo en
 `services/api.service.js`; `CACHE_NAME` v24. **Falta probar el frontend en navegador.** Pendiente: retención de la tabla `audits`.
 
+**CU27 evaluar propuestas (2026-10-03, en local, pendiente de desplegar):** acta `docs/validacion/CU27.md`, 578 tests en verde. Solo el
+**Administrativo** evalúa («Marcar viable» / «Archivar»; archivar exige observación, E1; una propuesta evaluada no se reevalúa → 409); el
+Líder consulta las de **las áreas de sus semilleros** (A1) y el Administrador consulta; el listado **no lleva contacto** (RNF12) y el
+detalle lo muestra solo al Administrativo; filtros por área/programa/estado/fechas (Bogotá). **El Líder dejó de poder evaluar** (decisión
+de la spec; antes podía). `POST`/`PUT /proposals` quedan solo para el Estudiante (cierra CU25-H4). Menú lateral de escritorio con
+«Solicitudes» y «Propuestas» para Líder, Administrativo y Administrador. Estados: sigue el puente de CU26. `CACHE_NAME` v25.
+**Falta probar el frontend en navegador.** Pendiente: A2 «Ver por área» (CU28).
+
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
 es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda
 cuenta conectada por SSH desde una VM Windows, mismo filesystem/repo/servidor de producción que
