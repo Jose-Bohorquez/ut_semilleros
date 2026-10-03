@@ -2,6 +2,7 @@
 
 import { apiFetch } from "../../services/api.service.js";
 import { getUser }  from "../../services/storage.service.js";
+import { escapeHtml } from "../../core/escape.js";
 
 export function initDashboardController() {
     const role = getUser()?.role || "";
@@ -21,7 +22,7 @@ async function loadSystemOverview() {
     const [sia, groups, audits] = await Promise.all([
         safe(apiFetch("/sia/admin/stats")),
         safe(apiFetch("/rbac/groups")),
-        safe(apiFetch("/audits")),
+        safe(apiFetch("/audits/summary")),   // CU30: contadores del servidor; antes se descargaba toda la tabla
     ]);
 
     renderSiaOverview(sia);
@@ -68,16 +69,13 @@ function renderRbacOverview(groups) {
 function renderAuditsOverview(audits) {
     const body = document.getElementById("sys-audits-body");
     if (!body) return;
-    if (!audits?.audits) { body.innerHTML = `<p class="sys-empty">No se pudo cargar.</p>`; return; }
+    if (typeof audits?.total !== "number") { body.innerHTML = `<p class="sys-empty">No se pudo cargar.</p>`; return; }
 
-    const list = audits.audits;
-    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const lastWeek = list.filter(a => new Date(a.created_at).getTime() >= weekAgo).length;
-    const latest = list[0];
+    const latest = audits.latest;
     body.innerHTML = `
-        <div class="sys-stat-row"><span>Eventos totales</span><b>${list.length}</b></div>
-        <div class="sys-stat-row"><span>Últimos 7 días</span><b>${lastWeek}</b></div>
-        ${latest ? `<p class="sys-latest">Último: ${latest.action} en ${latest.table_name}${latest.user ? " · " + latest.user.name : ""}</p>` : ""}
+        <div class="sys-stat-row"><span>Eventos totales</span><b>${audits.total}</b></div>
+        <div class="sys-stat-row"><span>Últimos 7 días</span><b>${audits.last_7_days}</b></div>
+        ${latest ? `<p class="sys-latest">Último: ${escapeHtml(latest.action)} en ${escapeHtml(latest.table_name)}${latest.user ? " · " + escapeHtml(latest.user.name) : ""}</p>` : ""}
     `;
 }
 

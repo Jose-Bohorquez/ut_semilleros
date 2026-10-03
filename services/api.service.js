@@ -190,6 +190,47 @@ export async function apiFetch(endpoint, options = {}) {
     return data;
 }
 
+/* CU30 A1: descarga autenticada de un archivo (CSV). `apiFetch` solo entiende JSON; aquí se
+   entrega el blob y se dispara la descarga. Devuelve el nombre del archivo. */
+export async function apiDownload(endpoint, fallbackName = "descarga.csv") {
+    const token = getToken();
+    let response;
+    try {
+        response = await fetch(buildUrl(endpoint), {
+            headers: { Accept: "text/csv, application/json", ...(token && { Authorization: `Bearer ${token}` }) },
+        });
+    } catch {
+        const err = new Error("No se pudo conectar con el servidor");
+        err.status = 0;
+        throw err;
+    }
+
+    if (!response.ok) {
+        let message = response.status === 401
+            ? "Su sesión expiró. Inicie sesión de nuevo."
+            : "No se pudo descargar el archivo";
+        try { const body = await response.json(); if (body?.message) message = body.message; } catch { /* sin cuerpo JSON */ }
+        const err = new Error(message);
+        err.status = response.status;
+        throw err;
+    }
+
+    const disposition = response.headers.get("content-disposition") || "";
+    const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+    const filename = match ? decodeURIComponent(match[1]) : fallbackName;
+
+    const url = URL.createObjectURL(await response.blob());
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    return filename;
+}
+
 /* =========================================================
    USUARIOS
    ========================================================= */

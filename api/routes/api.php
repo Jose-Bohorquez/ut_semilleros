@@ -400,12 +400,18 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | AUDITORÍA (RF14 / CU14) — solo A
+    | AUDITORÍA (RF14 / CU30 consultar; CU29 registra) — solo ADMIN_SISTEMA (E2: 403)
+    |   Las rutas fijas (summary, options, export) van antes que /audits/{id}.
     |----------------------------------------------------------------------
     */
 
-    Route::middleware('role:ADMIN_SISTEMA')
-         ->get('/audits', [AuditController::class, 'index']);
+    Route::middleware('role:ADMIN_SISTEMA')->group(function () {
+        Route::get('/audits',          [AuditController::class, 'index']);
+        Route::get('/audits/summary',  [AuditController::class, 'summary']);
+        Route::get('/audits/options',  [AuditController::class, 'options']);
+        Route::get('/audits/export',   [AuditController::class, 'export']);
+        Route::get('/audits/{id}',     [AuditController::class, 'show'])->whereNumber('id');
+    });
 
     /*
     |----------------------------------------------------------------------
