@@ -244,7 +244,7 @@ convertidos a UTC), `/audits/{id}` con la comparación campo a campo, `/audits/e
 el texto exacto y E2 (403) probado en cada endpoint. Pantalla reescrita (`modules/audits/audits.module.js`); `apiDownload` nuevo en
 `services/api.service.js`; `CACHE_NAME` v24. **Falta probar el frontend en navegador.** Pendiente: retención de la tabla `audits`.
 
-**CU28 reportes y estadísticas (2026-10-03):** acta `docs/validacion/CU28.md`, 600 tests en verde. `GET /api/reports`, `/reports/options` y `/reports/export` (`ReportController`, solo lectura) para Administrador, Administrativo y Líder (A1: solo sus semilleros). Cuatro indicadores con agregaciones SQL, filtros por fechas de Bogotá y CAT, CSV seguro (`App\Support\Csv`), E1 «Sin datos para el periodo» y E2 corte a 10 s (503). Pantalla `modules/reports`, ruta `/reports`, `CACHE_NAME` v26. Falta la prueba visual en navegador.
+**CU28 reportes y estadísticas (2026-10-03, desplegado en producción con diff 0; API 22/23 en vivo):** acta `docs/validacion/CU28.md`, 600 tests en verde. `GET /api/reports`, `/reports/options` y `/reports/export` (`ReportController`, solo lectura) para Administrador, Administrativo y Líder (A1: solo sus semilleros). Cuatro indicadores con agregaciones SQL, filtros por fechas de Bogotá y CAT, CSV seguro (`App\Support\Csv`), E1 «Sin datos para el periodo» y E2 corte a 10 s (503). Pantalla `modules/reports`, ruta `/reports`, `CACHE_NAME` v26. Falta la prueba visual en navegador.
 
 **CU27 evaluar propuestas (2026-10-03, desplegado en producción con diff 0; API 25/25 en vivo):** acta `docs/validacion/CU27.md`, 578 tests en verde. Solo el
 **Administrativo** evalúa («Marcar viable» / «Archivar»; archivar exige observación, E1; una propuesta evaluada no se reevalúa → 409); el
