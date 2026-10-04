@@ -13,6 +13,7 @@
 
 import { apiFetch }   from "../services/api.service.js";
 import { escapeHtml } from "./escape.js";
+import { mountInstallButton } from "./pwa-install.js";
 
 const WHATSAPP = "573178773186";
 const TOKEN_KEY = "sia_token";
@@ -68,6 +69,10 @@ export function mountSia() {
            aria-label="Reportar un error por WhatsApp" title="Reportar un error (solo bugs)">
           <i class="fab fa-whatsapp" aria-hidden="true"></i><span>Reportar bug</span>
         </a>
+        <button type="button" class="sia-fab sia-fab-install" id="pwa-install" hidden
+                aria-label="Instalar la app en este dispositivo" title="Instalar la app">
+          <i class="fas fa-download" aria-hidden="true"></i><span>Instalar app</span>
+        </button>
         <button type="button" class="sia-fab sia-fab-toggle" id="sia-toggle-collapse"
                 aria-label="Ocultar los botones de SIA y WhatsApp" title="Ocultar botones">
           <i class="fas fa-chevron-down" aria-hidden="true"></i>
@@ -97,6 +102,7 @@ export function mountSia() {
         </form>
       </section>`;
     document.body.appendChild(root);
+    mountInstallButton(document.getElementById("pwa-install"));   // botón «Instalar app» (se oculta si ya está instalada)
 
     const $ = id => document.getElementById(id);
     const panel = $("sia-panel"), body = $("sia-body"), form = $("sia-form"), input = $("sia-input");

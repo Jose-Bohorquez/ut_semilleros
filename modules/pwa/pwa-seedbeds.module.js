@@ -438,24 +438,31 @@ async function renderMembershipSection(seedbed) {
     const container = document.getElementById("membershipSection");
     if (!container) return;
 
-    let myRequests = [];
+    /* CU22 (regla del 2026-10-04): para postularse no debe tener ningún semillero asociado ni activo. El servidor
+       decide (GET /requests/eligibility) y explica el motivo; así no se llena un formulario que será rechazado. */
+    let elig = { can_apply: true, state: "free" };
     try {
-        const data = await apiFetch("/requests/my");
-        myRequests = data.requests || [];
+        elig = await apiFetch(`/requests/eligibility?seedbed_id=${encodeURIComponent(seedbed.id)}`);
     } catch {
-        /* si falla, se asume sin solicitud previa — el backend igual valida al enviar */
+        /* si falla, se asume libre — el backend igual valida al enviar */
     }
 
-    const existing = myRequests.find(r => r.seedbed_id === seedbed.id);
-
-    if (existing?.status === "APROBADA") {
+    if (elig.state === "member_here" || elig.state === "approved_here") {
         container.innerHTML = `<button type="button" class="pwa-btn-primary" disabled style="opacity:.6">
             <i class="fas fa-check-circle"></i> Ya eres integrante</button>`;
         return;
     }
-    if (existing?.status === "PENDIENTE") {
+    if (elig.state === "pending_here") {
         container.innerHTML = `<button type="button" class="pwa-btn-primary" disabled style="opacity:.6">
             <i class="fas fa-clock"></i> Solicitud pendiente</button>`;
+        return;
+    }
+    if (!elig.can_apply) {
+        container.innerHTML = `
+            <button type="button" class="pwa-btn-primary" disabled style="opacity:.6">
+                <i class="fas fa-lock"></i> No disponible por ahora</button>
+            <p id="eligibilityMsg" role="status" style="margin:var(--space-3) 0 0;font-size:var(--text-sm);line-height:1.5;color:var(--color-text-muted)">
+                ${escapeHtml(elig.message || "No puedes postularte a este semillero en este momento.")}</p>`;
         return;
     }
 

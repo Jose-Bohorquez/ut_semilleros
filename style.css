@@ -1466,3 +1466,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   max-height: none; overflow: visible; padding: 0; width: auto; max-width: none;
   background: none; box-shadow: none; border-radius: 0; animation: none;
 }
+
+
+/* Botón «Instalar app» (debajo de SIA y WhatsApp). Se oculta solo si la app ya está instalada o el navegador no instala. */
+.sia-fab[hidden] { display: none !important; }
+.sia-fab-install { background: #1d4ed8; }
