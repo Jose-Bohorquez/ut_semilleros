@@ -18,3 +18,11 @@ Jose entregó el listado de semilleros (`ListadoDeSemilleros.xlsx`) y la oferta 
 - Los 4 sin objetivo: texto provisional (hoy) o esperar el dato.
 - ¿Crear cuentas de Líder para los coordinadores (envía un correo de activación a cada persona)?
 - Programas presenciales: nombres de facultad para cargarlos.
+
+## Ejecución en producción (2026-10-04)
+Decisiones de Jose: referencia RN03 «Pendiente de acta (carga masiva IDEAD)», áreas por tema, semilleros completos publicados, 4 sin objetivo como borrador con texto provisional, coordinadores insertados **sin crear usuario ni enviar correo**, y el semillero 220424 solo se completa (coordinador).
+- Respaldo previo: ~/backups/ut-edu.online/2026-10-04_pre_carga_idead (JSON por tabla + archivos).
+-  (1 facultad, 12 programas, 21 CAT) y  (9 facultades, 29 programas presenciales asociados a su facultad por el código del programa).
+- : 20 semilleros nuevos (16 activos, 4 borradores) + 20 coordinadores; 220424 completado. Segunda corrida: 0 cambios (idempotente).
+- Totales en producción: 11 facultades, 42 programas, 22 CAT, 22 coordinadores, 23 semilleros (19 activos).
+- Pendiente: el listado presencial no trajo semilleros; los programas de IDEAD en cada semillero son todos los del instituto (ajustable en Editar).
