@@ -83,7 +83,7 @@ function renderRequests(requests, seedbeds){
     `).join("");
 
     const statusOptions = [
-        ["", "Todos"], ["PENDIENTE", "Pendientes"], ["APROBADA", "Aprobadas"], ["RECHAZADA", "Rechazadas"],
+        ["", "Todos"], ["PENDIENTE", "Pendientes"], ["APROBADA", "Aprobadas"], ["RECHAZADA", "Rechazadas"], ["CANCELADA", "Canceladas"],
     ].map(([v, l]) => `<option value="${v}" ${v === filters.status ? "selected" : ""}>${l}</option>`).join("");
 
     const readOnlyNote = canResolve() ? "" : `

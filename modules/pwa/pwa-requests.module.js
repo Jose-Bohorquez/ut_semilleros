@@ -18,6 +18,7 @@ const STATUS_MAP = {
     PENDIENTE: { label: "Pendiente",  cls: "badge-pwa-warning" },
     APROBADA:  { label: "Aprobada",   cls: "badge-pwa-success" },
     RECHAZADA: { label: "Rechazada",  cls: "badge-pwa-error"   },
+    CANCELADA: { label: "Cancelada",  cls: "badge-pwa-neutral" },
 };
 
 let loadedRequests = [];
@@ -118,7 +119,7 @@ function renderList(requests) {
                  margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--color-warning-text)">
         <i class="fas fa-lock"></i>
         Ya tienes una postulación ${requests.find(r => r.status === "APROBADA") ? "aprobada" : "pendiente"}.
-        No puedes enviar otra mientras esa siga activa.
+        No puedes enviar otra mientras esa siga activa. Si te equivocaste, ábrela y cancélala.
     </div>` : "";
 
     const content = `
@@ -277,9 +278,41 @@ function openRequestDetail(req) {
                       ${req.reason ? "color:var(--color-text-2)" : "font-style:italic;color:var(--color-text-muted)"}">
                 ${escapeHtml(req.reason || "Aún sin respuesta.")}
             </p>
+            ${req.status === "PENDIENTE" ? `
+            <button type="button" id="cancelRequestBtn" class="pwa-btn-secondary" data-cancel-id="${escapeHtml(req.id)}"
+                    style="margin-top:var(--space-4);color:var(--color-error)">
+                <i class="fas fa-ban"></i> Cancelar solicitud
+            </button>
+            <p style="margin:0;font-size:var(--text-xs);color:var(--color-text-muted)">
+                Si te equivocaste, puedes cancelarla y postularte de nuevo (a este u otro semillero).
+            </p>` : ""}
         </div>`;
 
     document.getElementById("requestDetailSheet").style.display = "flex";
+}
+
+/* El estudiante cancela SU solicitud pendiente (PUT /requests/{id}/cancel): queda como «Cancelada» y puede postularse de nuevo. */
+async function cancelRequest(id) {
+    const ask = await Swal.fire({
+        icon: "question",
+        title: "¿Cancelar tu solicitud?",
+        text: "Dejará de estar pendiente y podrás postularte de nuevo, a este u otro semillero.",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cancelar solicitud",
+        cancelButtonText: "No, mantenerla",
+        confirmButtonColor: "#dc2626",
+    });
+    if (!ask.isConfirmed) return;
+
+    try {
+        const res = await apiFetch(`/requests/${encodeURIComponent(id)}/cancel`, { method: "PUT" });
+        document.getElementById("requestDetailSheet").style.display = "none";
+        await Swal.fire({ icon: "success", title: "Solicitud cancelada", text: res?.message || "", timer: 2200, showConfirmButton: false });
+        await loadAndRender();
+    } catch (error) {
+        await Swal.fire({ icon: "error", title: "No se pudo cancelar", text: error.message || "Inténtalo de nuevo." });
+        await loadAndRender();
+    }
 }
 
 function renderError(msg) {
@@ -348,6 +381,8 @@ function bindEvents() {
     });
     detailSheet?.addEventListener("click", e => {
         if (e.target === detailSheet) detailSheet.style.display = "none";
+        const cancel = e.target.closest("#cancelRequestBtn");
+        if (cancel) cancelRequest(cancel.dataset.cancelId);
     });
 
     document.getElementById("newRequestForm")?.addEventListener("submit", async e => {

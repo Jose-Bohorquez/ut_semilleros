@@ -454,7 +454,25 @@ async function renderMembershipSection(seedbed) {
     }
     if (elig.state === "pending_here") {
         container.innerHTML = `<button type="button" class="pwa-btn-primary" disabled style="opacity:.6">
-            <i class="fas fa-clock"></i> Solicitud pendiente</button>`;
+            <i class="fas fa-clock"></i> Solicitud pendiente</button>
+            ${elig.request_id ? `
+            <button type="button" id="cancelPendingBtn" class="pwa-btn-secondary" style="margin-top:var(--space-3);color:var(--color-error)">
+                <i class="fas fa-ban"></i> Cancelar mi solicitud</button>` : ""}`;
+        document.getElementById("cancelPendingBtn")?.addEventListener("click", async () => {
+            const ask = await Swal.fire({
+                icon: "question", title: "¿Cancelar tu solicitud?",
+                text: "Podrás postularte de nuevo, a este u otro semillero.",
+                showCancelButton: true, confirmButtonText: "Sí, cancelar solicitud", cancelButtonText: "No, mantenerla", confirmButtonColor: "#dc2626",
+            });
+            if (!ask.isConfirmed) return;
+            try {
+                await apiFetch(`/requests/${encodeURIComponent(elig.request_id)}/cancel`, { method: "PUT" });
+                await Swal.fire({ icon: "success", title: "Solicitud cancelada", timer: 1800, showConfirmButton: false });
+            } catch (error) {
+                await Swal.fire({ icon: "error", title: "No se pudo cancelar", text: error.message || "Inténtalo de nuevo." });
+            }
+            await renderMembershipSection(seedbed);        // vuelve a mostrar «Ser miembro» (o el motivo real)
+        });
         return;
     }
     if (!elig.can_apply) {

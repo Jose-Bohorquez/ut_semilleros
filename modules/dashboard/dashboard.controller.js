@@ -154,6 +154,7 @@ const STATUS_META = {
     PENDIENTE:  { cls: "is-warn", label: "Pendiente" },
     APROBADA:   { cls: "is-ok",   label: "Aprobada"  },
     RECHAZADA:  { cls: "is-err",  label: "Rechazada" },
+    CANCELADA:  { cls: "is-warn", label: "Cancelada" },
     RECIBIDA:   { cls: "is-warn", label: "Recibida"  },   // propuestas (vocabulario de la spec)
     VIABLE:     { cls: "is-ok",   label: "Viable"    },
     ARCHIVADA:  { cls: "is-err",  label: "Archivada" },
