@@ -5,6 +5,7 @@
 - **CU22:** regla «un solo semillero a la vez» (ver `validacion/CU22.md`); `GET /requests/eligibility`; la PWA explica el motivo.
 - **SIA** retroalimentada (menú del avatar, instalar app, push desde el perfil, avisos automáticos, regla de postulación, retención de auditoría) y **manuales** actualizados (el del estudiante reescrito).
 - **CU12:** el documento del coordinador sigue siendo opcional (decisión de Jose).
+- **Cancelar postulación:** el estudiante cancela su solicitud pendiente (nuevo estado `CANCELADA`, no se borra, queda libre para postularse de nuevo); el líder la ve con el filtro «Canceladas» y no cuenta en los reportes.
 
 ---
 

@@ -43,6 +43,8 @@ nuevas.
 4. Al aprobar, el sistema te pregunta si quieres registrar ahora al estudiante como integrante
    (**«Registrar integrante»**) o dejarlo para después.
 
+Si un estudiante **cancela** su solicitud mientras está pendiente (por ejemplo porque se equivocó de semillero), deja de aparecer entre las pendientes; la ves con el filtro **«Canceladas»**.
+
 **Regla de un solo semillero:** para postularse, un estudiante no debe tener ningún semillero asociado
 ni activo (ni solicitud pendiente, ni ser integrante activo, ni una aprobada sin registrar). Si un
 estudiante quiere **cambiarse** de semillero o ya no participa, **inactívalo** desde «INTEGRANTES»

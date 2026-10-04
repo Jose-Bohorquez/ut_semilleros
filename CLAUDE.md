@@ -277,7 +277,7 @@ la API acepta los nombres antiguos como entrada. 647 tests. Desplegado con diff 
 (`/auth/google` 10→60, `/sia/*` 15→60, sin sesión 120→600 por minuto) saltaban en la red de la universidad porque muchos estudiantes comparten IP; con sesión sigue 120/min por usuario.
 **CU22:** para postularse el estudiante no debe tener ningún semillero asociado ni activo (`App\Support\SeedbedAssociation`: solicitud pendiente, integrante activo, o aprobada sin registrar);
 si el líder lo inactiva o lo rechazan queda libre; `GET /requests/eligibility` y la PWA explican el motivo. **CU12:** documento del coordinador opcional (decisión de Jose).
-CU13-H3/H4/H5 sin decidir (ver `docs/validacion/CU13.md`). SIA y manuales actualizados. 666 tests.
+CU13-H3/H4/H5 sin decidir (ver `docs/validacion/CU13.md`). SIA y manuales actualizados. **Cancelar postulación:** `PUT /requests/{id}/cancel` (estudiante, solo pendientes) → estado `CANCELADA` (migración `2026_10_04_000002`, en producción solo con `--path`); no cuenta en reportes. 675 tests.
 
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
 es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda

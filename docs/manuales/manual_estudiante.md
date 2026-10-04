@@ -77,9 +77,11 @@ actual.
 
 ## 6. Mis solicitudes
 
-En **«Solicitudes»** ves cada solicitud con su estado: **Pendiente**, **Aprobada** o **Rechazada**.
+En **«Solicitudes»** ves cada solicitud con su estado: **Pendiente**, **Aprobada**, **Rechazada** o **Cancelada**.
 Toca una para ver el detalle, incluida la **«Respuesta del líder»** (al rechazar siempre explica el
 motivo). Cuando el líder responde, te llega una **notificación**.
+
+**¿Te equivocaste de semillero?** Mientras la solicitud esté **Pendiente** puedes cancelarla: ábrela en «Solicitudes» y toca **«Cancelar solicitud»** (o, en el detalle del semillero, **«Cancelar mi solicitud»**) y confirma. No se borra: queda como **Cancelada** y quedas libre para postularte de nuevo, a ese u otro semillero.
 
 ## 7. Registrar una propuesta de investigación
 
