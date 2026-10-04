@@ -272,6 +272,13 @@ Escape cierra las hojas inferiores. `CACHE_NAME` v29, `style.css?v=21`, `pwa.css
 **Estados de propuesta (cierra el puente de CU26):** migración `2026_10_04_000001` convierte `PENDIENTE/APROBADA/RECHAZADA` en `RECIBIDA/VIABLE/ARCHIVADA` (reversible; en producción solo con `--path`);
 la API acepta los nombres antiguos como entrada. 647 tests. Desplegado con diff 0 y validado en vivo (12/12).
 
+**Instalar app, límites por IP y regla de un solo semillero (2026-10-04):** botón azul «Instalar app» (`core/pwa-install.js`, dentro de `.sia-fabs`):
+`beforeinstallprompt` en Android/Chrome/Edge, instrucciones en iPhone y en Android sin aviso, oculto si ya está instalada. «Too Many Attempts» en la PWA: los límites por IP
+(`/auth/google` 10→60, `/sia/*` 15→60, sin sesión 120→600 por minuto) saltaban en la red de la universidad porque muchos estudiantes comparten IP; con sesión sigue 120/min por usuario.
+**CU22:** para postularse el estudiante no debe tener ningún semillero asociado ni activo (`App\Support\SeedbedAssociation`: solicitud pendiente, integrante activo, o aprobada sin registrar);
+si el líder lo inactiva o lo rechazan queda libre; `GET /requests/eligibility` y la PWA explican el motivo. **CU12:** documento del coordinador opcional (decisión de Jose).
+CU13-H3/H4/H5 sin decidir (ver `docs/validacion/CU13.md`). SIA y manuales actualizados. 666 tests.
+
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
 es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda
 cuenta conectada por SSH desde una VM Windows, mismo filesystem/repo/servidor de producción que

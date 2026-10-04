@@ -42,7 +42,7 @@ Leyenda: **E** = escribe (crea/edita/activa-inactiva) · **C** = solo consulta �
 ## Reglas de negocio vigentes
 
 1. **RN06**: el Líder solo modifica lo suyo (semillero, objetivos, resultados, integrantes, solicitudes). El Administrador no tiene restricción.
-2. **Una solicitud activa por estudiante** en todo el sistema (Pendiente o Aprobada); si la rechazan, puede volver a intentar. (Más estricta que RN05 de la spec, por decisión del proyecto.)
+2. **Un solo semillero a la vez** (decisión de Jose, 2026-10-04): para postularse, el estudiante no debe tener ningún semillero asociado ni activo (ni solicitud pendiente, ni ser integrante activo, ni una aprobada sin registrar). Si el líder lo inactiva como integrante o lo rechazan, queda libre. Más estricta que RN05 de la spec, que lo exige solo por semillero.
 3. **RN15**: un estudiante puede registrar como máximo **5 propuestas cada 24 horas** (429 al superarlo).
 4. Nada se elimina (RN01): se inactiva o cambia de estado. Excepción documentada: quitar un objetivo desde «Editar» semillero lo borra.
 5. **Perfil (CU05)**: el usuario solo edita su **teléfono** y su **contraseña**; nombre y correo los cambia el Administrador (CU06).

@@ -136,3 +136,22 @@ los nodos de documentación).
 | Documentación de SIA | `docs/sia/README.md` |
 | Manuales (este documento y los demás) | `docs/manuales/` |
 | Reglas y prohibiciones del proyecto | `CLAUDE.md` (raíz) |
+
+## 6. Cambios de la tanda del 2026-10-03/04 (para quien mantenga el sistema)
+
+- **Límites de peticiones.** Con sesión: 120/min por usuario. Sin sesión: 600/min **por IP** (en el campus
+  muchos estudiantes comparten IP pública); `/auth/google` y `/sia/*`: 60/min por IP. El login (5 por
+  correo+IP) y SIA (por conversación, por IP y tope global) tienen límites propios. Los contadores viven en
+  la tabla `cache`; `App\Support\ResilientRateLimiter` reintenta ante un deadlock y, si persiste, deja pasar la petición.
+- **CU22.** La regla «sin ningún semillero asociado ni activo» está en `App\Support\SeedbedAssociation`
+  (la usan `POST /requests` y `GET /requests/eligibility`). El integrante se reconoce por `user_id` o por correo.
+- **Estados de propuesta.** Migración `2026_10_04_000001`: `RECIBIDA/VIABLE/ARCHIVADA` (antes
+  `PENDIENTE/APROBADA/RECHAZADA`); reversible. En producción se ejecuta **solo esa migración** con
+  `php artisan migrate --path=database/migrations/2026_10_04_000001_proposals_status_vocabulary.php --force`.
+  La API acepta los nombres antiguos como entrada.
+- **Push.** El permiso se pide desde Perfil con un toque; `POST /push-subscriptions/test` envía una prueba al
+  propio usuario. Los avisos automáticos (CU24/CU27) los crea `App\Support\UserNotifier`.
+- **Auditoría.** `php artisan audits:prune` (ver el manual del administrador).
+- **PWA.** `CACHE_NAME` del service worker sube con cada cambio de CSS/JS del shell; el service worker precarga
+  las librerías de CDN. El botón «Instalar app» (`core/pwa-install.js`) usa `beforeinstallprompt`.
+- **Pruebas visuales.** `scripts/ui-tests/` (Playwright sobre el Docker local; ver su README).

@@ -35,4 +35,4 @@ mayúscula, minúscula, número y símbolo).
 
 ## 6. Cerrar sesión
 
-Menú superior → **«Cerrar sesión»**.
+Escritorio: botón **«Cerrar sesión»** de la barra superior. Celular: toca tu **avatar** (arriba a la derecha) → **«Cerrar sesión»**.

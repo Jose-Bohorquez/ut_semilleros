@@ -37,10 +37,16 @@ nuevas.
 
 1. Ve a **«Solicitudes»**.
 2. Cada fila muestra el estudiante, el semillero solicitado y el estado.
-3. Cambia el estado a **APROBADA** o **RECHAZADA** según corresponda.
+3. Toca **«Ver»** en la solicitud: aprueba (la respuesta es opcional) o rechaza (el motivo es
+   obligatorio, mínimo 5 caracteres). El estudiante recibe una **notificación** (campana y, si las
+   activó, también en su celular) con tu respuesta.
+4. Al aprobar, el sistema te pregunta si quieres registrar ahora al estudiante como integrante
+   (**«Registrar integrante»**) o dejarlo para después.
 
-Un estudiante aprobado queda como integrante activo del semillero; no puede volver a solicitar el
-mismo semillero mientras siga activo en él.
+**Regla de un solo semillero:** para postularse, un estudiante no debe tener ningún semillero asociado
+ni activo (ni solicitud pendiente, ni ser integrante activo, ni una aprobada sin registrar). Si un
+estudiante quiere **cambiarse** de semillero o ya no participa, **inactívalo** desde «INTEGRANTES»
+(con su motivo): queda libre para postularse a otro.
 
 ## 5. Consultar propuestas
 
@@ -60,5 +66,5 @@ mayúscula, minúscula, número y símbolo).
 
 ## 8. Cerrar sesión
 
-Menú superior → **«Cerrar sesión»**. Cierra tu sesión en este dispositivo; tus otras sesiones
+Escritorio: botón **«Cerrar sesión»** de la barra superior. Celular: toca tu **avatar** (arriba a la derecha) → **«Cerrar sesión»**. Cierra tu sesión en este dispositivo; tus otras sesiones
 abiertas (si entraste desde otro equipo) no se ven afectadas.

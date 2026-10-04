@@ -1,3 +1,13 @@
+# Sesión 2026-10-04 (2) — Instalar app, límites por IP, un solo semillero
+
+- **Botón «Instalar app»** (azul, bajo SIA y WhatsApp): diálogo nativo en Android/Chrome/Edge; instrucciones en iPhone y en Android sin aviso; se oculta si ya está instalada.
+- **«Too Many Attempts» en la PWA:** los límites por IP (SIA 15/min, Google 10/min, sin sesión 120/min) saltaban en la red de la universidad, donde muchos estudiantes comparten IP. Ahora 60/60/600 por IP; con sesión se mantiene 120/min por usuario.
+- **CU22:** regla «un solo semillero a la vez» (ver `validacion/CU22.md`); `GET /requests/eligibility`; la PWA explica el motivo.
+- **SIA** retroalimentada (menú del avatar, instalar app, push desde el perfil, avisos automáticos, regla de postulación, retención de auditoría) y **manuales** actualizados (el del estudiante reescrito).
+- **CU12:** el documento del coordinador sigue siendo opcional (decisión de Jose).
+
+---
+
 # Sesión 2026-10-04 — Push, barras de la PWA y estados de propuesta
 
 - **Push:** permiso desde el perfil con un toque, botón de prueba, aviso al estudiante al resolver su solicitud o evaluar su propuesta (cola asíncrona: ver `ENVIOS_ASINCRONOS_2026-10-03.md`).

@@ -241,3 +241,11 @@ enmascarado, IP, `STATUS_CHANGE` como acción propia, auditoría de las tablas p
 proyecto, grupos RBAC) y de los límites de SIA, registros no modificables y E1 (log técnico + alerta al Administrador sin revertir
 la operación; el LOGIN sigue siendo estricto por decisión de CU01). Con esto, el alterno A2 de CU07–CU14 queda cubierto en el
 backend; **la pantalla de Auditoría todavía no muestra los valores** (CU30). Ya no queda ningún CRÍTICO ni ALTO abierto de CU01–CU25.
+
+## 8. Actualización 2026-10-04 (decisiones de Jose y cierres)
+
+- **CU22-H3/H4:** resuelto con la regla «un solo semillero a la vez» (ver `CU22.md`).
+- **CU12-H1:** el documento del coordinador **es opcional** (decisión de Jose).
+- **CU25-H4/H5:** cerrados con CU27 (solo el estudiante crea/edita; el teléfono no sale en listados).
+- **Decisión §6.2** (`POST /requests` solo Estudiante): aplicada. **§6.4** (vocabulario de propuestas): migración real hecha (`RECIBIDA/VIABLE/ARCHIVADA`).
+- **Pendiente de decisión:** CU13-H3/H4/H5 (ver `CU13.md`). Los demás MEDIO/BAJO abiertos se conocen solo por su identificador (el detalle de cada uno no se guardó); para retomarlos hay que re-auditar el caso de uso contra la spec.

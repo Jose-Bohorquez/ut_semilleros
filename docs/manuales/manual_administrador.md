@@ -78,6 +78,13 @@ En **«Perfil»** puedes cambiar tu foto, nombre, correo y contraseña.
 
 ## 11. Cerrar sesión
 
-Menú superior → **«Cerrar sesión»**. Cierra la sesión de este dispositivo; si el usuario tenía
+Escritorio: botón **«Cerrar sesión»** de la barra superior. Celular: toca tu **avatar** (arriba a la derecha) → **«Cerrar sesión»**. Cierra la sesión de este dispositivo; si el usuario tenía
 sesiones abiertas en otros dispositivos, esas no se ven afectadas (solo un restablecimiento de
 contraseña cierra todas a la vez).
+
+## 12. Retención de la auditoría
+
+La tabla de auditoría crece con cada acción del sistema y **no se borra sola**. El equipo técnico puede
+eliminar los registros más antiguos con `php artisan audits:prune` (conserva 24 meses por defecto, nunca
+menos de 6; `--dry-run` solo cuenta lo que borraría y `--archive=ruta.csv` guarda antes una copia). La
+purga queda registrada en la propia auditoría como **«Purga de auditoría»**. No está programada.
