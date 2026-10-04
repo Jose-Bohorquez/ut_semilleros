@@ -256,12 +256,14 @@ async function scenario(name, fn) {
   });
 
   await scenario("tema-y-logout", async () => {
-    await E.click("#themeToggleBtn"); await sleep(400);
+    const viaMenu = VP !== "desktop";            // en móvil el tema y «Cerrar sesión» están en el menú del avatar
+    const open = async () => { if (viaMenu) { await E.click("#userAvatarLink"); await sleep(300); } };
+    await open(); await E.click(viaMenu ? '#userMenu [data-action="theme"]' : "#themeToggleBtn"); await sleep(400);
     const dark = await E.evaluate(() => document.documentElement.getAttribute("data-theme") || document.body.className);
     log("tema tras alternar:", dark);
     await shot(E, "est_tema_alterno");
-    await E.click("#themeToggleBtn"); await sleep(300);
-    await E.click("#logoutBtn"); await sleep(1500);
+    await open(); await E.click(viaMenu ? '#userMenu [data-action="theme"]' : "#themeToggleBtn"); await sleep(300);
+    await open(); await E.click(viaMenu ? '#userMenu [data-action="logout"]' : "#logoutBtn"); await sleep(1500);
     if (await swalOpen(E, 1500)) { await swalClick(E, "confirm"); await sleep(1500); }
     log("tras cerrar sesión:", E.url());
     if (!/\/($|login)/.test(new URL(E.url()).pathname)) H.report("FLOW", "cerrar sesión no vuelve a la pantalla de ingreso");

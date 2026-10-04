@@ -102,9 +102,12 @@ const shown = (p, sel) => p.$eval(sel, (e) => e.offsetParent !== null || getComp
     const msg = await P.evaluate(() => (document.querySelector(".swal2-popup") || document.querySelector("#app")).innerText.replace(/\s+/g, " ").slice(0, 160));
     log("guardar perfil →", msg.slice(0, 100));
     await P.keyboard.press("Escape"); await sleep(300);
-    const tt = await P.$eval("#themeToggleBtn", (e) => e.className); await P.click("#themeToggleBtn"); await sleep(300);
-    ok((await P.evaluate(() => document.documentElement.getAttribute("data-theme") || "")) !== "", "el botón de tema cambia el tema");
-    await P.click("#themeToggleBtn"); await sleep(200);
+    await P.click("#userAvatarLink"); await sleep(300);
+    ok(await P.$eval("#userMenu", (e) => !e.hidden), "el avatar abre el menú de usuario");
+    await P.click('#userMenu [data-action="theme"]'); await sleep(300);
+    ok((await P.evaluate(() => document.documentElement.getAttribute("data-theme") || "")) !== "", "«Modo oscuro» del menú cambia el tema");
+    ok(await P.$eval("#userMenu", (e) => e.hidden), "el menú se cierra al elegir una opción");
+    await P.click("#userAvatarLink"); await P.click('#userMenu [data-action="theme"]'); await sleep(200);
   });
 
   await scenario("notificaciones-y-barra", async () => {
