@@ -16,7 +16,8 @@ use Illuminate\Support\Str;
  * Formato: [{"code","title","objective"|null,"coordinator","email","phone"|null,"areas":["Humanidades",…]}]
  *
  * Reglas:
- *  - Idempotente: un semillero cuyo código ya existe NO se toca; un coordinador cuyo correo ya existe se reutiliza.
+ *  - Idempotente: un semillero cuyo código ya existe solo se completa (coordinador, objetivo, programas, áreas si le faltan),
+ *    nunca se sobrescribe; un coordinador cuyo correo ya existe se reutiliza. Los coordinadores NO reciben correo (no se crea usuario).
  *  - Los programas de cada semillero son TODOS los de la facultad indicada (--faculty, por defecto IDEAD); el listado no
  *    dice cuáles aplican a cada uno. Se pueden ajustar luego desde «Editar» en Semilleros.
  *  - Sin objetivo general (obligatorio) se pone un texto provisional y el semillero queda INACTIVO (borrador).
@@ -76,9 +77,9 @@ class ImportSeedbeds extends Command
                 continue;
             }
 
-            if (Seedbed::where('code', $code)->exists()) {
+            if ($existing = Seedbed::where('code', $code)->first()) {
                 $stats['existentes']++;
-                $this->line("  = {$code} ya existe: no se toca");
+                $this->completeExisting($existing, $r, $email, $programIds, $dry);
                 continue;
             }
 
@@ -128,5 +129,39 @@ class ImportSeedbeds extends Command
             . ($stats['sin_area'] ? " · sin área: {$stats['sin_area']}" : ''));
 
         return self::SUCCESS;
+    }
+
+    /** Semillero que ya existe: solo se rellena lo que le falta (coordinador, objetivo, programas, áreas); nada se sobrescribe. */
+    private function completeExisting(Seedbed $s, array $r, string $email, array $programIds, bool $dry): void
+    {
+        $changes = [];
+        if (! $s->coordinator_id) {
+            $changes[] = 'coordinador';
+            if (! $dry) {
+                $coordinator = Coordinator::where('email', $email)->first() ?? Coordinator::create([
+                    'name' => trim((string) $r['coordinator']), 'email' => $email,
+                    'phone' => ($r['phone'] ?? null) ?: null, 'status' => 'ACTIVO',
+                ]);
+                $s->coordinator_id = $coordinator->id;
+            }
+        }
+        $objective = trim((string) ($r['objective'] ?? ''));
+        if (mb_strlen(trim((string) $s->objetivo_general)) < 10 && mb_strlen($objective) >= 10) {
+            $changes[] = 'objetivo';
+            $s->objetivo_general = $objective;
+        }
+        if (! $dry) {
+            $s->save();
+        }
+        if ($s->programs()->count() === 0) {
+            $changes[] = 'programas';
+            $dry || $s->programs()->sync($programIds);
+        }
+        $areaIds = Area::whereIn('name', (array) ($r['areas'] ?? []))->pluck('id')->all();
+        if ($s->areas()->count() === 0 && $areaIds) {
+            $changes[] = 'áreas';
+            $dry || $s->areas()->sync($areaIds);
+        }
+        $this->line("  = {$s->code} ya existe: " . ($changes ? 'se completa ' . implode(', ', $changes) : 'no hay datos nuevos'));
     }
 }

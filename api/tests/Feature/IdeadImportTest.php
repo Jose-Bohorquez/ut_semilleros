@@ -78,6 +78,25 @@ class IdeadImportTest extends TestCase
         $this->assertSame([0, 0, 0], [Faculty::count(), Program::count(), Cat::count()]);
     }
 
+    public function test_the_presencial_catalog_creates_27_programs_in_9_faculties_idempotently(): void
+    {
+        $this->artisan('catalog:presencial')->assertExitCode(0);
+        $this->artisan('catalog:presencial')->expectsOutputToContain('Creados: 0 facultades, 0 programas')->assertExitCode(0);
+
+        $this->assertSame(9, Faculty::count());
+        $this->assertSame(29, Program::count());
+        $this->assertSame('Facultad de Ciencias de la Salud', Program::where('code', '1002')->first()->faculty->name);
+        $this->assertSame(0, Program::whereNull('faculty_id')->count());
+    }
+
+    public function test_presencial_and_distance_catalogs_coexist(): void
+    {
+        $this->artisan('catalog:idead'); $this->artisan('catalog:presencial');
+
+        $this->assertSame(41, Program::count());
+        $this->assertSame(10, Faculty::count());
+    }
+
     /* ── Importación de semilleros ── */
 
     public function test_import_requires_the_catalog_first(): void
@@ -114,18 +133,23 @@ class IdeadImportTest extends TestCase
         $this->assertStringContainsString('por definir', $c2->objetivo_general);
     }
 
-    public function test_it_is_idempotent_and_never_touches_an_existing_seedbed(): void
+    public function test_it_is_idempotent_and_only_fills_the_gaps_of_an_existing_seedbed(): void
     {
         $this->artisan('catalog:idead'); $this->areas();
-        $mine = Seedbed::create(['code' => '220424', 'name' => 'Nombre que ya existía', 'status' => 'ACTIVO']);
+        $mine = Seedbed::create(['code' => '220424', 'name' => 'Nombre que ya existía', 'status' => 'ACTIVO', 'authorization_reference' => '123']);
         $file = $this->file([$this->row('220424', ['title' => 'Otro nombre']), $this->row('N1')]);
 
         $this->artisan('seedbeds:import', ['file' => $file])->assertExitCode(0);
         $this->artisan('seedbeds:import', ['file' => $file])->expectsOutputToContain('Semilleros nuevos: 0')->assertExitCode(0);
 
-        $this->assertSame('Nombre que ya existía', $mine->fresh()->name);
+        $fresh = $mine->fresh();
+        $this->assertSame('Nombre que ya existía', $fresh->name, 'el nombre no se sobrescribe');
+        $this->assertSame('123', $fresh->authorization_reference);
+        $this->assertNotNull($fresh->coordinator_id, 'se le completa el coordinador que faltaba');
+        $this->assertStringContainsString('suficiente longitud', $fresh->objetivo_general);
+        $this->assertSame(1, $fresh->areas()->count());
         $this->assertSame(2, Seedbed::count());
-        $this->assertSame(1, Coordinator::count());   // el de 220424 no se crea porque ese semillero se omite antes
+        $this->assertSame(2, Coordinator::count());
     }
 
     public function test_a_coordinator_with_the_same_email_is_reused(): void
