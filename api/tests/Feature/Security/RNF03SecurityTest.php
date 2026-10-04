@@ -83,8 +83,27 @@ class RNF03SecurityTest extends TestCase
 
     public function test_api_rate_limit_is_applied(): void
     {
+        /* Sin sesión el límite es por IP y alto (600/min): en el campus cientos de estudiantes comparten IP pública. */
         $r = $this->getJson('/api/auth/config');
-        $this->assertSame('120', $r->headers->get('X-RateLimit-Limit'));
+        $this->assertSame('600', $r->headers->get('X-RateLimit-Limit'));
+    }
+
+    public function test_authenticated_users_keep_the_stricter_per_user_limit(): void
+    {
+        $u = User::factory()->create();
+        $t = $u->createToken('t', ['*'], now()->addHour())->plainTextToken;
+        $this->assertSame('120', $this->withToken($t)->getJson('/api/me')->headers->get('X-RateLimit-Limit'));
+    }
+
+    /* «Too Many Attempts» en la PWA: SIA (15/min) y Google (10/min) limitaban POR IP y en la red de la universidad
+       todos los estudiantes comparten IP. Ahora toleran ráfagas de un campus (60/min); la protección de costo de
+       SIA sigue en SiaController (por conversación, por IP y tope global). */
+    public function test_sia_and_google_login_tolerate_a_campus_sized_burst(): void
+    {
+        foreach (['/api/sia/close', '/api/auth/google'] as $url) {
+            $limit = $this->postJson($url, [])->headers->get('X-RateLimit-Limit');
+            $this->assertSame('60', $limit, $url);
+        }
     }
 
     /* El límite es por usuario aunque corra antes de auth:sanctum (review 2026-09-28) */

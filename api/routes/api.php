@@ -42,13 +42,13 @@ Route::post('/reset-password',   [AuthController::class, 'resetPassword']);
 /* CU02 — Google institucional. tokeninfo es una llamada externa: se limita
    por IP para que el endpoint no sirva de amplificador. */
 Route::get('/auth/config',       [AuthController::class, 'authConfig']);
-Route::middleware('throttle:10,1')
+Route::middleware('throttle:60,1')
      ->post('/auth/google',      [AuthController::class, 'google']);
 
 /* SIA — asistente con IA (RF17 propuesto). Público: también se usa en el login.
    Límites por IP/usuario/conversación y tope global en SiaController; el throttle
    por minuto frena ráfagas antes de tocar la BD. */
-Route::middleware('throttle:15,1')->group(function () {
+Route::middleware('throttle:60,1')->group(function () {
     Route::post('/sia/chat',  [SiaController::class, 'chat']);
     Route::post('/sia/close', [SiaController::class, 'close']);
 });
@@ -328,6 +328,10 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
        interprete como un id. */
     Route::middleware('role:ESTUDIANTE')
          ->get('/requests/my', [RequestController::class, 'myRequests']);
+
+    /* GET /requests/eligibility — ¿puede postularse? (CU22); va antes de /requests/{id} por la misma razón. */
+    Route::middleware('role:ESTUDIANTE')
+         ->get('/requests/eligibility', [RequestController::class, 'eligibility']);
 
     Route::middleware('role:ADMIN_SISTEMA,LIDER_SEMILLERO,ADMINISTRATIVO')
          ->get('/requests/{id}', [RequestController::class, 'show'])

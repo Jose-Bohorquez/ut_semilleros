@@ -187,22 +187,13 @@ class RequestController extends Controller
             ], 422);
         }
 
-        /* Regla de negocio (Jose, 2026-07-28): un estudiante no puede tener
-           más de una postulación activa a la vez. Si ya tiene una PENDIENTE
-           (esperando revisión) o APROBADA (ya es integrante de un semillero),
-           no puede postularse a otro. RECHAZADA no cuenta — sí puede volver
-           a intentarlo en otro semillero. (Nota: la spec de CU22/RN05 solo
-           exige esto por semillero, no a nivel de todo el sistema — esta
-           regla más estricta ya estaba decidida por el proyecto y se
-           mantiene tal cual). */
-        $yaTieneActiva = RequestModel::where('user_id', $validated['user_id'])
-            ->whereIn('status', ['PENDIENTE', 'APROBADA'])
-            ->exists();
-
-        if ($yaTieneActiva) {
-            return response()->json([
-                'message' => 'Ya tienes una postulación pendiente o aprobada. No puedes postularte a otro semillero mientras esa siga activa.',
-            ], 409);
+        /* Regla de negocio (Jose, 2026-07-28; precisada el 2026-10-04): para postularse el estudiante no debe tener
+           ningún semillero asociado ni activo — ni una solicitud pendiente, ni ser integrante activo, ni una
+           aprobada aún sin registrar. Si el líder lo inactiva (sale del semillero) queda libre. RECHAZADA no cuenta.
+           (La spec de CU22/RN05 solo lo exige por semillero; esta regla más estricta es decisión del proyecto.) */
+        $estado = \App\Support\SeedbedAssociation::evaluate(auth()->user(), (int) $validated['seedbed_id']);
+        if (! $estado['can_apply']) {
+            return response()->json(['message' => $estado['message'], 'state' => $estado['state']], 409);
         }
 
         $requestModel = RequestModel::create($validated);
@@ -280,6 +271,17 @@ class RequestController extends Controller
                 : 'Solicitud rechazada',
             'request' => $req->load(['user:id,name,email', 'seedbed:id,name', 'program:id,name']),
         ]);
+    }
+
+    /**
+     * GET /requests/eligibility?seedbed_id= — ¿puede el estudiante postularse (a este semillero)? La PWA lo usa en el
+     * detalle del semillero para explicar el motivo en lugar de dejarlo llenar un formulario que será rechazado.
+     */
+    public function eligibility(Request $request)
+    {
+        $request->validate(['seedbed_id' => 'nullable|integer']);
+
+        return response()->json(\App\Support\SeedbedAssociation::evaluate(auth()->user(), $request->integer('seedbed_id') ?: null));
     }
 
     public function myRequests()

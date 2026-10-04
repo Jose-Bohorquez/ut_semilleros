@@ -65,8 +65,13 @@ class AppServiceProvider extends ServiceProvider
                token aquí mismo. Con $request->user() salía siempre null y el límite
                quedaba por IP (en el Wi-Fi del campus muchos estudiantes comparten IP). */
             $user = $request->bearerToken() ? $request->user('sanctum') : null;
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(120)
-                ->by($user ? 'u:' . $user->id : 'ip:' . $request->ip());
+            /* Con sesión: 120/min por usuario. Sin sesión (login, SIA, /auth/config…) el límite es por IP y en la red
+               de la universidad cientos de estudiantes comparten la misma IP pública: con 120 aparecía «Too Many
+               Attempts» al azar en la PWA. Los endpoints sensibles tienen además su propio límite (login: 5 por
+               correo+IP; SIA: por conversación y tope global). */
+            return $user
+                ? \Illuminate\Cache\RateLimiting\Limit::perMinute(120)->by('u:' . $user->id)
+                : \Illuminate\Cache\RateLimiting\Limit::perMinute(600)->by('ip:' . $request->ip());
         });
     }
 
