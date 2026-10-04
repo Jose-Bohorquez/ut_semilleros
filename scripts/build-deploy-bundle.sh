@@ -48,8 +48,13 @@ if command -v docker >/dev/null 2>&1 && docker ps --format '{{.Names}}' | grep -
   [ "$bad" = 0 ] || exit 1
 fi
 
-tar -czf "$OUT" -T "$LIST"
-( cd "$(dirname "$OUT")" && sha256sum "$(basename "$OUT")" ) > "${OUT}.sha256"
+# version.json: identificador de ESTA versión (commit). La app lo consulta para avisar/actualizarse sola (core/app-update.js).
+# Va dentro del paquete pero no está en el repo ni en $LIST (por eso no entra en la comprobación «diff 0» por MD5).
+STAMP_DIR="$(mktemp -d)"
+printf '{"version":"%s","built":"%s"}\n' "$(git rev-parse --short HEAD)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$STAMP_DIR/version.json"
+tar -czf "$OUT" -T "$LIST" -C "$STAMP_DIR" version.json
+rm -rf "$STAMP_DIR"
+( cd "$(dirname "$OUT")"&& sha256sum "$(basename "$OUT")" ) > "${OUT}.sha256"
 
 echo "Base: $BASE   HEAD: $(git rev-parse --short HEAD)"
 echo "Archivos en el paquete: $(wc -l < "$LIST")"

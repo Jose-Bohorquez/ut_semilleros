@@ -14,7 +14,7 @@ debajo de los botones rojo «SIA» y verde «Reportar bug»):
   (el cuadro con la flecha hacia arriba), elige **«Añadir a pantalla de inicio»** y toca **«Añadir»**.
   En iPhone solo se puede instalar desde Safari.
 
-Si el botón no aparece es porque la aplicación **ya está instalada** (o tu navegador no permite
+Si el botón no aparece es porque la aplicación **ya está instalada** (también desaparece al abrirla desde su ícono) (o tu navegador no permite
 instalar). También puedes ocultarlo con la flechita pequeña que está debajo de los botones. Si
 prefieres hacerlo a mano en Android: menú ⋮ → **«Instalar aplicación»**.
 
@@ -125,3 +125,7 @@ necesitas corregirlos, pídeselo. Aquí también está el panel de **notificacio
 Toca tu **avatar** (arriba a la derecha) → **«Cerrar sesión»**. Se borra tu sesión y tus datos de este
 dispositivo; el listado de semilleros que ya consultaste se conserva para que puedas verlo sin
 conexión la próxima vez.
+
+## 12. Actualizaciones
+
+La aplicación se actualiza sola. Cuando hay una versión nueva ves un aviso **«Hay una versión nueva de la aplicación»** con el botón **«Actualizar»**; si no lo tocas, se aplica sola cuando vuelves a la app después de un minuto o cuando cambias de pantalla. Si algo se ve viejo, toca **«Actualizar»** o cierra la app y ábrela de nuevo.

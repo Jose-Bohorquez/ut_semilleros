@@ -79,6 +79,7 @@ class SiaKnowledgeRetrievalTest extends TestCase
             'activar push'          => ['cómo activo las notificaciones push en mi celular', 'Notificaciones: ver las que recibí'],
             'aviso respuesta'       => ['me llega una notificación cuando responden mi solicitud', 'Notificaciones: ver las que recibí'],
             'cancelar solicitud'    => ['cómo cancelo mi solicitud me equivoqué de semillero', 'Cancelar mi solicitud'],
+            'actualizar app'        => ['la app no se actualiza veo una versión vieja', 'no se actualiza o veo una versión vieja'],
             'instalar app'          => ['cómo instalo la app en mi celular', 'Instalar la aplicación en el celular'],
             'boton instalar'        => ['dónde está el botón instalar app', 'Instalar la aplicación en el celular'],
             'postular otro'         => ['por qué no puedo postularme a otro semillero', 'por qué no puedo postularme a otro semillero'],

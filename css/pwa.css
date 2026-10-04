@@ -15,7 +15,7 @@
    estado translúcida, por lo que el navbar debe compensarlo.
    En Android y browser normal env() devuelve 0, sin efecto.
 */
-@media (display-mode: standalone) {
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
   .navbar {
     padding-top: env(safe-area-inset-top, 0px) !important;
   }
@@ -23,12 +23,12 @@
 
 /* Login en la PWA instalada: la cabecera y el pie también quedan bajo la barra
    de estado translúcida y el indicador de inicio (CU01 en PWA, 2026-09-28). */
-@media (display-mode: standalone) {
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
   .login-header { padding-top: env(safe-area-inset-top, 0px); }
   .login-footer { padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px)); }
 }
 
-@media (display-mode: standalone) {
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
   .pwa-detail-bar {
     padding-top: env(safe-area-inset-top, 0px);
     height: calc(56px + env(safe-area-inset-top, 0px));
@@ -799,3 +799,74 @@
 
 [data-theme="dark"] .user-menu { box-shadow: 0 12px 32px rgba(0,0,0,0.55); }
 [data-theme="dark"] .pwa-bottom-nav { box-shadow: 0 -4px 20px rgba(0,0,0,0.45); }
+
+
+/* =========================================================
+   ANIMACIONES Y PULIDO DE LAS VISTAS (2026-10-04)
+   Todo lo que se mueve respeta «reducir movimiento» (prefers-reduced-motion); sin animación la app se ve igual.
+   ========================================================= */
+
+/* ── Aviso «Hay una versión nueva» (core/app-update.js) ── */
+#updateBanner {
+  position: fixed; left: 12px; right: 12px; z-index: 1300;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-card);
+  background: var(--color-text); color: var(--color-surface); font-size: var(--text-sm);
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+}
+#updateBanner i { margin-right: 6px; color: #fbbf24; }
+#updateBanner button {
+  flex-shrink: 0; min-height: 36px; padding: 0 var(--space-4); border: none; border-radius: var(--radius-full);
+  background: var(--color-primary); color: #fff; font: inherit; font-weight: 600; cursor: pointer;
+}
+@media (min-width: 769px) { #updateBanner { left: auto; right: 24px; bottom: 24px; max-width: 420px; } }
+
+/* ── Retroalimentación al tocar (siempre, sin depender del movimiento decorativo) ── */
+.pwa-card, .quick-link-card, .kpi-card, .faculty-card, .seedbed-card { transition: transform .15s ease, box-shadow .2s ease; -webkit-tap-highlight-color: transparent; }
+.pwa-card:active, .quick-link-card:active, .faculty-card:active, .seedbed-card:active { transform: scale(.98); }
+.pwa-btn-primary:active, .pwa-btn-secondary:active, .btn:active, .pwa-fab:active { transform: scale(.97); }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  @keyframes pwaFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pwaRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes pwaPop  { 0% { transform: scale(.55); } 55% { transform: scale(1.14); } 100% { transform: scale(1); } }
+  @keyframes pwaGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* Cada pantalla entra con un suave desvanecido y sus tarjetas suben una tras otra */
+  .content > * { animation: pwaFade .28s ease both; }
+  .pwa-card, .faculty-card, .seedbed-card, .pwa-section-header, .empty-state, .alert-info, .alert-warning, .alert-success {
+    animation: pwaRise .42s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .pwa-card:nth-child(1), .faculty-card:nth-child(1), .seedbed-card:nth-child(1) { animation-delay: .03s; }
+  .pwa-card:nth-child(2), .faculty-card:nth-child(2), .seedbed-card:nth-child(2) { animation-delay: .08s; }
+  .pwa-card:nth-child(3), .faculty-card:nth-child(3), .seedbed-card:nth-child(3) { animation-delay: .13s; }
+  .pwa-card:nth-child(4), .faculty-card:nth-child(4), .seedbed-card:nth-child(4) { animation-delay: .18s; }
+  .pwa-card:nth-child(5), .faculty-card:nth-child(5), .seedbed-card:nth-child(5) { animation-delay: .23s; }
+  .pwa-card:nth-child(6), .faculty-card:nth-child(6), .seedbed-card:nth-child(6) { animation-delay: .28s; }
+  .pwa-card:nth-child(n+7), .faculty-card:nth-child(n+7), .seedbed-card:nth-child(n+7) { animation-delay: .32s; }
+
+  /* La línea de acento del saludo «se dibuja» */
+  .accent-divider { transform-origin: left; animation: pwaGrow .6s .25s cubic-bezier(.2,.7,.2,1) both; }
+
+  /* Barra inferior: el icono que acabas de tocar «salta» */
+  .pwa-bottom-nav .nav-item.active .nav-icon { animation: pwaPop .42s cubic-bezier(.3,1.5,.5,1) both; }
+
+  /* Hojas inferiores y menú: ya usan slideUpModal / userMenuIn; el fondo oscuro aparece con fundido */
+  #seedbedDetail, #proposalSheet, #requestDetailSheet, #notifSheet, #newRequestModal { animation: pwaFade .2s ease both; }
+
+  /* Tablas del panel: las filas aparecen en cascada corta */
+  .dataTable tbody tr { animation: pwaFade .3s ease both; }
+}
+
+/* ── Tarjetas de resumen más compactas en el móvil (antes tres tarjetas enormes llenaban la pantalla) ── */
+@media (max-width: 520px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .kpi-grid .kpi-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .kpi-card { padding: var(--space-3) var(--space-4); gap: var(--space-1); }
+  .kpi-icon { width: 32px; height: 32px; font-size: 14px; }
+  .kpi-value { font-size: var(--text-2xl); }
+  .kpi-label { font-size: var(--text-xs); }
+  .kpi-trend { font-size: 11px; align-self: flex-start; }
+}

@@ -155,3 +155,11 @@ los nodos de documentación).
 - **PWA.** `CACHE_NAME` del service worker sube con cada cambio de CSS/JS del shell; el service worker precarga
   las librerías de CDN. El botón «Instalar app» (`core/pwa-install.js`) usa `beforeinstallprompt`.
 - **Pruebas visuales.** `scripts/ui-tests/` (Playwright sobre el Docker local; ver su README).
+
+## 7. Actualización automática de la PWA y carga de catálogos (2026-10-04)
+
+- **`/version.json`**: `scripts/build-deploy-bundle.sh` lo genera en cada paquete (`{"version":"<commit>","built":"…"}`); no está en el repo ni en la lista de archivos (por eso no entra en la comprobación de diff por MD5). La app (`core/app-update.js`) lo consulta sin caché al volver a primer plano, al recuperar la red y cada 10 minutos; si cambia, muestra el aviso «Hay una versión nueva» y recarga sola en la siguiente navegación o tras un minuto en segundo plano. El service worker lo deja pasar siempre a la red.
+- **Botón «Instalar app»**: reconoce la app instalada en cualquier modo de pantalla (el manifest pide `fullscreen`), recuerda la instalación en `localStorage` (`pwa_installed`) y usa `getInstalledRelatedApps()` (`related_applications` del manifest).
+- **Catálogo y carga del IDEAD** (idempotentes, con `--dry-run`; no usar `db:seed` en producción):
+  `php artisan catalog:idead` (facultad IDEAD, 12 programas de pregrado, 21 CAT) y
+  `php artisan seedbeds:import <archivo.json> [--publish] [--approval-ref="…"]` (semilleros y coordinadores; el JSON lleva datos personales: **no se sube al repo**). Un semillero con código ya existente no se toca.

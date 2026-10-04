@@ -384,6 +384,13 @@ export const routes = {
 
 export async function navigateTo(path) {
 
+    /* Hay una versión nueva de la app (core/app-update.js): el cambio de pantalla es el momento seguro para cargarla,
+       porque no se pierde nada que alguien esté escribiendo. */
+    if (window.__updateReady && path !== window.location.pathname) {
+        window.location.assign(path);
+        return;
+    }
+
     if (navigating) return;
 
     navigating = true;

@@ -1,6 +1,7 @@
 /* #archivo: /frontend/app.js */
-import { renderRoute } from './core/router.js?v=4';
+import { renderRoute } from './core/router.js?v=5';
 import { mountSia }    from './core/sia.widget.js';
+import { startUpdateWatch } from './core/app-update.js';
 import { flushPendingRevokes } from './services/api.service.js';
 import { setLoginFlash } from './services/storage.service.js';
 
@@ -29,8 +30,9 @@ window.addEventListener("storage", e => {
  */
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
-        .then(async () => {
+        .then(async (registration) => {
             console.log('Service Worker registrado');
+            startUpdateWatch(registration);   // busca versiones nuevas (version.json + service worker) y las aplica sola en momentos seguros
             // Pide al SW que guarde lo que la página ya cargó (módulos JS, CSS, imágenes). En la primera visita esas
             // peticiones ocurren antes de que el SW controle la página y no quedarían en caché: sin esto, reabrir
             // la app sin conexión justo después de instalarla dejaba la pantalla en blanco.

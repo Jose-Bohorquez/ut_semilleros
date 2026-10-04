@@ -3,7 +3,7 @@
    Service Worker de la PWA del Sistema de Semilleros
    ========================================================= */
 
-const CACHE_NAME = "semilleros-v30";
+const CACHE_NAME = "semilleros-v31";
 
 /* Archivos del shell (raramente cambian → cache first) */
 const SHELL_URLS = [
@@ -137,6 +137,9 @@ self.addEventListener("fetch", event => {
 
     /* API → nunca cachear */
     if (isApiCall(url)) return;
+
+    /* /version.json lo consulta la app para saber si hay una versión nueva (core/app-update.js): siempre de la red */
+    if (url.pathname === "/version.json") return;
 
     /* RNF02: abrir cualquier ruta de la SPA sin conexión (/seedbeds, /dashboard…).
        Red primero para recibir siempre el index.html actual; sin red, el shell. */

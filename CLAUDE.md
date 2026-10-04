@@ -272,6 +272,7 @@ Escape cierra las hojas inferiores. `CACHE_NAME` v29, `style.css?v=21`, `pwa.css
 **Estados de propuesta (cierra el puente de CU26):** migración `2026_10_04_000001` convierte `PENDIENTE/APROBADA/RECHAZADA` en `RECIBIDA/VIABLE/ARCHIVADA` (reversible; en producción solo con `--path`);
 la API acepta los nombres antiguos como entrada. 647 tests. Desplegado con diff 0 y validado en vivo (12/12).
 
+**Actualización automática y botón de instalar (2026-10-04):** `scripts/build-deploy-bundle.sh` estampa `/version.json` en cada paquete; `core/app-update.js` avisa «Hay una versión nueva» y recarga sola en un momento seguro; el service worker no cachea `/version.json`; `core/pwa-install.js` reconoce la app instalada en cualquier `display-mode` (el manifest pide `fullscreen`). Comandos `catalog:idead` y `seedbeds:import` (carga del IDEAD; JSON con datos personales fuera del repo). 687 tests.
 **Instalar app, límites por IP y regla de un solo semillero (2026-10-04):** botón azul «Instalar app» (`core/pwa-install.js`, dentro de `.sia-fabs`):
 `beforeinstallprompt` en Android/Chrome/Edge, instrucciones en iPhone y en Android sin aviso, oculto si ya está instalada. «Too Many Attempts» en la PWA: los límites por IP
 (`/auth/google` 10→60, `/sia/*` 15→60, sin sesión 120→600 por minuto) saltaban en la red de la universidad porque muchos estudiantes comparten IP; con sesión sigue 120/min por usuario.

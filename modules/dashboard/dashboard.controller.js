@@ -251,11 +251,26 @@ function renderMySeedbedSummary(seedbeds) {
     `).join("");
 }
 
+/* Los números de las tarjetas «cuentan» desde 0 hasta su valor (0,6 s). Solo si el valor es un número entero y la
+   persona no pidió reducir el movimiento; en cualquier otro caso se escribe tal cual. */
+function animateNumber(el, value) {
+    const target = Number(value);
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reduce || !Number.isInteger(target) || target <= 0 || target > 100000) { el.textContent = value; return; }
+    const start = performance.now(), duration = 600;
+    const tick = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3)));      // desaceleración suave
+        if (t < 1) requestAnimationFrame(tick); else el.textContent = target;
+    };
+    requestAnimationFrame(tick);
+}
+
 function setKPI(id, value, trendLabel, direction) {
     const valueEl = document.getElementById(id);
     const trendEl = document.getElementById(`${id}-trend`);
     if (!valueEl) return;
-    valueEl.textContent = value;
+    animateNumber(valueEl, value);
     if (trendEl) {
         const icon  = direction === "up" ? "fa-arrow-up" : direction === "down" ? "fa-arrow-down" : "fa-minus";
         const cls   = `kpi-trend kpi-trend-${direction === "up" ? "up" : direction === "down" ? "down" : "flat"}`;
