@@ -25,6 +25,7 @@ const ACTION_LABEL = {
     LOGIN:          "Inicio de sesión",
     LOGOUT:         "Cierre de sesión",
     CONSENT:        "Autorización de datos",
+    PRUNE:          "Purga de auditoría",
     PASSWORD_RESET: "Contraseña restablecida",
 };
 

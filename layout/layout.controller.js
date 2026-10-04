@@ -48,12 +48,50 @@ function _registerNavListener() {
         if (!el) return;
         e.preventDefault();
         _closeSidebar();
+        _closeUserMenu();
         navigateTo(el.getAttribute("href").replace(window.location.origin, ""));
     });
 
     document.addEventListener("keydown", e => {
-        if (e.key === "Escape") _closeSidebar();
+        if (e.key === "Escape") { _closeSidebar(); _closeUserMenu(); _closeBottomSheet(); }
     });
+
+    /* Tocar fuera del menú de usuario lo cierra */
+    document.addEventListener("click", e => {
+        if (!e.target.closest("#userMenu, #userAvatarLink")) _closeUserMenu();
+    });
+}
+
+/* Hojas inferiores de la PWA (detalle de semillero, nueva propuesta/notificación, detalle de solicitud):
+   Escape cierra la que esté abierta pulsando su propia «×» (así cada módulo hace su limpieza habitual).
+   Si hay un SweetAlert o el modal de crear abierto, esos ya gestionan su Escape y no se toca nada. */
+const _SHEETS = [
+    ["notifSheet", "closeNotifSheet"], ["proposalSheet", "closeProposalSheet"],
+    ["requestDetailSheet", "closeRequestDetailBtn"], ["seedbedDetail", "closeDetail"],
+];
+function _closeBottomSheet() {
+    if (document.querySelector(".swal2-container, #crudModal")) return;
+    for (const [sheetId, closeId] of _SHEETS) {
+        const sheet = document.getElementById(sheetId);
+        if (sheet && getComputedStyle(sheet).display !== "none") {
+            document.getElementById(closeId)?.click();
+            return;
+        }
+    }
+}
+
+function _openUserMenu() {
+    const menu = document.getElementById("userMenu");
+    if (!menu) return;
+    menu.hidden = false;
+    document.getElementById("userAvatarLink")?.setAttribute("aria-expanded", "true");
+}
+
+function _closeUserMenu() {
+    const menu = document.getElementById("userMenu");
+    if (!menu || menu.hidden) return;
+    menu.hidden = true;
+    document.getElementById("userAvatarLink")?.setAttribute("aria-expanded", "false");
 }
 
 /* Sidebar helpers accesibles dentro y fuera del módulo */
@@ -96,22 +134,33 @@ export function initLayoutController() {
         window.__subscribePush?.();
     }
 
-    /* Logout — se añade al botón que acaba de renderizar */
-    document.getElementById("logoutBtn")?.addEventListener("click", async e => {
+    /* Logout — el botón de la barra (escritorio) y el ítem del menú de usuario (móvil) */
+    document.querySelectorAll("#logoutBtn, [data-action='logout']").forEach(el => el.addEventListener("click", async e => {
         const btn = e.currentTarget;
         if (btn.disabled) return;   /* doble clic */
         btn.disabled = true;
         btn.setAttribute("aria-busy", "true");
         await logout();
         navigateTo("/");   /* CU03 paso 4 */
-    });
+    }));
 
-    /* Theme toggle — se añade al botón que acaba de renderizar */
+    /* Theme toggle — idem */
     syncThemeIcon();
-    document.getElementById("themeToggleBtn")?.addEventListener("click", () => {
+    document.querySelectorAll("#themeToggleBtn, [data-action='theme']").forEach(el => el.addEventListener("click", () => {
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
         applyTheme(isDark ? "light" : "dark");
-    });
+        _closeUserMenu();
+    }));
+
+    /* Menú de usuario (móvil): el avatar lo abre; en escritorio sigue llevando al perfil */
+    const avatar = document.getElementById("userAvatarLink");
+    avatar?.addEventListener("click", e => {
+        if (!window.matchMedia("(max-width: 768px)").matches) return;   // escritorio: navega al perfil
+        e.preventDefault();
+        e.stopPropagation();                                              // el listener global de [data-link] no debe navegar
+        const menu = document.getElementById("userMenu");
+        menu?.hidden ? _openUserMenu() : _closeUserMenu();
+    }, true);
 
     /* Hamburger / sidebar mobile */
     const hamburger = document.getElementById("hamburgerBtn");
@@ -160,6 +209,6 @@ export function applyTheme(theme) {
 export function syncThemeIcon() {
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
     const icon   = document.getElementById("themeIcon");
-    if (!icon) return;
-    icon.className = isDark ? "fas fa-moon" : "fas fa-sun";
+    if (icon) icon.className = isDark ? "fas fa-moon" : "fas fa-sun";
+    document.querySelectorAll("[data-theme-label]").forEach(l => { l.textContent = isDark ? "Modo claro" : "Modo oscuro"; });
 }

@@ -1458,3 +1458,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .filter-bar { flex-direction: column; align-items: stretch; }
   .filter-bar .btn { width: 100%; }
 }
+
+
+/* Modal de crear/editar: la regla de «caja» (padding, altura máxima y scroll) se aplicaba a la caja Y al formulario
+   interior → doble barra de scroll y doble relleno. Solo la caja se desplaza; el formulario fluye dentro. */
+#crudModal .crudModalBox form {
+  max-height: none; overflow: visible; padding: 0; width: auto; max-width: none;
+  background: none; box-shadow: none; border-radius: 0; animation: none;
+}

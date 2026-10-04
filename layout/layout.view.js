@@ -123,15 +123,23 @@ export function LayoutView(content = "") {
     /* ─── BOTTOM NAV ────────────────────────────────── */
 
     const navItems  = BOTTOM_NAV[role] || BOTTOM_NAV.ESTUDIANTE;
+    /* Perfil muestra la foto (o las iniciales) de la persona en lugar de un icono genérico. */
+    const initials = escapeHtml((user?.name || "?").split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase());
+    const navAvatar = user?.profile_photo
+        ? `<img class="nav-avatar" src="${safeImageSrc(user.profile_photo)}" alt="">`
+        : `<span class="nav-avatar nav-avatar-initials" aria-hidden="true">${initials}</span>`;
+
     const bottomNav = navItems.map(item => `
         <a href="${item.href}" data-link
            class="nav-item"
            data-path="${item.href}"
            aria-label="${item.label}">
-            <i class="fas ${item.icon}"></i>
-            <span>${item.label}</span>
+            <span class="nav-icon">${item.href === "/profile" ? navAvatar : `<i class="fas ${item.icon}"></i>`}</span>
+            <span class="nav-label">${item.label}</span>
         </a>
     `).join("");
+
+    const ROLE_NAMES = { ADMIN_SISTEMA: "Administrador del sistema", ADMINISTRATIVO: "Administrativo", LIDER_SEMILLERO: "Líder de semillero", ESTUDIANTE: "Estudiante" };
 
 
     /* ─── HTML ──────────────────────────────────────── */
@@ -154,7 +162,8 @@ export function LayoutView(content = "") {
 
             <div class="user-info">
                 <!-- Avatar del navbar: foto si existe, iniciales si no -->
-                <a href="/profile" data-link style="text-decoration:none;display:flex;align-items:center;gap:6px"
+                <a href="/profile" data-link id="userAvatarLink" class="user-avatar-link" aria-haspopup="menu" aria-expanded="false"
+                   style="text-decoration:none;display:flex;align-items:center;gap:6px"
                    title="Ver perfil">
                     ${user?.profile_photo
                         ? `<img src="${safeImageSrc(user.profile_photo)}"
@@ -188,6 +197,24 @@ export function LayoutView(content = "") {
                     <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
                     <span class="pwa-hide-label">Cerrar sesión</span>
                 </button>
+
+                <!-- Menú de usuario (solo móvil/tablet): el avatar lo abre. Reúne Perfil, Tema y Cerrar sesión,
+                     que antes ocupaban dos botones más en la barra y dejaban «Cerrar sesión» a un toque accidental. -->
+                <div id="userMenu" class="user-menu" role="menu" aria-label="Menú de usuario" hidden>
+                    <div class="user-menu-head">
+                        <strong>${escapeHtml(user?.name || "")}</strong>
+                        <span>${escapeHtml(ROLE_NAMES[role] || "")}</span>
+                    </div>
+                    <a href="/profile" data-link role="menuitem" class="user-menu-item">
+                        <i class="fas fa-user-circle" aria-hidden="true"></i> Mi perfil
+                    </a>
+                    <button type="button" role="menuitem" class="user-menu-item" data-action="theme">
+                        <i class="fas fa-circle-half-stroke" aria-hidden="true"></i> <span data-theme-label>Modo oscuro</span>
+                    </button>
+                    <button type="button" role="menuitem" class="user-menu-item user-menu-danger" data-action="logout">
+                        <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Cerrar sesión
+                    </button>
+                </div>
             </div>
 
         </header>
