@@ -46,3 +46,15 @@ Validación en vivo con una cuenta `qa_temp_*` (borrada): 5 rondas de **12 petic
 
 - **Límite de conexiones del hosting**: con una ráfaga artificial de **24 peticiones simultáneas** de un mismo usuario Hostinger rechazó conexiones a MySQL (`SQLSTATE[2002] Operation not permitted`, 500). No es el deadlock ni el limitador: es el tope de conexiones/procesos del plan compartido. Con 12 simultáneas no ocurre. Conviene tenerlo presente si un día se concentran muchos usuarios a la vez (candidatos: reducir las peticiones del Dashboard o consolidarlas en un solo endpoint).
 - **Hueco del script de despliegue**: `scripts/build-deploy-bundle.sh` no listaba `style.css`, así que cualquier cambio de la hoja de estilos raíz no viajaba en el paquete. Corregido (y `index.html` pasa a `style.css?v=20`).
+
+## Segunda tanda (2026-10-03/04)
+
+Tras revisar Jose la PWA en su teléfono se corrigió y desplegó:
+
+- **Pestañas Misión / Visión / Objetivos** del detalle de semillero (PWA): el manejador de clic estaba en el contenedor de los paneles y los botones quedaban fuera, así que nunca se activaban. Desde entonces `scripts/ui-tests/pwa_deep.js` **verifica el efecto** de cada interacción (no solo que se pueda pulsar) y falla contra la versión anterior.
+- **Notificaciones push:** la app pedía el permiso al iniciar sesión sin ningún toque (iOS lo exige y Chrome lo bloquea en silencio). Ahora se pide desde Perfil → «Notificaciones en este dispositivo» (y desde un aviso en la campana), con botón de **prueba** (`POST /push-subscriptions/test`) que informa por dispositivo. El estudiante recibe campana + push al aprobar/rechazar su solicitud y al evaluar su propuesta.
+- **Barras de la PWA rediseñadas** (móvil): arriba solo avatar (abre Perfil · Tema · Cerrar sesión) y campana; abajo, indicador activo en «píldora», foto o iniciales en Perfil y modo oscuro coherente; botones flotantes más pequeños. Escape cierra las hojas inferiores; el modal de crear ya no tiene doble scroll.
+- **CU22:** `POST /requests` solo para el Estudiante. **Auditoría:** `php artisan audits:prune` (retención). **Estados de propuesta:** migración real a `RECIBIDA/VIABLE/ARCHIVADA` (ver CLAUDE.md).
+- **CU28-E2 verificado con el motor real**: producción es MariaDB 11.8 y corta la consulta con `max_statement_time` (la prueba local con MySQL 9 usa `max_execution_time`); el Líder con semilleros propios coincide con los conteos directos.
+
+Verificación: pasada completa en escritorio, tablet y móvil (0 hallazgos nuevos), `pwa_deep` 0 hallazgos, flujos de extremo a extremo y 647 pruebas automáticas.

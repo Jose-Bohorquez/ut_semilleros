@@ -251,7 +251,7 @@ el texto exacto y E2 (403) probado en cada endpoint. Pantalla reescrita (`module
 Líder consulta las de **las áreas de sus semilleros** (A1) y el Administrador consulta; el listado **no lleva contacto** (RNF12) y el
 detalle lo muestra solo al Administrativo; filtros por área/programa/estado/fechas (Bogotá). **El Líder dejó de poder evaluar** (decisión
 de la spec; antes podía). `POST`/`PUT /proposals` quedan solo para el Estudiante (cierra CU25-H4). Menú lateral de escritorio con
-«Solicitudes» y «Propuestas» para Líder, Administrativo y Administrador. Estados: sigue el puente de CU26. `CACHE_NAME` v25.
+«Solicitudes» y «Propuestas» para Líder, Administrativo y Administrador. Estados: ver «Estados de propuesta» más abajo (migración real del 2026-10-04). `CACHE_NAME` v25.
 **Falta probar el frontend en navegador.** Pendiente: A2 «Ver por área» (CU28).
 
 **Envíos asíncronos (2026-10-03, decisión de Jose: «todo debería ser asíncrono», opción cola real con reintentos):**
@@ -261,6 +261,16 @@ en todos. `PushSender::send()` (entrega inmediata) queda solo para `POST /push-s
 **Desplegado en producción con diff 0** (acta `docs/validacion/ENVIOS_ASINCRONOS_2026-10-03.md`, `semilleros-v28`).
 **Producción sigue en `QUEUE_CONNECTION=sync` hasta que Jose agregue el cron en hPanel** (comando exacto y orden en
 `docs/manuales/manual_tecnico.md` §5); con `sync` todo funciona igual que antes (en el acto, sin reintentos).
+
+**Primera prueba visual con navegador, push, barras PWA y estados de propuesta (2026-10-03/04):** acta `docs/validacion/PRUEBAS_VISUALES_2026-10-03.md`,
+herramientas en `scripts/ui-tests/` (corren en pcjose, contra el Docker local). Corregidos: PWA en blanco sin conexión (SW: `ignoreSearch` + precarga de CDN),
+500 por deadlock en el limitador (`ResilientRateLimiter`), «Cancelar» cortado en móvil, pestañas Misión/Visión/Objetivos de la PWA que no respondían, «Inactivar» de Proyectos (404),
+rol ADMIN preseleccionado al crear usuario, errores 422/429 en inglés y estilos de las pantallas de CU24/27/28/30.
+**Barras PWA rediseñadas:** en móvil el avatar abre un menú (Perfil · Tema · Cerrar sesión), la barra inferior marca la pestaña activa con una «píldora» y Perfil muestra tu foto;
+Escape cierra las hojas inferiores. `CACHE_NAME` v29, `style.css?v=21`, `pwa.css?v=2`. **Push:** el permiso se pide desde Perfil → «Notificaciones en este dispositivo» con un toque
+(nunca al iniciar sesión) y hay un botón de prueba (`POST /push-subscriptions/test`). **CU22:** `POST /requests` solo para Estudiante. **Auditoría:** `php artisan audits:prune` (retención, no programado).
+**Estados de propuesta (cierra el puente de CU26):** migración `2026_10_04_000001` convierte `PENDIENTE/APROBADA/RECHAZADA` en `RECIBIDA/VIABLE/ARCHIVADA` (reversible; en producción solo con `--path`);
+la API acepta los nombres antiguos como entrada. 647 tests. Desplegado con diff 0 y validado en vivo (12/12).
 
 **Trabajo en paralelo con 2 cuentas Claude (desde 2026-09-30):** ver `ONBOARDING.md` en la raíz —
 es la guía de arranque para cualquier cuenta Claude que se sume (ahora mismo hay una segunda

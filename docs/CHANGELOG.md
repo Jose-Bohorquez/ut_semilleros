@@ -1,3 +1,13 @@
+# Sesión 2026-10-04 — Push, barras de la PWA y estados de propuesta
+
+- **Push:** permiso desde el perfil con un toque, botón de prueba, aviso al estudiante al resolver su solicitud o evaluar su propuesta (cola asíncrona: ver `ENVIOS_ASINCRONOS_2026-10-03.md`).
+- **PWA:** barras rediseñadas (menú del avatar, píldora activa, foto en Perfil, modo oscuro coherente); Escape cierra las hojas inferiores; el modal de crear ya no tiene doble scroll; las pestañas Misión/Visión/Objetivos responden.
+- **CU22:** `POST /requests` solo para el Estudiante. **Auditoría:** comando `audits:prune`.
+- **Estados de propuesta:** `RECIBIDA/VIABLE/ARCHIVADA` reales en la base de datos (migración reversible, datos conservados).
+- CU28-E2 verificado con el motor real de producción (MariaDB 11.8, `max_statement_time`).
+
+---
+
 # Sesión 2026-10-03 — Primera prueba visual con navegador real
 
 Chrome + Playwright sobre el entorno local: todas las pantallas por rol en escritorio/tablet/móvil, ~300 botones y modales, flujos de extremo a extremo, CRUD de 12 catálogos y PWA. Acta: `docs/validacion/PRUEBAS_VISUALES_2026-10-03.md`; herramientas: `scripts/ui-tests/`. Corregido: PWA en blanco sin conexión (SW), 500 aleatorio por deadlock en la caché del limitador (`ResilientRateLimiter`), «Cancelar» cortado en móvil, «Inactivar» de Proyectos (404), rol ADMIN preseleccionado al crear usuario, errores 422/429 en inglés, botones/filtros sin estilo, botones flotantes que tapaban acciones, textos de catálogos y gráficas del Dashboard. `CACHE_NAME` v27. 607 tests.
