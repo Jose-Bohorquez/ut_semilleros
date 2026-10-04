@@ -191,7 +191,7 @@ export function DashboardView() {
             <div class="chart-card-header">
                 <div>
                     <p class="chart-card-title">Propuestas por estado</p>
-                    <p class="chart-card-subtitle">Pendientes / Aprobadas / Rechazadas</p>
+                    <p class="chart-card-subtitle">Recibidas / Viables / Archivadas</p>
                 </div>
                 <i class="fas fa-chart-bar" style="color:var(--color-primary);font-size:20px"></i>
             </div>

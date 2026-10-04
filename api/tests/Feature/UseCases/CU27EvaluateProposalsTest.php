@@ -46,7 +46,7 @@ class CU27EvaluateProposalsTest extends TestCase
             'title'       => 'Idea ' . uniqid(),
             'description' => 'Descripción completa de la propuesta para evaluar en CU27, con suficiente detalle.',
             'phone'       => '3001234567',
-            'status'      => 'PENDIENTE',
+            'status'      => 'RECIBIDA',
         ], array_diff_key($attrs, ['review_note' => 1])));
         // review_note no es asignable en masa (solo lo fija la evaluación): se fija aparte.
         if (isset($attrs['review_note'])) {
@@ -180,7 +180,7 @@ class CU27EvaluateProposalsTest extends TestCase
         Sanctum::actingAs($this->leaderOfAreas([$area]));
 
         $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'VIABLE'])->assertStatus(403);   // E2
-        $this->assertSame('PENDIENTE', $p->fresh()->status);
+        $this->assertSame('RECIBIDA', $p->fresh()->status);
     }
 
     /* ── Paso 3: filtros por área, programa, estado y fechas ── */
@@ -191,8 +191,8 @@ class CU27EvaluateProposalsTest extends TestCase
         $prog1 = $this->program(); $prog2 = $this->program();
         $p1 = $this->proposal([$a1], [], null, $prog1);
         $p2 = $this->proposal([$a2], [], null, $prog1);
-        $p3 = $this->proposal([$a1], ['status' => 'APROBADA'], null, $prog2);
-        $p4 = $this->proposal([$a1], ['status' => 'RECHAZADA', 'review_note' => 'No es viable por alcance.'], null, $prog1);
+        $p3 = $this->proposal([$a1], ['status' => 'VIABLE'], null, $prog2);
+        $p4 = $this->proposal([$a1], ['status' => 'ARCHIVADA', 'review_note' => 'No es viable por alcance.'], null, $prog1);
         Sanctum::actingAs($this->user('ADMINISTRATIVO'));
 
         $ids = fn (string $q) => $this->ids($this->getJson("/api/proposals?$q")->assertOk());
@@ -207,10 +207,10 @@ class CU27EvaluateProposalsTest extends TestCase
 
     public function test_the_internal_state_names_also_work_as_filters(): void
     {
-        $p = $this->proposal([$this->area()], ['status' => 'APROBADA']);
+        $p = $this->proposal([$this->area()], ['status' => 'VIABLE']);
         Sanctum::actingAs($this->user('ADMINISTRATIVO'));
 
-        $this->assertSame([$p->id], $this->ids($this->getJson('/api/proposals?status=APROBADA')->assertOk()));
+        $this->assertSame([$p->id], $this->ids($this->getJson('/api/proposals?status=VIABLE')->assertOk()));
     }
 
     /** Días completos de Bogotá (UTC-5). */
@@ -307,7 +307,7 @@ class CU27EvaluateProposalsTest extends TestCase
 
         $this->assertSame('Propuesta marcada como viable', $res->json('message'));
         $p->refresh();
-        $this->assertSame('APROBADA', $p->status);               // Viable (puente de estados)
+        $this->assertSame('VIABLE', $p->status);               // Viable (puente de estados)
         $this->assertSame('Viable', $p->status_label);
         $this->assertSame('Encaja con el semillero de IA, coordina una reunión.', $p->review_note);
         $this->assertSame($evaluator->id, (int) $p->reviewed_by);
@@ -321,7 +321,7 @@ class CU27EvaluateProposalsTest extends TestCase
 
         $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'VIABLE'])->assertOk();
 
-        $this->assertSame('APROBADA', $p->fresh()->status);
+        $this->assertSame('VIABLE', $p->fresh()->status);
         $this->assertNull($p->fresh()->review_note);
     }
 
@@ -335,7 +335,7 @@ class CU27EvaluateProposalsTest extends TestCase
         ])->assertOk();
 
         $this->assertSame('Propuesta archivada', $res->json('message'));
-        $this->assertSame('RECHAZADA', $p->fresh()->status);
+        $this->assertSame('ARCHIVADA', $p->fresh()->status);
         $this->assertSame('Archivada', $p->fresh()->status_label);
     }
 
@@ -353,7 +353,7 @@ class CU27EvaluateProposalsTest extends TestCase
             ->assertJsonPath('errors.review_note.0', 'La observación es obligatoria para archivar la propuesta.');
 
         $p->refresh();
-        $this->assertSame('PENDIENTE', $p->status);
+        $this->assertSame('RECIBIDA', $p->status);
         $this->assertNull($p->reviewed_by);
     }
 
@@ -363,11 +363,11 @@ class CU27EvaluateProposalsTest extends TestCase
         $b = $this->proposal([$this->area()]);
         Sanctum::actingAs($this->user('ADMINISTRATIVO'));
 
-        $this->putJson("/api/proposals/{$a->id}/update-status", ['status' => 'APROBADA'])->assertOk();
-        $this->putJson("/api/proposals/{$b->id}/update-status", ['status' => 'RECHAZADA', 'review_note' => 'Sin viabilidad técnica.'])->assertOk();
+        $this->putJson("/api/proposals/{$a->id}/update-status", ['status' => 'VIABLE'])->assertOk();
+        $this->putJson("/api/proposals/{$b->id}/update-status", ['status' => 'ARCHIVADA', 'review_note' => 'Sin viabilidad técnica.'])->assertOk();
 
-        $this->assertSame('APROBADA', $a->fresh()->status);
-        $this->assertSame('RECHAZADA', $b->fresh()->status);
+        $this->assertSame('VIABLE', $a->fresh()->status);
+        $this->assertSame('ARCHIVADA', $b->fresh()->status);
     }
 
     public function test_an_evaluation_must_be_viable_or_archived(): void
@@ -379,7 +379,7 @@ class CU27EvaluateProposalsTest extends TestCase
             $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => $status])
                 ->assertStatus(422)->assertJsonValidationErrors(['status']);
         }
-        $this->assertSame('PENDIENTE', $p->fresh()->status);
+        $this->assertSame('RECIBIDA', $p->fresh()->status);
     }
 
     public function test_the_observation_has_a_maximum_length(): void
@@ -394,13 +394,13 @@ class CU27EvaluateProposalsTest extends TestCase
     /** Postcondición de falla: «la propuesta conserva su estado»; la spec no define la reevaluación. */
     public function test_an_evaluated_proposal_is_not_evaluated_again(): void
     {
-        $p = $this->proposal([$this->area()], ['status' => 'APROBADA', 'review_note' => 'Viable desde el inicio.']);
+        $p = $this->proposal([$this->area()], ['status' => 'VIABLE', 'review_note' => 'Viable desde el inicio.']);
         Sanctum::actingAs($this->user('ADMINISTRATIVO'));
 
         $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'ARCHIVADA', 'review_note' => 'Cambié de opinión.'])
             ->assertStatus(409)->assertJsonPath('message', 'Esta propuesta ya fue evaluada.');
 
-        $this->assertSame('APROBADA', $p->fresh()->status);
+        $this->assertSame('VIABLE', $p->fresh()->status);
         $this->assertSame('Viable desde el inicio.', $p->fresh()->review_note);
     }
 
@@ -421,7 +421,7 @@ class CU27EvaluateProposalsTest extends TestCase
             Sanctum::actingAs($actor);
             $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'VIABLE'])->assertStatus(403);
         }
-        $this->assertSame('PENDIENTE', $p->fresh()->status);
+        $this->assertSame('RECIBIDA', $p->fresh()->status);
     }
 
     /* ── Paso 6: auditoría (CU29) ── */
@@ -437,8 +437,8 @@ class CU27EvaluateProposalsTest extends TestCase
         $row = Audit::where('table_name', 'proposals')->where('record_id', $p->id)->where('action', 'STATUS_CHANGE')->latest('id')->first();
         $this->assertNotNull($row);
         $this->assertSame($evaluator->id, (int) $row->user_id);
-        $this->assertSame('PENDIENTE', $row->old_values['status']);
-        $this->assertSame('APROBADA', $row->new_values['status']);
+        $this->assertSame('RECIBIDA', $row->old_values['status']);
+        $this->assertSame('VIABLE', $row->new_values['status']);
         $this->assertSame('Aprobada para ejecución.', $row->new_values['review_note']);
     }
 
@@ -466,7 +466,7 @@ class CU27EvaluateProposalsTest extends TestCase
         $p = $this->proposal([$area]);
         $payload = [
             'program_id' => $p->program_id, 'areas' => [$area->id], 'title' => 'Cambiada',
-            'description' => 'Descripción nueva con más de veinte caracteres.', 'status' => 'APROBADA',
+            'description' => 'Descripción nueva con más de veinte caracteres.', 'status' => 'VIABLE',
         ];
 
         foreach (['ADMIN_SISTEMA', 'ADMINISTRATIVO', 'LIDER_SEMILLERO'] as $role) {
@@ -474,7 +474,7 @@ class CU27EvaluateProposalsTest extends TestCase
             $this->putJson("/api/proposals/{$p->id}", $payload)->assertStatus(403);
             $this->postJson('/api/proposals', $payload)->assertStatus(403);
         }
-        $this->assertSame('PENDIENTE', $p->fresh()->status);
+        $this->assertSame('RECIBIDA', $p->fresh()->status);
         $this->assertNotSame('Cambiada', $p->fresh()->title);
     }
 
@@ -487,27 +487,27 @@ class CU27EvaluateProposalsTest extends TestCase
         Sanctum::actingAs($student);
 
         $created = $this->postJson('/api/proposals', [
-            'user_id' => $other->id, 'status' => 'APROBADA', 'program_id' => $program->id, 'areas' => [$area->id],
+            'user_id' => $other->id, 'status' => 'VIABLE', 'program_id' => $program->id, 'areas' => [$area->id],
             'title' => 'Mi idea', 'description' => 'Descripción de mi idea con más de veinte caracteres.',
         ])->assertStatus(201);
 
         $id = $created->json('proposal.id');
         $this->assertSame($student->id, (int) Proposal::find($id)->user_id, 'user_id del cliente ignorado.');
-        $this->assertSame('PENDIENTE', Proposal::find($id)->status, 'status del cliente ignorado.');
+        $this->assertSame('RECIBIDA', Proposal::find($id)->status, 'status del cliente ignorado.');
 
         $this->putJson("/api/proposals/{$id}", [
             'program_id' => $program->id, 'areas' => [$area->id], 'title' => 'Mi idea editada',
-            'description' => 'Descripción editada con más de veinte caracteres.', 'status' => 'APROBADA',
+            'description' => 'Descripción editada con más de veinte caracteres.', 'status' => 'VIABLE',
         ])->assertOk();
         $this->assertSame('Mi idea editada', Proposal::find($id)->title);
-        $this->assertSame('PENDIENTE', Proposal::find($id)->status, 'No cambia el estado desde la edición.');
+        $this->assertSame('RECIBIDA', Proposal::find($id)->status, 'No cambia el estado desde la edición.');
     }
 
     public function test_the_student_cannot_edit_an_evaluated_or_a_foreign_proposal(): void
     {
         $area = $this->area();
         $student = $this->user('ESTUDIANTE');
-        $evaluated = $this->proposal([$area], ['status' => 'APROBADA'], $student);
+        $evaluated = $this->proposal([$area], ['status' => 'VIABLE'], $student);
         $foreign = $this->proposal([$area]);
         Sanctum::actingAs($student);
         $payload = ['program_id' => $evaluated->program_id, 'areas' => [$area->id], 'title' => 'X',

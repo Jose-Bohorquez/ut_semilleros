@@ -38,7 +38,7 @@ class ProposalCrudTest extends TestCase
             'title'       => 'Investigación sobre IA',
             'description' => 'Propuesta para aplicar IA en la educación superior de la región.',
             'phone'       => '3001234567',
-            'status'      => 'PENDIENTE',
+            'status'      => 'RECIBIDA',
         ], $overrides);
     }
 
@@ -139,17 +139,17 @@ class ProposalCrudTest extends TestCase
             'program_id'  => $program->id,
             'title'       => 'Original',
             'description' => 'Descripción original con longitud suficiente para pasar validación.',
-            'status'      => 'PENDIENTE',
+            'status'      => 'RECIBIDA',
         ]);
         $proposal->areas()->attach($area->id);
 
         $response = $this->putJson("/api/proposals/{$proposal->id}", $this->payload([
             'user_id' => $user->id, 'program_id' => $program->id, 'areas' => [$area->id],
-            'title' => 'Actualizada', 'status' => 'APROBADA',
+            'title' => 'Actualizada', 'status' => 'VIABLE',
         ]));
         $response->assertStatus(200);
         // El título cambia, pero el estado NO: solo lo cambia la evaluación (CU27, update-status del Administrativo).
-        $this->assertDatabaseHas('proposals', ['id' => $proposal->id, 'title' => 'Actualizada', 'status' => 'PENDIENTE']);
+        $this->assertDatabaseHas('proposals', ['id' => $proposal->id, 'title' => 'Actualizada', 'status' => 'RECIBIDA']);
     }
 
     public function test_proposal_update_returns_404_for_missing(): void

@@ -16,9 +16,9 @@ import { initLayoutController } from "../../layout/layout.controller.js";
 import { escapeHtml }           from "../../core/escape.js";
 
 const STATUS_BADGE = {
-    PENDIENTE: "badge-pwa-warning",
-    APROBADA:  "badge-pwa-success",
-    RECHAZADA: "badge-pwa-error",
+    RECIBIDA:  "badge-pwa-warning",
+    VIABLE:    "badge-pwa-success",
+    ARCHIVADA: "badge-pwa-error",
 };
 
 const emptyFilters = () => ({ area_id: "", program_id: "", status: "", from: "", to: "" });
@@ -196,7 +196,7 @@ async function openProposal(id) {
         return;
     }
 
-    const evaluable = canEvaluate() && p.status === "PENDIENTE";
+    const evaluable = canEvaluate() && p.status === "RECIBIDA";
 
     // Paso 4: descripción completa y, solo para el Administrativo, los datos de contacto.
     const contact = p.contact ? `

@@ -113,10 +113,10 @@ class SecurityRegressionTest extends TestCase
         $program = Program::create(['name' => 'P', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
         $this->postJson('/api/proposals', [
             'user_id' => $other->id, 'program_id' => $program->id, 'areas' => [$area->id],
-            'title' => 'qa_sec', 'description' => 'Descripción con longitud suficiente para pasar validación.', 'status' => 'APROBADA',
+            'title' => 'qa_sec', 'description' => 'Descripción con longitud suficiente para pasar validación.', 'status' => 'VIABLE',
         ])->assertStatus(201);
 
-        $this->assertDatabaseHas('proposals', ['title' => 'qa_sec', 'user_id' => $student->id, 'status' => 'PENDIENTE']);
+        $this->assertDatabaseHas('proposals', ['title' => 'qa_sec', 'user_id' => $student->id, 'status' => 'RECIBIDA']);
     }
 
     public function test_student_cannot_reassign_own_proposal_to_another_user(): void
@@ -126,18 +126,18 @@ class SecurityRegressionTest extends TestCase
         $area     = Area::create(['name' => 'A', 'code' => 'A-' . uniqid(), 'status' => 'ACTIVO']);
         $faculty  = Faculty::create(['name' => 'F', 'status' => 'ACTIVO']);
         $program  = Program::create(['name' => 'P', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
-        $proposal = Proposal::create(['user_id' => $student->id, 'program_id' => $program->id, 'title' => 't', 'description' => 'Descripción con longitud suficiente.', 'status' => 'PENDIENTE']);
+        $proposal = Proposal::create(['user_id' => $student->id, 'program_id' => $program->id, 'title' => 't', 'description' => 'Descripción con longitud suficiente.', 'status' => 'RECIBIDA']);
         $proposal->areas()->attach($area->id);
         Sanctum::actingAs($student);
 
         $this->putJson("/api/proposals/{$proposal->id}", [
             'user_id' => $other->id, 'program_id' => $program->id, 'areas' => [$area->id],
-            'title' => 't2', 'description' => 'Descripción actualizada con longitud suficiente.', 'status' => 'APROBADA',
+            'title' => 't2', 'description' => 'Descripción actualizada con longitud suficiente.', 'status' => 'VIABLE',
         ])->assertStatus(200);
 
         $proposal->refresh();
         $this->assertSame($student->id, $proposal->user_id);
-        $this->assertSame('PENDIENTE', $proposal->status);
+        $this->assertSame('RECIBIDA', $proposal->status);
         $this->assertSame('t2', $proposal->title);
     }
 

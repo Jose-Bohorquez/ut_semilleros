@@ -22,22 +22,22 @@ class ProposalController extends Controller
         'description.max'     => 'La descripción debe tener entre 20 y 2000 caracteres.',
     ];
 
-    /* CU27: los dos nombres de cada estado de evaluación. Internamente siguen siendo
-       APROBADA/RECHAZADA (puente reversible de CU26); la spec los llama Viable/Archivada. */
+    /* CU27: estados de evaluación. Los valores internos son ya los de la spec (Viable/Archivada); se siguen
+       aceptando APROBADA/RECHAZADA como entrada por compatibilidad con clientes antiguos. */
     private const EVALUATION_STATUSES = [
-        'VIABLE'    => 'APROBADA',
-        'ARCHIVADA' => 'RECHAZADA',
-        'APROBADA'  => 'APROBADA',
-        'RECHAZADA' => 'RECHAZADA',
+        'VIABLE'    => 'VIABLE',
+        'ARCHIVADA' => 'ARCHIVADA',
+        'APROBADA'  => 'VIABLE',
+        'RECHAZADA' => 'ARCHIVADA',
     ];
 
     private const FILTER_STATUSES = [
-        'RECIBIDA'  => 'PENDIENTE',
-        'VIABLE'    => 'APROBADA',
-        'ARCHIVADA' => 'RECHAZADA',
-        'PENDIENTE' => 'PENDIENTE',
-        'APROBADA'  => 'APROBADA',
-        'RECHAZADA' => 'RECHAZADA',
+        'RECIBIDA'  => 'RECIBIDA',
+        'VIABLE'    => 'VIABLE',
+        'ARCHIVADA' => 'ARCHIVADA',
+        'PENDIENTE' => 'RECIBIDA',
+        'APROBADA'  => 'VIABLE',
+        'RECHAZADA' => 'ARCHIVADA',
     ];
 
     /**
@@ -171,7 +171,7 @@ class ProposalController extends Controller
 
             "phone"=>"nullable|string|max:30",
 
-            "status"=>"nullable|in:PENDIENTE,APROBADA,RECHAZADA"
+            "status"=>"nullable|in:RECIBIDA,VIABLE,ARCHIVADA,PENDIENTE,APROBADA,RECHAZADA"
 
         ], self::MESSAGES);
 
@@ -179,7 +179,7 @@ class ProposalController extends Controller
            autenticado y nace PENDIENTE (Recibida) — se ignora el `user_id` y el `status`
            que mande el cliente. La evaluación es exclusiva de update-status (CU27). */
         $validated['user_id'] = auth()->id();
-        $validated['status']  = 'PENDIENTE';
+        $validated['status']  = 'RECIBIDA';
 
         $areas = $validated['areas'];
         unset($validated['areas']);
@@ -213,7 +213,7 @@ class ProposalController extends Controller
         if ($proposal->user_id !== auth()->id()) {
             return response()->json(['message' => 'No puedes editar una propuesta que no es tuya'], 403);
         }
-        if ($proposal->status !== 'PENDIENTE') {
+        if ($proposal->status !== 'RECIBIDA') {
             return response()->json(['message' => 'Solo puedes editar propuestas en estado Pendiente'], 403);
         }
 
@@ -232,7 +232,7 @@ class ProposalController extends Controller
 
             "phone"=>"nullable|string|max:30",
 
-            "status"=>"nullable|in:PENDIENTE,APROBADA,RECHAZADA"
+            "status"=>"nullable|in:RECIBIDA,VIABLE,ARCHIVADA,PENDIENTE,APROBADA,RECHAZADA"
 
         ], self::MESSAGES);
 
@@ -274,12 +274,12 @@ class ProposalController extends Controller
     {
         $proposal = Proposal::findOrFail($id);
 
-        if ($proposal->status !== 'PENDIENTE') {
+        if ($proposal->status !== 'RECIBIDA') {
             return response()->json(['message' => 'Esta propuesta ya fue evaluada.'], 409);
         }
 
         $target   = self::EVALUATION_STATUSES[$request->input('status')] ?? null;
-        $archives = $target === 'RECHAZADA';
+        $archives = $target === 'ARCHIVADA';
 
         $validated = $request->validate([
             'status'      => ['required', Rule::in(array_keys(self::EVALUATION_STATUSES))],

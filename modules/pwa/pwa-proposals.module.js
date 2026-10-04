@@ -3,7 +3,7 @@
    Reglas:
    - Solo ve SUS PROPIAS propuestas (GET /proposals/my)
    - Puede CREAR nuevas propuestas
-   - Puede EDITAR solo si status === 'PENDIENTE'
+   - Puede EDITAR solo si status === 'RECIBIDA'
    - NO puede aprobar, rechazar ni cambiar estado
    - La aprobación corresponde al Administrador o Líder de Semillero
    ─────────────────────────────────────────────────────────────── */
@@ -18,9 +18,9 @@ import { escapeHtml }      from "../../core/escape.js";
    entrega en `status_label`; este mapa es el respaldo y define el color y si la
    propuesta aún se puede editar (extensión existente: solo mientras está Recibida). */
 const STATUS_MAP = {
-    PENDIENTE: { label: "Recibida",   cls: "badge-pwa-warning", editable: true  },
-    APROBADA:  { label: "Viable",     cls: "badge-pwa-success", editable: false },
-    RECHAZADA: { label: "Archivada",  cls: "badge-pwa-error",   editable: false },
+    RECIBIDA: { label: "Recibida",   cls: "badge-pwa-warning", editable: true  },
+    VIABLE:    { label: "Viable",     cls: "badge-pwa-success", editable: false },
+    ARCHIVADA: { label: "Archivada",  cls: "badge-pwa-error",   editable: false },
 };
 
 const statusOf = (p) => {
@@ -163,7 +163,7 @@ function renderList(proposals) {
             </div>`;
         }).join("");
 
-    const notice = proposals.some(p => p.status === "PENDIENTE")
+    const notice = proposals.some(p => p.status === "RECIBIDA")
         ? `<div style="display:flex;align-items:center;gap:6px;
                  background:var(--color-warning-light);border:1px solid var(--color-warning-border);
                  border-radius:var(--radius-btn);padding:var(--space-3) var(--space-4);
@@ -367,7 +367,7 @@ function bindListEvents() {
 
         const user    = getUser();
         const isEdit  = !!id;
-        const payload = { user_id: user.id, program_id: programId, areas: areaIds, title, description: desc, phone: phone || null, status: "PENDIENTE" };
+        const payload = { user_id: user.id, program_id: programId, areas: areaIds, title, description: desc, phone: phone || null, status: "RECIBIDA" };
 
         try {
             if (isEdit) {
@@ -407,7 +407,7 @@ function showProposalDetail(p) {
     const areas = (p.areas || []).map(a => escapeHtml(a.name)).join(", ") || "—";
     const note = p.review_note
         ? escapeHtml(p.review_note)
-        : `<em>${p.status === "PENDIENTE" ? "Aún sin respuesta del evaluador." : "Sin observación registrada."}</em>`;
+        : `<em>${p.status === "RECIBIDA" ? "Aún sin respuesta del evaluador." : "Sin observación registrada."}</em>`;
 
     Swal.fire({
         title: escapeHtml(p.title),

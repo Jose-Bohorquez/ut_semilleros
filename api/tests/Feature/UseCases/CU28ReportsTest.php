@@ -92,7 +92,7 @@ class CU28ReportsTest extends TestCase
     {
         $p = Proposal::create([
             'user_id' => $this->user('ESTUDIANTE')->id, 'program_id' => $this->program($this->faculty('F' . uniqid()), 'P' . uniqid())->id,
-            'title' => 'Idea', 'description' => 'Descripción de prueba con más de veinte caracteres.', 'status' => 'PENDIENTE',
+            'title' => 'Idea', 'description' => 'Descripción de prueba con más de veinte caracteres.', 'status' => 'RECIBIDA',
         ]);
         $p->areas()->attach(array_map(fn ($a) => $a->id, $areas));
         if ($createdAt) {

@@ -118,11 +118,11 @@ async function loadKPIs(role) {
         const list = proposalsData.proposals;
         if (role === "ESTUDIANTE") {
             /* Estudiante: muestra total de sus propuestas y estado */
-            const pending = list.filter(p => p.status === "PENDIENTE").length;
+            const pending = list.filter(p => p.status === "RECIBIDA").length;
             const label   = pending > 0 ? `${pending} pendiente${pending > 1 ? "s" : ""}` : "Ninguna pendiente";
             setKPI("kpi-proposals", list.length, label, pending > 0 ? "down" : "up");
         } else {
-            const pending = list.filter(p => p.status === "PENDIENTE").length;
+            const pending = list.filter(p => p.status === "RECIBIDA").length;
             setKPI("kpi-proposals", pending, pending > 0 ? "Requieren revisión" : "Al día",
                 pending > 0 ? "down" : "up");
         }
@@ -154,6 +154,9 @@ const STATUS_META = {
     PENDIENTE:  { cls: "is-warn", label: "Pendiente" },
     APROBADA:   { cls: "is-ok",   label: "Aprobada"  },
     RECHAZADA:  { cls: "is-err",  label: "Rechazada" },
+    RECIBIDA:   { cls: "is-warn", label: "Recibida"  },   // propuestas (vocabulario de la spec)
+    VIABLE:     { cls: "is-ok",   label: "Viable"    },
+    ARCHIVADA:  { cls: "is-err",  label: "Archivada" },
 };
 
 function timeAgo(dateStr) {
@@ -359,17 +362,17 @@ async function loadCharts() {
     const proposalList = proposals?.proposals || [];
     if (proposalList.length && document.getElementById("chartProposalStatus")) {
         const counts = {
-            PENDIENTE: proposalList.filter(p => p.status === "PENDIENTE").length,
-            APROBADA:  proposalList.filter(p => p.status === "APROBADA").length,
-            RECHAZADA: proposalList.filter(p => p.status === "RECHAZADA").length,
+            RECIBIDA:  proposalList.filter(p => p.status === "RECIBIDA").length,
+            VIABLE:    proposalList.filter(p => p.status === "VIABLE").length,
+            ARCHIVADA: proposalList.filter(p => p.status === "ARCHIVADA").length,
         };
         new Chart(freshCanvas("chartProposalStatus"), {
             type: "bar",
             data: {
-                labels: ["Pendientes", "Aprobadas", "Rechazadas"],
+                labels: ["Recibidas", "Viables", "Archivadas"],
                 datasets: [{
                     label: "Propuestas",
-                    data:  [counts.PENDIENTE, counts.APROBADA, counts.RECHAZADA],
+                    data:  [counts.RECIBIDA, counts.VIABLE, counts.ARCHIVADA],
                     backgroundColor: [warning, success, primary],
                     borderRadius: 6,
                     borderSkipped: false,

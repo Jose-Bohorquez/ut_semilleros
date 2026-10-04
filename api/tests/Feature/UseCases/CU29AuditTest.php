@@ -260,7 +260,7 @@ class CU29AuditTest extends TestCase
     public function test_unchanged_pivot_does_not_create_a_row(): void
     {
         Sanctum::actingAs($this->admin());
-        $p = Proposal::create(['user_id' => User::factory()->create()->id, 'title' => 'T', 'description' => 'x', 'status' => 'PENDIENTE']);
+        $p = Proposal::create(['user_id' => User::factory()->create()->id, 'title' => 'T', 'description' => 'x', 'status' => 'RECIBIDA']);
         $area = Area::create(['name' => 'A', 'code' => 'AX', 'status' => 'ACTIVO']);
         \App\Support\AuditTrail::pivot($p, 'areas', [$area->id], [$area->id]);
 

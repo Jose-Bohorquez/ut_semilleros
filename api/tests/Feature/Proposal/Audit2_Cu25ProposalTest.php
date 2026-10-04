@@ -43,7 +43,7 @@ class Audit2_Cu25ProposalTest extends TestCase
             'title'       => 'Investigación sobre IA',
             'description' => 'Propuesta para aplicar IA en la educación superior de la región.',
             'phone'       => '3001234567',
-            'status'      => 'PENDIENTE',
+            'status'      => 'RECIBIDA',
         ], $overrides);
     }
 
@@ -75,7 +75,7 @@ class Audit2_Cu25ProposalTest extends TestCase
         $program = $this->programActivo();
         $proposal = Proposal::create([
             'user_id' => $student->id, 'program_id' => $program->id, 'title' => 'T',
-            'description' => 'Descripción original con longitud suficiente.', 'status' => 'PENDIENTE',
+            'description' => 'Descripción original con longitud suficiente.', 'status' => 'RECIBIDA',
         ]);
         $proposal->areas()->attach($area->id);
 
@@ -194,15 +194,15 @@ class Audit2_Cu25ProposalTest extends TestCase
         $student = $this->student();
         $proposal = Proposal::create([
             'user_id' => $student->id, 'program_id' => $this->programActivo()->id, 'title' => 'T',
-            'description' => 'Descripción original con longitud suficiente.', 'status' => 'PENDIENTE',
+            'description' => 'Descripción original con longitud suficiente.', 'status' => 'RECIBIDA',
         ]);
 
         Sanctum::actingAs($evaluator);
-        $this->putJson("/api/proposals/{$proposal->id}/update-status", ['status' => 'APROBADA'])
+        $this->putJson("/api/proposals/{$proposal->id}/update-status", ['status' => 'VIABLE'])
             ->assertStatus(200);
 
         $fresh = DB::table('proposals')->where('id', $proposal->id)->first();
-        $this->assertSame('APROBADA', $fresh->status);
+        $this->assertSame('VIABLE', $fresh->status);
         $this->assertSame($evaluator->id, (int) $fresh->reviewed_by);
         $this->assertNotNull($fresh->reviewed_at);
     }

@@ -7,14 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Proposal extends Model
 {
 
-    /* Vocabulario de la especificación (RF11, CU25 paso 5, CU26 paso 3) sobre los
-       valores internos del enum. Migrar el enum es decisión de CU27; mientras tanto
-       la API y la PWA muestran estas etiquetas (puente reversible). */
+    /* Vocabulario de la especificación (RF11, CU25 paso 5, CU26 paso 3). Desde la migración
+       2026_10_04_000001 los valores internos del enum SON estos (antes PENDIENTE/APROBADA/RECHAZADA). */
     public const STATUS_LABELS = [
-        'PENDIENTE' => 'Recibida',
-        'APROBADA'  => 'Viable',
-        'RECHAZADA' => 'Archivada',
+        'RECIBIDA'  => 'Recibida',
+        'VIABLE'    => 'Viable',
+        'ARCHIVADA' => 'Archivada',
     ];
+
+    /** Nombres internos anteriores: la API los sigue aceptando como ENTRADA (clientes con caché antigua). */
+    public const LEGACY_STATUSES = [
+        'PENDIENTE' => 'RECIBIDA',
+        'APROBADA'  => 'VIABLE',
+        'RECHAZADA' => 'ARCHIVADA',
+    ];
+
+    /** Devuelve el estado en el vocabulario actual (acepta también los nombres anteriores) o null si no existe. */
+    public static function normalizeStatus(?string $status): ?string
+    {
+        $s = strtoupper(trim((string) $status));
+
+        return self::LEGACY_STATUSES[$s] ?? (isset(self::STATUS_LABELS[$s]) ? $s : null);
+    }
 
     protected $appends = ['status_label'];
 

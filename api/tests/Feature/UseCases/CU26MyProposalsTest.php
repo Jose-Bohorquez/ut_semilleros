@@ -44,7 +44,7 @@ class CU26MyProposalsTest extends TestCase
             'title'       => 'Idea ' . uniqid(),
             'description' => 'Descripción completa de la propuesta para la consulta de CU26.',
             'phone'       => '3001234567',
-            'status'      => 'PENDIENTE',
+            'status'      => 'RECIBIDA',
         ], $attrs));
         $p->areas()->attach($this->area()->id);
         return $p;
@@ -114,9 +114,9 @@ class CU26MyProposalsTest extends TestCase
     public function test_state_labels_follow_the_specification_vocabulary(): void
     {
         $s = $this->student();
-        $recibida  = $this->proposal($s, ['status' => 'PENDIENTE']);
-        $viable    = $this->proposal($s, ['status' => 'APROBADA']);
-        $archivada = $this->proposal($s, ['status' => 'RECHAZADA']);
+        $recibida  = $this->proposal($s, ['status' => 'RECIBIDA']);
+        $viable    = $this->proposal($s, ['status' => 'VIABLE']);
+        $archivada = $this->proposal($s, ['status' => 'ARCHIVADA']);
 
         Sanctum::actingAs($s);
         $byId = collect($this->getJson('/api/proposals/my')->assertOk()->json('proposals'))->keyBy('id');
@@ -137,7 +137,7 @@ class CU26MyProposalsTest extends TestCase
         // El evaluador (Administrativo, CU27) responde: CU27 paso 7 «el estudiante ve el nuevo estado en CU26».
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMINISTRATIVO']));
         $this->putJson("/api/proposals/{$p->id}/update-status", [
-            'status' => 'APROBADA', 'review_note' => 'Es viable, agenda una reunión con el líder.',
+            'status' => 'VIABLE', 'review_note' => 'Es viable, agenda una reunión con el líder.',
         ])->assertOk();
 
         Sanctum::actingAs($s);
@@ -153,9 +153,9 @@ class CU26MyProposalsTest extends TestCase
         $p = $this->proposal($s);
         Sanctum::actingAs(User::factory()->create(['role' => 'ADMINISTRATIVO']));
 
-        $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'APROBADA', 'review_note' => 'no'])
+        $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'VIABLE', 'review_note' => 'no'])
             ->assertStatus(422)->assertJsonValidationErrors(['review_note']);
-        $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'APROBADA'])->assertOk();
+        $this->putJson("/api/proposals/{$p->id}/update-status", ['status' => 'VIABLE'])->assertOk();
     }
 
     /** Paso 5: el detalle trae la descripción COMPLETA (sin recortar). */
@@ -223,9 +223,9 @@ class CU26MyProposalsTest extends TestCase
     public function test_internal_status_is_kept_for_existing_consumers(): void
     {
         $s = $this->student();
-        $this->proposal($s, ['status' => 'PENDIENTE']);
+        $this->proposal($s, ['status' => 'RECIBIDA']);
 
         Sanctum::actingAs($s);
-        $this->assertSame('PENDIENTE', $this->getJson('/api/proposals/my')->json('proposals.0.status'));
+        $this->assertSame('RECIBIDA', $this->getJson('/api/proposals/my')->json('proposals.0.status'));
     }
 }

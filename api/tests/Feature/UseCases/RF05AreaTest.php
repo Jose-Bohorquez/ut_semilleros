@@ -110,11 +110,11 @@ class RF05AreaTest extends TestCase
         $faculty = Faculty::create(['name' => 'F', 'status' => 'ACTIVO']);
         $program = Program::create(['name' => 'P', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
         Sanctum::actingAs($u);
-        $this->postJson('/api/proposals', ['user_id' => $u->id, 'program_id' => $program->id, 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'PENDIENTE'])
+        $this->postJson('/api/proposals', ['user_id' => $u->id, 'program_id' => $program->id, 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'RECIBIDA'])
             ->assertStatus(422)->assertJsonValidationErrors(['areas']);
 
         $area = Area::create(['code' => 'A', 'name' => 'A', 'status' => 'ACTIVO']);
-        $this->postJson('/api/proposals', ['user_id' => $u->id, 'program_id' => $program->id, 'areas' => [$area->id], 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'PENDIENTE'])
+        $this->postJson('/api/proposals', ['user_id' => $u->id, 'program_id' => $program->id, 'areas' => [$area->id], 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'RECIBIDA'])
             ->assertCreated();
     }
 
@@ -124,11 +124,11 @@ class RF05AreaTest extends TestCase
         $faculty = Faculty::create(['name' => 'F', 'status' => 'ACTIVO']);
         $program = Program::create(['name' => 'P', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
         $area = Area::create(['code' => 'A', 'name' => 'A', 'status' => 'ACTIVO']);
-        $p = Proposal::create(['user_id' => $u->id, 'program_id' => $program->id, 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'PENDIENTE']);
+        $p = Proposal::create(['user_id' => $u->id, 'program_id' => $program->id, 'title' => 'T', 'description' => 'Descripción con longitud suficiente.', 'status' => 'RECIBIDA']);
         $p->areas()->attach($area->id);
         $area->update(['status' => 'INACTIVO']);
         Sanctum::actingAs($u);
-        $this->putJson("/api/proposals/{$p->id}", ['user_id' => $u->id, 'program_id' => $program->id, 'areas' => [$area->id], 'title' => 'T2', 'description' => 'Descripción actualizada con longitud suficiente.', 'status' => 'PENDIENTE'])
+        $this->putJson("/api/proposals/{$p->id}", ['user_id' => $u->id, 'program_id' => $program->id, 'areas' => [$area->id], 'title' => 'T2', 'description' => 'Descripción actualizada con longitud suficiente.', 'status' => 'RECIBIDA'])
             ->assertOk();
     }
 }

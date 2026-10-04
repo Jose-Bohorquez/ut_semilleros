@@ -237,7 +237,7 @@ class PushNotificationsTest extends TestCase
         $program = Program::create(['name' => 'P2', 'faculty_id' => $f->id, 'status' => 'ACTIVO']);
         $p = Proposal::create([
             'user_id' => $student->id, 'program_id' => $program->id, 'title' => 'Sensores de agua',
-            'description' => 'Descripción de la propuesta con suficiente detalle para evaluarla.', 'phone' => '3001234567', 'status' => 'PENDIENTE',
+            'description' => 'Descripción de la propuesta con suficiente detalle para evaluarla.', 'phone' => '3001234567', 'status' => 'RECIBIDA',
         ]);
         $p->areas()->attach(Area::create(['name' => 'A', 'code' => 'A1', 'status' => 'ACTIVO'])->id);
         Sanctum::actingAs($this->user('ADMINISTRATIVO'));
