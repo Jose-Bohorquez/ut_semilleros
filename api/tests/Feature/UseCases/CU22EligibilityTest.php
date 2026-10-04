@@ -79,7 +79,7 @@ class CU22EligibilityTest extends TestCase
     {
         $u = $this->student(); $s = $this->seedbed('A');
 
-        $this->assertSame(['can_apply' => true, 'state' => 'free', 'message' => null, 'seedbed_name' => null], $this->eligibility($u, $s));
+        $this->assertSame(['can_apply' => true, 'state' => 'free', 'message' => null, 'seedbed_name' => null, 'request_id' => null], $this->eligibility($u, $s));
         $this->apply($u, $s)->assertStatus(201);
     }
 

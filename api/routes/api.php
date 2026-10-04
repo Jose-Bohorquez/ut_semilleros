@@ -329,6 +329,11 @@ Route::middleware(['auth:sanctum', 'active', 'consent'])->group(function () {
     Route::middleware('role:ESTUDIANTE')
          ->get('/requests/my', [RequestController::class, 'myRequests']);
 
+    /* PUT /requests/{id}/cancel — el estudiante cancela su solicitud pendiente (CU22/CU23). */
+    Route::middleware('role:ESTUDIANTE')
+         ->put('/requests/{id}/cancel', [RequestController::class, 'cancel'])
+         ->whereNumber('id');
+
     /* GET /requests/eligibility — ¿puede postularse? (CU22); va antes de /requests/{id} por la misma razón. */
     Route::middleware('role:ESTUDIANTE')
          ->get('/requests/eligibility', [RequestController::class, 'eligibility']);

@@ -33,11 +33,11 @@ class RequestController extends Controller
 
         $filters = $request->validate([
             'seedbed_id' => 'nullable|integer',
-            'status'     => 'nullable|in:PENDIENTE,APROBADA,RECHAZADA',
+            'status'     => 'nullable|in:PENDIENTE,APROBADA,RECHAZADA,CANCELADA',
             'from'       => 'nullable|date',
             'to'         => 'nullable|date|after_or_equal:from',
         ], [
-            'status.in'           => 'El estado debe ser PENDIENTE, APROBADA o RECHAZADA.',
+            'status.in'           => 'El estado debe ser PENDIENTE, APROBADA, RECHAZADA o CANCELADA.',
             'from.date'           => 'La fecha inicial no es válida.',
             'to.date'             => 'La fecha final no es válida.',
             'to.after_or_equal'   => 'La fecha final no puede ser anterior a la inicial.',
@@ -270,6 +270,32 @@ class RequestController extends Controller
                 ? 'Solicitud aprobada'
                 : 'Solicitud rechazada',
             'request' => $req->load(['user:id,name,email', 'seedbed:id,name', 'program:id,name']),
+        ]);
+    }
+
+    /**
+     * PUT /requests/{id}/cancel — el estudiante cancela SU solicitud mientras esté pendiente (por si se equivocó).
+     * No se borra: pasa a CANCELADA, queda en «Mis solicitudes» y en la auditoría (STATUS_CHANGE), y el estudiante
+     * queda libre para postularse de nuevo (a este u otro semillero). Una solicitud ajena responde 404 (no se revela
+     * que existe) y una ya resuelta 409.
+     */
+    public function cancel($id)
+    {
+        $req = RequestModel::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+
+        if ($req->status !== 'PENDIENTE') {
+            return response()->json([
+                'message' => $req->status === 'CANCELADA'
+                    ? 'Esta solicitud ya estaba cancelada.'
+                    : 'Solo puedes cancelar solicitudes pendientes. Esta ya fue resuelta por el líder.',
+            ], 409);
+        }
+
+        $req->forceFill(['status' => 'CANCELADA', 'reason' => 'Cancelada por el estudiante.'])->save();
+
+        return response()->json([
+            'message' => 'Solicitud cancelada. Ya puedes postularte de nuevo.',
+            'request' => $req->load(['seedbed:id,name', 'program:id,name']),
         ]);
     }
 

@@ -187,6 +187,7 @@ class ReportController extends Controller
     {
         $q = DB::table('requests')
             ->join('seedbeds', 'seedbeds.id', '=', 'requests.seedbed_id')
+            ->where('requests.status', '!=', 'CANCELADA')   // retiradas por el estudiante: no cuentan
             ->when($f['cat_id'], fn ($q, $v) => $q->where('seedbeds.cat_id', $v))
             ->when($scope !== null, fn ($q) => $q->whereIn('requests.seedbed_id', $scope));
         $this->dates($q, 'requests.created_at', $f);

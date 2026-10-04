@@ -22,7 +22,7 @@ use App\Models\User;
 class SeedbedAssociation
 {
     /**
-     * @return array{can_apply:bool,state:string,message:?string,seedbed_name:?string}
+     * @return array{can_apply:bool,state:string,message:?string,seedbed_name:?string,request_id:?int}
      *   state: free | pending_here | pending_other | member_here | member_other | approved_here | approved_other
      */
     public static function evaluate(User $user, ?int $seedbedId = null): array
@@ -53,13 +53,13 @@ class SeedbedAssociation
             foreach ($found as [$kind, $items, $idOf]) {
                 foreach ($items as $item) {
                     if (($seedbedId !== null && (int) $idOf($item) === $seedbedId) === $here) {
-                        return self::result($kind, $here, $item->seedbed?->name);
+                        return self::result($kind, $here, $item->seedbed?->name, $kind === 'pending' ? (int) $item->id : null);
                     }
                 }
             }
         }
 
-        return ['can_apply' => true, 'state' => 'free', 'message' => null, 'seedbed_name' => null];
+        return ['can_apply' => true, 'state' => 'free', 'message' => null, 'seedbed_name' => null, 'request_id' => null];
     }
 
     private static function mine($q, User $user): void
@@ -67,7 +67,7 @@ class SeedbedAssociation
         $q->where('user_id', $user->id)->orWhereRaw('lower(email) = ?', [mb_strtolower((string) $user->email)]);
     }
 
-    private static function result(string $kind, bool $here, ?string $name): array
+    private static function result(string $kind, bool $here, ?string $name, ?int $requestId = null): array
     {
         $n = $name ? "«{$name}»" : 'otro semillero';
 
@@ -81,6 +81,6 @@ class SeedbedAssociation
         ];
         $state = $kind . ($here ? '_here' : '_other');
 
-        return ['can_apply' => false, 'state' => $state, 'message' => $messages[$state], 'seedbed_name' => $name];
+        return ['can_apply' => false, 'state' => $state, 'message' => $messages[$state], 'seedbed_name' => $name, 'request_id' => $requestId];
     }
 }
