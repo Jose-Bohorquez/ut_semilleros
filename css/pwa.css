@@ -263,6 +263,108 @@
 
 
 /* =========================================================
+   FACULTADES — tarjetas de sección (CU17, pantalla 1)
+   Hallazgo real (2026-10-10): con el .pwa-card genérico, el nombre de la
+   facultad se truncaba a una línea ("Instituto de Educación a Di…") y
+   la lista quedaba como filas finas sin separación visual real, con
+   mucho espacio vacío debajo cuando hay pocas facultades. Estas tarjetas
+   son más altas, con el nombre completo (puede partirse en 2 líneas) y
+   una vista previa de los programas de esa facultad.
+   ========================================================= */
+
+.faculty-section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 560px) {
+  .faculty-section-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+.faculty-section-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+}
+
+.faculty-section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.faculty-section-name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: 1.3;
+  /* Sin truncar: el nombre completo de la facultad importa más que una
+     línea prolija (hallazgo real de esta ronda). */
+  white-space: normal;
+}
+
+.faculty-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.faculty-chip {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-full);
+  padding: 3px var(--space-3);
+}
+
+.faculty-chip-more {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+}
+
+.faculty-section-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.faculty-section-link {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (hover: hover) {
+  .faculty-section-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+    border-color: var(--color-primary);
+  }
+}
+
+/* Semilleros cargados en lote sin programa específico aún (ver
+   ImportSeedbeds.php) — se agrupan aparte para no repetirse en varias
+   áreas del IDEAD a la vez. */
+.faculty-section-pending {
+  border-style: dashed;
+  border-color: var(--color-warning-border, var(--color-border));
+}
+
+
+/* =========================================================
    PWA SECTION HEADER — cabecera de grupos/secciones
    ========================================================= */
 
@@ -823,8 +925,8 @@
 @media (min-width: 769px) { #updateBanner { left: auto; right: 24px; bottom: 24px; max-width: 420px; } }
 
 /* ── Retroalimentación al tocar (siempre, sin depender del movimiento decorativo) ── */
-.pwa-card, .quick-link-card, .kpi-card, .faculty-card, .seedbed-card { transition: transform .15s ease, box-shadow .2s ease; -webkit-tap-highlight-color: transparent; }
-.pwa-card:active, .quick-link-card:active, .faculty-card:active, .seedbed-card:active { transform: scale(.98); }
+.pwa-card, .quick-link-card, .kpi-card, .faculty-section-card, .seedbed-card { transition: transform .15s ease, box-shadow .2s ease; -webkit-tap-highlight-color: transparent; }
+.pwa-card:active, .quick-link-card:active, .faculty-section-card:active, .seedbed-card:active { transform: scale(.98); }
 .pwa-btn-primary:active, .pwa-btn-secondary:active, .btn:active, .pwa-fab:active { transform: scale(.97); }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -836,16 +938,16 @@
 
   /* Cada pantalla entra con un suave desvanecido y sus tarjetas suben una tras otra */
   .content > * { animation: pwaFade .28s ease both; }
-  .pwa-card, .faculty-card, .seedbed-card, .pwa-section-header, .empty-state, .alert-info, .alert-warning, .alert-success {
+  .pwa-card, .faculty-section-card, .seedbed-card, .pwa-section-header, .empty-state, .alert-info, .alert-warning, .alert-success {
     animation: pwaRise .42s cubic-bezier(.2,.7,.2,1) both;
   }
-  .pwa-card:nth-child(1), .faculty-card:nth-child(1), .seedbed-card:nth-child(1) { animation-delay: .03s; }
-  .pwa-card:nth-child(2), .faculty-card:nth-child(2), .seedbed-card:nth-child(2) { animation-delay: .08s; }
-  .pwa-card:nth-child(3), .faculty-card:nth-child(3), .seedbed-card:nth-child(3) { animation-delay: .13s; }
-  .pwa-card:nth-child(4), .faculty-card:nth-child(4), .seedbed-card:nth-child(4) { animation-delay: .18s; }
-  .pwa-card:nth-child(5), .faculty-card:nth-child(5), .seedbed-card:nth-child(5) { animation-delay: .23s; }
-  .pwa-card:nth-child(6), .faculty-card:nth-child(6), .seedbed-card:nth-child(6) { animation-delay: .28s; }
-  .pwa-card:nth-child(n+7), .faculty-card:nth-child(n+7), .seedbed-card:nth-child(n+7) { animation-delay: .32s; }
+  .pwa-card:nth-child(1), .faculty-section-card:nth-child(1), .seedbed-card:nth-child(1) { animation-delay: .03s; }
+  .pwa-card:nth-child(2), .faculty-section-card:nth-child(2), .seedbed-card:nth-child(2) { animation-delay: .08s; }
+  .pwa-card:nth-child(3), .faculty-section-card:nth-child(3), .seedbed-card:nth-child(3) { animation-delay: .13s; }
+  .pwa-card:nth-child(4), .faculty-section-card:nth-child(4), .seedbed-card:nth-child(4) { animation-delay: .18s; }
+  .pwa-card:nth-child(5), .faculty-section-card:nth-child(5), .seedbed-card:nth-child(5) { animation-delay: .23s; }
+  .pwa-card:nth-child(6), .faculty-section-card:nth-child(6), .seedbed-card:nth-child(6) { animation-delay: .28s; }
+  .pwa-card:nth-child(n+7), .faculty-section-card:nth-child(n+7), .seedbed-card:nth-child(n+7) { animation-delay: .32s; }
 
   /* La línea de acento del saludo «se dibuja» */
   .accent-divider { transform-origin: left; animation: pwaGrow .6s .25s cubic-bezier(.2,.7,.2,1) both; }

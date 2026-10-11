@@ -38,6 +38,17 @@ class SeedIdeadCatalog extends Command
         '0856' => 'Administración de Empresas Turísticas y Hoteleras',
     ];
 
+    /* El IDEAD no se divide en facultades: agrupa sus programas por área de
+       estudio (decisión de Jose, 2026-10-11). "0838" (Tecnología en
+       Protección y Recuperación de Ecosistemas Forestales) no venía
+       clasificada en la nota de Jose — se puso en Ingeniería y Tecnologías
+       por afinidad temática; ajustar si no es correcto. */
+    public const AREAS = [
+        'Ciencias Empresariales y Económicas' => ['0803', '0855', '0856'],
+        'Ingeniería y Tecnologías' => ['0854', '0853', '0845', '0850', '0838'],
+        'Educación' => ['0852', '0851', '0846', '0847'],
+    ];
+
     /** código => nombre de la ciudad/sede */
     public const CATS = [
         'IBAGUE' => 'Ibagué', 'CHAPARRAL' => 'Chaparral', 'BARRANQUILLA' => 'Barranquilla',
@@ -70,7 +81,10 @@ class SeedIdeadCatalog extends Command
             $created['programas']++;
             $this->line("  + programa {$code} {$name}");
             if (! $dry) {
-                Program::create(['code' => $code, 'name' => $name, 'type' => 'PREGRADO', 'faculty_id' => $faculty->id, 'status' => 'ACTIVO']);
+                Program::create([
+                    'code' => $code, 'name' => $name, 'type' => 'PREGRADO',
+                    'area_tematica' => $this->areaOf($code), 'faculty_id' => $faculty->id, 'status' => 'ACTIVO',
+                ]);
             }
         }
 
@@ -86,5 +100,14 @@ class SeedIdeadCatalog extends Command
         $this->info(($dry ? '[simulación] ' : '') . "Creados: {$created['facultad']} facultad, {$created['programas']} programas, {$created['cat']} CAT. Ya existían: {$existing['programas']} programas, {$existing['cat']} CAT.");
 
         return self::SUCCESS;
+    }
+
+    private function areaOf(string $code): ?string
+    {
+        foreach (self::AREAS as $area => $codes) {
+            if (in_array($code, $codes, true)) return $area;
+        }
+
+        return null;
     }
 }

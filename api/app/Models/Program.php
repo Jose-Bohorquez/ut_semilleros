@@ -12,6 +12,7 @@ class Program extends Model
         'code',
         'name',
         'type',
+        'area_tematica',
         'faculty_id',
         'status'
     ];

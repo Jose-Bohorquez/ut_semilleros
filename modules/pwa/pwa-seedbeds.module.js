@@ -51,14 +51,62 @@ async function loadAndRender() {
     renderFacultyList();
 }
 
-/* Facultades a las que pertenece un semillero: todas las de sus programas
-   (CU13 Ronda B: un semillero puede tener varios programas). */
+/* Facultades REALES a las que pertenece un semillero (para el detalle,
+   CU18 paso 2): todas las de sus programas (CU13 Ronda B: un semillero
+   puede tener varios programas). */
 function facultiesOf(seedbed) {
     const map = new Map();
     (seedbed.programs || []).forEach(p => {
         if (p.faculty) map.set(p.faculty.id, p.faculty.name);
     });
     return [...map.entries()].map(([id, name]) => ({ id, name }));
+}
+
+/* Secciones para la pantalla principal (hallazgo real, 2026-10-11): el
+   IDEAD no se divide en facultades — es una unidad académica paralela a
+   las facultades presenciales que administra sus 12 programas agrupados
+   por ÁREA DE ESTUDIO (programs.area_tematica), no por facultad. Mostrar
+   "IDEAD" como una sola facultad agrupaba mal semilleros que en realidad
+   pertenecen a áreas distintas. Las facultades presenciales siguen
+   agrupándose como siempre (por facultad real).
+   Un semillero recién cargado por lotes (seedbeds:import) que todavía
+   tiene los 12 programas del IDEAD pegados como placeholder (ver
+   ImportSeedbeds.php) cae en "IDEAD · Por clasificar" en vez de
+   repetirse en las 3 áreas a la vez. */
+function sectionsOf(seedbed) {
+    const map = new Map();
+    const ideadPrograms = [];
+
+    (seedbed.programs || []).forEach(p => {
+        if (!p.faculty) return;
+        if (p.faculty.code === "IDEAD") {
+            ideadPrograms.push(p);
+        } else {
+            map.set(`fac-${p.faculty.id}`, { name: p.faculty.name, programs: new Set() });
+        }
+    });
+
+    (seedbed.programs || []).forEach(p => {
+        if (p.faculty && p.faculty.code !== "IDEAD") {
+            map.get(`fac-${p.faculty.id}`)?.programs.add(p.name);
+        }
+    });
+
+    if (ideadPrograms.length) {
+        const areas = new Set(ideadPrograms.map(p => p.area_tematica).filter(Boolean));
+        if (areas.size === 1) {
+            const area = [...areas][0];
+            const key = `idead-${area}`;
+            if (!map.has(key)) map.set(key, { name: area, programs: new Set() });
+            ideadPrograms.forEach(p => map.get(key).programs.add(p.name));
+        } else {
+            const key = "idead-pending";
+            if (!map.has(key)) map.set(key, { name: "IDEAD · Por clasificar", programs: new Set(), pending: true });
+            ideadPrograms.forEach(p => map.get(key).programs.add(p.name));
+        }
+    }
+
+    return [...map.entries()].map(([id, v]) => ({ id, ...v, programs: [...v.programs] }));
 }
 
 function renderError(msg) {
@@ -92,34 +140,63 @@ function renderFacultyList() {
         return;
     }
 
-    const byFaculty = new Map();
+    /* Secciones: facultades presenciales + áreas del IDEAD (ver sectionsOf).
+       Cantidad de semilleros + programas distintos como preview, para que
+       la tarjeta se sienta como una sección propia y no una fila genérica
+       (hallazgo real, 2026-10-10: con nombres largos como "Instituto de
+       Educación a Distancia (IDEAD)" el .card-title de una línea lo
+       truncaba; 2026-10-11: agrupar el IDEAD como una sola "facultad"
+       mezclaba semilleros de áreas distintas). */
+    const bySection = new Map();
     allSeedbeds.forEach(s => {
-        facultiesOf(s).forEach(f => {
-            if (!byFaculty.has(f.id)) byFaculty.set(f.id, { name: f.name, count: 0 });
-            byFaculty.get(f.id).count++;
+        sectionsOf(s).forEach(sec => {
+            if (!bySection.has(sec.id)) bySection.set(sec.id, { name: sec.name, count: 0, programs: new Set(), pending: !!sec.pending });
+            const entry = bySection.get(sec.id);
+            entry.count++;
+            sec.programs.forEach(p => entry.programs.add(p));
         });
     });
 
-    const cards = [...byFaculty.entries()].map(([id, f]) => `
-        <div class="pwa-card faculty-card" data-faculty-id="${escapeHtml(id)}" style="cursor:pointer">
-            <div class="card-avatar avatar-green" style="font-size:1rem;font-weight:700">
-                <i class="fas fa-building-columns"></i>
+    const totalSections = bySection.size;
+    const totalSeedbeds = allSeedbeds.length;
+
+    const cards = [...bySection.entries()].map(([id, f]) => {
+        const programs = [...f.programs];
+        const shown = programs.slice(0, 3);
+        const rest = programs.length - shown.length;
+        const chips = shown.map(p => `<span class="faculty-chip">${escapeHtml(p)}</span>`).join("")
+            + (rest > 0 ? `<span class="faculty-chip faculty-chip-more">+${rest}</span>` : "");
+
+        return `
+        <div class="faculty-section-card${f.pending ? " faculty-section-pending" : ""}" data-faculty-id="${escapeHtml(id)}">
+            <div class="faculty-section-head">
+                <div class="card-avatar ${f.pending ? "avatar-yellow" : "avatar-green"}" style="font-size:1rem;font-weight:700">
+                    <i class="fas ${f.pending ? "fa-circle-question" : "fa-building-columns"}"></i>
+                </div>
+                <div class="faculty-section-name">${escapeHtml(f.name)}</div>
             </div>
-            <div class="card-body">
-                <div class="card-title">${escapeHtml(f.name)}</div>
-                <div class="card-subtitle">${f.count} semillero${f.count === 1 ? "" : "s"}</div>
+            ${f.pending
+                ? `<p class="pwa-hint">Semilleros cargados sin un programa específico asignado todavía.</p>`
+                : (chips ? `<div class="faculty-chips">${chips}</div>` : "")}
+            <div class="faculty-section-footer">
+                <span>${f.count} semillero${f.count === 1 ? "" : "s"}</span>
+                <span class="faculty-section-link">Ver semilleros <i class="fas fa-arrow-right"></i></span>
             </div>
-            <i class="fas fa-chevron-right card-arrow"></i>
-        </div>`).join("");
+        </div>`;
+    }).join("");
 
     document.getElementById("app").innerHTML = LayoutView(`
     <div style="padding:var(--space-4)">
         ${searchBarHtml()}
-        <h2 style="margin:0 0 var(--space-4);font-size:var(--text-2xl);font-weight:700">
+        <h2 style="margin:0 0 var(--space-1);font-size:var(--text-2xl);font-weight:700">
             <i class="fas fa-seedling" style="color:var(--color-primary);margin-right:8px"></i>
-            Facultades
+            Facultades y áreas
         </h2>
-        <div id="facultyList">${cards}</div>
+        <p style="margin:0 0 var(--space-4);color:var(--color-text-muted);font-size:var(--text-sm)">
+            ${totalSections} ${totalSections === 1 ? "sección" : "secciones"} ·
+            ${totalSeedbeds} semillero${totalSeedbeds === 1 ? "" : "s"}
+        </p>
+        <div id="facultyList" class="faculty-section-grid">${cards}</div>
         <div id="searchResults" style="display:none"></div>
     </div>
     ${detailSheetHtml()}
@@ -129,9 +206,9 @@ function renderFacultyList() {
     bindCommonEvents();
 
     document.getElementById("facultyList").addEventListener("click", e => {
-        const card = e.target.closest(".faculty-card");
+        const card = e.target.closest(".faculty-section-card");
         if (!card) return;
-        renderFacultySeedbeds(parseInt(card.dataset.facultyId));
+        renderFacultySeedbeds(card.dataset.facultyId);
     });
 }
 
@@ -139,10 +216,10 @@ function renderFacultyList() {
    PANTALLA 2: SEMILLEROS DE UNA FACULTAD (paso 4/5)
    ========================================================= */
 
-function renderFacultySeedbeds(facultyId) {
-    currentFacultyId = facultyId;
-    const seedbeds = allSeedbeds.filter(s => facultiesOf(s).some(f => f.id === facultyId));
-    const facultyName = seedbeds[0] ? facultiesOf(seedbeds[0]).find(f => f.id === facultyId)?.name : "";
+function renderFacultySeedbeds(sectionId) {
+    currentFacultyId = sectionId;
+    const seedbeds = allSeedbeds.filter(s => sectionsOf(s).some(sec => sec.id === sectionId));
+    const facultyName = seedbeds[0] ? sectionsOf(seedbeds[0]).find(sec => sec.id === sectionId)?.name : "";
 
     document.getElementById("app").innerHTML = LayoutView(`
     <div style="padding:var(--space-4)">
@@ -297,7 +374,7 @@ async function handleSeedbedUnavailable(seedbedId) {
         allSeedbeds = (data.seedbeds || []).filter(s => s.status === "ACTIVO");
     } catch { /* se conserva allSeedbeds depurado */ }
 
-    if (currentFacultyId && allSeedbeds.some(s => facultiesOf(s).some(f => f.id === currentFacultyId))) {
+    if (currentFacultyId && allSeedbeds.some(s => sectionsOf(s).some(sec => sec.id === currentFacultyId))) {
         renderFacultySeedbeds(currentFacultyId);
     } else {
         renderFacultyList();
