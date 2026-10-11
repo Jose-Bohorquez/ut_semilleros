@@ -305,6 +305,10 @@ export function createCrudModule(config) {
                 <button type="button" class="btn btn-sm btn-warning" id="bulkDeactivate-${entity}">
                     <i class="fas fa-toggle-on"></i> Inactivar
                 </button>
+                ${bulkEditableFields().length ? `
+                <button type="button" class="btn btn-sm btn-secondary" id="bulkEditField-${entity}">
+                    <i class="fas fa-pen"></i> Editar campo
+                </button>` : ""}
                 <button type="button" class="btn btn-sm btn-ghost" id="bulkClear-${entity}">
                     <i class="fas fa-xmark"></i> Cancelar selección
                 </button>
@@ -1129,6 +1133,144 @@ export function createCrudModule(config) {
         await init();
     }
 
+    /* Campos que tiene sentido fijar al mismo valor en varias filas a la vez:
+       un <select> fijo (ej. Nivel) o una relación de un solo valor (ej. CAT,
+       Coordinador, Programa de una propuesta). Se deja fuera a propósito:
+       `status` (ya tiene su propio botón Activar/Inactivar), relaciones
+       múltiples (¿reemplazar la lista completa o solo agregar? ambiguo sin
+       preguntar), texto libre/contraseña/computados. Jose, 2026-10-11:
+       "no solo con esa columna... en otras y no solo en semilleros, en
+       todas" — por eso es genérico aquí, no un caso especial de Semilleros. */
+    function bulkEditableFields() {
+        return fields.filter(f =>
+            !f.readonly && f.name !== "id" && f.name !== "status" &&
+            (f.type === "select" || f.type === "relation")
+        );
+    }
+
+    /* Payload completo a partir de lo que ya se tiene en caché, con la MISMA
+       forma que espera el PUT de cada módulo (los endpoints piden todos los
+       campos obligatorios, no un parche parcial) — mismas reglas de
+       conversión que usa el formulario normal: relation guarda el id en
+       `record[f.name]`, relation-multi guarda los ids de `record[f.name]`
+       (array de objetos), un campo `required:false` vacío se omite. */
+    function buildFullPayload(record) {
+        const data = {};
+        for (const f of fields) {
+            if (f.name === "id" || f.readonly || f.type === "password") continue;
+            if (f.type === "relation-multi") {
+                data[f.name] = (record[f.name] || []).map(item => String(item.id));
+            } else {
+                data[f.name] = record[f.name] ?? "";
+            }
+        }
+        for (const f of fields) {
+            if (f.required === false && data[f.name] === "") delete data[f.name];
+        }
+        return data;
+    }
+
+    async function renderBulkValueField(field) {
+        if (field.type === "select") {
+            const options = field.options.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join("");
+            return `<select id="bulkEditValue-${entity}" name="bulkEditValue-${entity}">${options}</select>`;
+        }
+        /* RELATION: mismo criterio de "solo activos" que el formulario normal */
+        try {
+            const relData = await apiFetch(`/${field.relation}`);
+            const items = (relData?.[field.relation] || []).filter(i => i.status !== "INACTIVO");
+            const options = items.map(i => `<option value="${escapeHtml(i.id)}">${escapeHtml(i[field.display] ?? i.id)}</option>`).join("");
+            return `<select id="bulkEditValue-${entity}" name="bulkEditValue-${entity}">${options || '<option value="">Sin opciones activas</option>'}</select>`;
+        } catch (err) {
+            return `<p style="color:var(--color-error)">No se pudo cargar ${escapeHtml(field.label)}: ${escapeHtml(err.message || "error")}</p>`;
+        }
+    }
+
+    async function openBulkEditModal() {
+        const editable = bulkEditableFields();
+        const count = selectedIds.size;
+
+        document.getElementById("crudModal")?.remove();
+
+        const fieldOptions = editable.map(f => `<option value="${escapeHtml(f.name)}">${escapeHtml(f.label)}</option>`).join("");
+
+        document.body.insertAdjacentHTML("beforeend", `
+        <div id="crudModal" role="dialog" aria-modal="true">
+            <div class="crudModalBox">
+                <h3><i class="fas fa-pen" style="color:var(--color-primary);margin-right:8px"></i>
+                    Editar campo en ${count} registro${count === 1 ? "" : "s"}</h3>
+                <div class="form-group">
+                    <label for="bulkEditFieldSelect-${entity}">Campo a cambiar</label>
+                    <select id="bulkEditFieldSelect-${entity}" name="bulkEditFieldSelect-${entity}">${fieldOptions}</select>
+                </div>
+                <div class="form-group" id="bulkEditValueWrap-${entity}">
+                    <label for="bulkEditValue-${entity}">Nuevo valor</label>
+                    <div class="skeleton skeleton-row"></div>
+                </div>
+                <p class="optional-hint">Se sobrescribirá este campo en los ${count} registros seleccionados. Los demás campos de cada registro quedan igual.</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" id="bulkEditCancel-${entity}"><i class="fas fa-times"></i> Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="bulkEditApply-${entity}"><i class="fas fa-check"></i> Aplicar a ${count}</button>
+                </div>
+            </div>
+        </div>`);
+
+        const fieldSelect = document.getElementById(`bulkEditFieldSelect-${entity}`);
+        const valueWrap   = document.getElementById(`bulkEditValueWrap-${entity}`);
+
+        const refreshValueInput = async () => {
+            const field = editable.find(f => f.name === fieldSelect.value);
+            valueWrap.innerHTML = `<label for="bulkEditValue-${entity}">Nuevo valor</label>${await renderBulkValueField(field)}`;
+        };
+        fieldSelect.addEventListener("change", refreshValueInput);
+        await refreshValueInput();
+
+        document.getElementById(`bulkEditCancel-${entity}`)?.addEventListener("click", () => {
+            document.getElementById("crudModal")?.remove();
+        });
+
+        document.getElementById(`bulkEditApply-${entity}`)?.addEventListener("click", async () => {
+            const field = editable.find(f => f.name === fieldSelect.value);
+            const valueInput = document.getElementById(`bulkEditValue-${entity}`);
+            const newValue = valueInput?.value;
+            if (!newValue) {
+                Swal.fire({ icon: "warning", title: "Elige un valor", timer: 1500, showConfirmButton: false, toast: true, position: "top-end" });
+                return;
+            }
+
+            const result = await Swal.fire({
+                title: `¿Cambiar "${field.label}" en ${count} registro${count === 1 ? "" : "s"}?`,
+                icon: "warning", showCancelButton: true,
+                confirmButtonText: "Sí, aplicar", reverseButtons: true,
+            });
+            if (!result.isConfirmed) return;
+
+            document.getElementById("crudModal")?.remove();
+
+            let ok = 0, failed = 0;
+            for (const id of selectedIds) {
+                const record = recordsCache.find(r => String(r.id) === id);
+                if (!record) { failed++; continue; }
+                const payload = buildFullPayload(record);
+                payload[field.name] = newValue;
+                try {
+                    await apiFetch(`/${entity}/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+                    ok++;
+                } catch {
+                    failed++;
+                }
+            }
+
+            selectedIds.clear();
+            Swal.fire({
+                icon:  failed ? "warning" : "success",
+                title: failed ? `${ok} actualizado${ok === 1 ? "" : "s"}, ${failed} con error` : "Listo",
+                timer: 2500, showConfirmButton: false, toast: true, position: "top-end",
+            });
+            await init();
+        });
+    }
+
     function bindBulkSelection(table) {
 
         syncBulkUI(table);
@@ -1184,6 +1326,11 @@ export function createCrudModule(config) {
                 confirmButtonText: "Inactivar", confirmButtonColor: "#f59e0b", reverseButtons: true,
             });
             if (result.isConfirmed) await bulkToggle(ids, result.value ? { reason: result.value } : {});
+        });
+
+        document.getElementById(`bulkEditField-${entity}`)?.addEventListener("click", () => {
+            if (!selectedIds.size) return;
+            openBulkEditModal();
         });
     }
 
