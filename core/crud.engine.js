@@ -30,6 +30,11 @@ export function createCrudModule(config) {
     let recordsCache  = [];
     let eventsBound   = false;
     let submitting    = false;
+    /* Selección múltiple para activar/inactivar en lote (Jose, 2026-10-11:
+       "si quiero hacer una selección múltiple o completa para modificar x
+       campo en todas las filas, no es posible"). Se queda en IDs (string)
+       para sobrevivir el re-render de DataTables entre páginas. */
+    let selectedIds   = new Set();
 
     /* Auto-detect toggle-status support:
        entity supports it when it has a status field with ACTIVO *and* INACTIVO options. Proyectos tiene
@@ -191,6 +196,11 @@ export function createCrudModule(config) {
         /* Show actions column when at least one action type is available */
         const showActionsCol = !noEdit || (!isReadonly && config.actions?.length > 0);
 
+        /* Columna de selección — solo si el rol puede editar/togglear algo
+           (seleccionar filas sin poder hacerles nada no tiene sentido). */
+        const showSelectCol = hasToggle && !noEdit;
+        selectedIds = new Set(); /* cada render (nuevo filtro, alta/edición) parte de cero */
+
         /* Rows */
         const rows = records.map(record => {
 
@@ -259,6 +269,7 @@ export function createCrudModule(config) {
 
             return `
             <tr>
+                ${showSelectCol ? `<td class="select-col" data-label=""><input type="checkbox" id="rowSelect-${entity}-${escapeHtml(record.id)}" name="rowSelect-${entity}-${escapeHtml(record.id)}" class="row-select-${entity}" data-id="${escapeHtml(record.id)}" aria-label="Seleccionar fila"></td>` : ""}
                 ${cols}
                 ${showActionsCol ? `<td class="actions-col" data-label="Acciones"><div class="actions-cell">${actions}</div></td>` : ""}
             </tr>`;
@@ -284,6 +295,22 @@ export function createCrudModule(config) {
             </div>` : ""}
         </div>
 
+        ${showSelectCol ? `
+        <div class="bulk-bar" id="bulkBar-${entity}" style="display:none">
+            <span><strong id="bulkCount-${entity}">0</strong> seleccionado(s)</span>
+            <div class="bulk-bar-actions">
+                <button type="button" class="btn btn-sm btn-success" id="bulkActivate-${entity}">
+                    <i class="fas fa-toggle-off"></i> Activar
+                </button>
+                <button type="button" class="btn btn-sm btn-warning" id="bulkDeactivate-${entity}">
+                    <i class="fas fa-toggle-on"></i> Inactivar
+                </button>
+                <button type="button" class="btn btn-sm btn-ghost" id="bulkClear-${entity}">
+                    <i class="fas fa-xmark"></i> Cancelar selección
+                </button>
+            </div>
+        </div>` : ""}
+
         ${activeFilters.length ? `
         <div class="crud-filters" role="group" aria-label="Filtrar registros">
             ${activeFilters.map(f => `
@@ -299,6 +326,7 @@ export function createCrudModule(config) {
         <table id="datatable-${entity}" class="display mobile-card-table" style="width:100%">
             <thead>
                 <tr>
+                    ${showSelectCol ? `<th class="select-col"><input type="checkbox" id="selectAll-${entity}" aria-label="Seleccionar todo"></th>` : ""}
                     ${headers}
                     ${showActionsCol ? `<th class="actions-col">Acciones</th>` : ""}
                 </tr>
@@ -325,9 +353,15 @@ export function createCrudModule(config) {
                 if (i !== -1) $.fn.dataTable.ext.search.splice(i, 1);
             });
             predicateSearches = [];
+            /* El checkbox de selección (si existe) es siempre la columna 0 —
+               los índices de las demás columnas (filtros, orden) se corren
+               uno a la derecha. */
+            const colOffset = showSelectCol ? 1 : 0;
+
             const table = $(tableId).DataTable({
                 pageLength: config.pageLength ?? 10,
                 dom: "Bfrtip",
+                columnDefs: showSelectCol ? [{ orderable: false, searchable: false, targets: 0 }] : [],
                 buttons: [
                     { extend: "copy",    text: '<i class="fas fa-copy"></i> Copiar'   },
                     { extend: "excel",   text: '<i class="fas fa-file-excel"></i> Excel' },
@@ -343,6 +377,8 @@ export function createCrudModule(config) {
                     paginate: { next: "Siguiente", previous: "Anterior" }
                 }
             });
+
+            if (showSelectCol) bindBulkSelection(table);
 
             /* Filtros por columna (config.filters), ej. rol/estado en Usuarios
                (CU06 / RF01): coincidencia exacta sobre el texto de la celda,
@@ -364,8 +400,9 @@ export function createCrudModule(config) {
                     predicateSearches.push(fn);
                     sel.addEventListener("change", () => table.draw());
                 } else {
-                    const colIndex = tableFields.findIndex(tf => tf.name === f.field);
-                    if (colIndex === -1) return;
+                    const fieldIndex = tableFields.findIndex(tf => tf.name === f.field);
+                    if (fieldIndex === -1) return;
+                    const colIndex = fieldIndex + colOffset;
                     sel.addEventListener("change", e => {
                         const val = e.target.value;
                         table.column(colIndex).search(val ? `^${val}$` : "", true, false).draw();
@@ -1034,6 +1071,120 @@ export function createCrudModule(config) {
                 config.onAction(e, recordsCache);
             });
         }
+    }
+
+
+    /* =====================================================
+       SELECCIÓN MÚLTIPLE Y ACCIONES EN LOTE
+       (Jose, 2026-10-11: "si quiero hacer una selección múltiple... no es
+       posible, cosa que me dificulta la gestión completa")
+    ===================================================== */
+
+    function getFilteredIds(table) {
+        /* Las filas se construyen como HTML (no data-driven), así que para
+           saber qué IDs quedan tras un filtro/búsqueda se leen los checkbox
+           de los <tr> que DataTables considera "aplicados" — funciona igual
+           en cualquier página, no solo la visible. */
+        return Array.from(table.rows({ search: "applied" }).nodes())
+            .map(tr => tr.querySelector(`.row-select-${entity}`)?.dataset.id)
+            .filter(Boolean);
+    }
+
+    function syncBulkUI(table) {
+        document.querySelectorAll(`.row-select-${entity}`).forEach(cb => {
+            cb.checked = selectedIds.has(cb.dataset.id);
+        });
+
+        const selectAllCb = document.getElementById(`selectAll-${entity}`);
+        if (selectAllCb) {
+            const filteredIds = getFilteredIds(table);
+            const allSelected = filteredIds.length > 0 && filteredIds.every(id => selectedIds.has(id));
+            const anySelected = filteredIds.some(id => selectedIds.has(id));
+            selectAllCb.checked = allSelected;
+            selectAllCb.indeterminate = anySelected && !allSelected;
+        }
+
+        const bar = document.getElementById(`bulkBar-${entity}`);
+        const countEl = document.getElementById(`bulkCount-${entity}`);
+        if (bar) bar.style.display = selectedIds.size > 0 ? "flex" : "none";
+        if (countEl) countEl.textContent = selectedIds.size;
+    }
+
+    async function bulkToggle(ids, body) {
+        let ok = 0, failed = 0;
+        for (const id of ids) {
+            try {
+                await apiFetch(`/${entity}/${id}/toggle-status`, { method: "PUT", body: JSON.stringify(body) });
+                ok++;
+            } catch {
+                failed++;
+            }
+        }
+        selectedIds.clear();
+        Swal.fire({
+            icon:  failed ? "warning" : "success",
+            title: failed ? `${ok} actualizado${ok === 1 ? "" : "s"}, ${failed} con error` : "Listo",
+            timer: 2200, showConfirmButton: false, toast: true, position: "top-end",
+        });
+        await init();
+    }
+
+    function bindBulkSelection(table) {
+
+        syncBulkUI(table);
+        table.on("draw", () => syncBulkUI(table));
+
+        document.getElementById(`selectAll-${entity}`)?.addEventListener("change", e => {
+            const ids = getFilteredIds(table);
+            ids.forEach(id => e.target.checked ? selectedIds.add(id) : selectedIds.delete(id));
+            syncBulkUI(table);
+        });
+
+        document.getElementById(`datatable-${entity}`)?.addEventListener("change", e => {
+            const cb = e.target.closest(`.row-select-${entity}`);
+            if (!cb) return;
+            cb.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id);
+            syncBulkUI(table);
+        });
+
+        document.getElementById(`bulkClear-${entity}`)?.addEventListener("click", () => {
+            selectedIds.clear();
+            syncBulkUI(table);
+        });
+
+        document.getElementById(`bulkActivate-${entity}`)?.addEventListener("click", async () => {
+            const ids = [...selectedIds].filter(id => recordsCache.find(r => String(r.id) === id)?.status !== "ACTIVO");
+            if (!ids.length) {
+                Swal.fire({ icon: "info", title: "Ya están activos", timer: 1500, showConfirmButton: false, toast: true, position: "top-end" });
+                return;
+            }
+            const result = await Swal.fire({
+                title: `¿Activar ${ids.length} registro${ids.length === 1 ? "" : "s"}?`,
+                icon: "warning", showCancelButton: true,
+                confirmButtonText: "Sí, activar", confirmButtonColor: "#22c55e", reverseButtons: true,
+            });
+            if (result.isConfirmed) await bulkToggle(ids, {});
+        });
+
+        document.getElementById(`bulkDeactivate-${entity}`)?.addEventListener("click", async () => {
+            const ids = [...selectedIds].filter(id => recordsCache.find(r => String(r.id) === id)?.status === "ACTIVO");
+            if (!ids.length) {
+                Swal.fire({ icon: "info", title: "Ya están inactivos", timer: 1500, showConfirmButton: false, toast: true, position: "top-end" });
+                return;
+            }
+            /* Algunos módulos exigen motivo al inactivar (CU15/19/20/21: mín.
+               5 caracteres) — se pide una sola vez para todo el lote; si el
+               módulo no lo necesita, el backend simplemente lo ignora. */
+            const result = await Swal.fire({
+                title: `Inactivar ${ids.length} registro${ids.length === 1 ? "" : "s"}`,
+                input: "text",
+                inputLabel: "Motivo (si este módulo lo requiere)",
+                inputPlaceholder: "Motivo de inactivación",
+                showCancelButton: true,
+                confirmButtonText: "Inactivar", confirmButtonColor: "#f59e0b", reverseButtons: true,
+            });
+            if (result.isConfirmed) await bulkToggle(ids, result.value ? { reason: result.value } : {});
+        });
     }
 
     return { init };
