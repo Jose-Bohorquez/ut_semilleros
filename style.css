@@ -441,6 +441,38 @@ td.actions-col, th.actions-col {
   align-items: center;
 }
 
+/* Celdas relation-multi (programas, áreas…) — antes volcaban TODOS los
+   nombres como texto plano separado por comas; con un semillero de 12
+   programas (carga IDEAD) la fila crecía a cientos de píxeles y la tabla
+   quedaba inusable en escritorio (hallazgo real, 2026-10-11). */
+.cell-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 260px;
+}
+
+.cell-chip {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-2);
+  white-space: nowrap;
+}
+
+.cell-chip-more {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+}
+
+/* Columnas de texto libre (objetivo, descripción…) — tope de ancho para
+   que una sola celda no empuje la fila a cientos de píxeles de alto. */
+td[data-label] {
+  max-width: 320px;
+  overflow-wrap: break-word;
+}
+
 tbody tr { transition: background 0.15s ease; }
 tbody tr:hover { background: var(--color-surface-2); }
 

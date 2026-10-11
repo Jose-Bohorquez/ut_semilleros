@@ -202,8 +202,17 @@ export function createCrudModule(config) {
                 }
 
                 if (f.type === "relation-multi") {
-                    const names = (record[f.name] || []).map(item => item[f.display]).join(", ");
-                    return `<td data-label="${f.label}">${escapeHtml(names)}</td>`;
+                    /* Antes se concatenaban TODOS los nombres separados por coma en
+                       una sola celda de texto plano — con semilleros de 12 programas
+                       (carga IDEAD) la fila crecía a cientos de píxeles de alto y la
+                       tabla quedaba inusable (hallazgo real, 2026-10-11). Se limita a
+                       2 chips + "+N" en vez de volcar la lista completa. */
+                    const items = record[f.name] || [];
+                    const shown = items.slice(0, 2);
+                    const rest = items.length - shown.length;
+                    const chips = shown.map(item => `<span class="cell-chip">${escapeHtml(item[f.display])}</span>`).join("")
+                        + (rest > 0 ? `<span class="cell-chip cell-chip-more">+${rest}</span>` : "");
+                    return `<td data-label="${f.label}"><div class="cell-chips">${chips || "—"}</div></td>`;
                 }
 
                 const val = record[f.name] ?? "";
